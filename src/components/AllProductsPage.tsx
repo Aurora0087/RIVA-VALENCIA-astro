@@ -5,7 +5,7 @@ import type { ShopifyProduct, ShopifyConnectionStatus } from '@/lib/shopify';
 import { addToCart } from '@/lib/storefrontCart';
 import { getWishlist, isWishlisted, removeWishlistItem, wishlistItemFromProduct, addWishlistItem, WISHLIST_EVENT } from '@/lib/wishlist';
 
-const CATEGORY_TABS = [
+const DEFAULT_CATEGORY_TABS = [
   { key: 'all', label: 'All' },
   { key: 'shoulder-bags', label: 'Shoulder Bags' },
   { key: 'handbags', label: 'Handbags' },
@@ -47,6 +47,14 @@ const SORT_OPTIONS = [
 ] as const;
 
 const CATEGORY_MATCHERS: Record<string, string[]> = {
+  man: [' man ', ' men ', 'mens', "men's", 'briefcase', 'attache'],
+  woman: [' woman ', ' women ', 'womens', "women's", 'handbag', 'shoulder'],
+  'work-essentials': ['work essential', 'work essentials', 'office', 'desk', 'folio', 'organizer'],
+  techpack: ['techpack', 'tech pack', 'tech', 'charger', 'cable', 'device'],
+  gloves: ['glove', 'gloves'],
+  'mobile-case': ['mobile case', 'phone case', 'iphone case', 'smartphone case'],
+  'watch-strap': ['watch strap', 'watchband', 'watch band'],
+  keychain: ['keychain', 'key chain', 'keyring', 'key ring'],
   'shoulder-bags': ['shoulder', 'hobo'],
   handbags: ['handbag', 'tote', 'satchel', 'top-handle'],
   'sling-bags': ['sling', 'crossbody'],
@@ -56,7 +64,7 @@ const CATEGORY_MATCHERS: Record<string, string[]> = {
   wallets: ['wallet', 'cardholder'],
   belts: ['belt'],
   'travel-bags': ['travel', 'duffle', 'duffel', 'weekender'],
-};
+} as const;
 
 const COLOR_MATCHERS: Record<string, string[]> = {
   Black: ['black', 'noir'],
@@ -78,8 +86,9 @@ const MATERIAL_MATCHERS: Record<string, string[]> = {
 
 const BATCH = 12;
 
-type CategoryKey = (typeof CATEGORY_TABS)[number]['key'];
+type CategoryKey = 'all' | keyof typeof CATEGORY_MATCHERS;
 type SortKey = (typeof SORT_OPTIONS)[number]['key'];
+type CategoryTab = { key: CategoryKey; label: string };
 
 interface Props {
   products: ShopifyProduct[];
@@ -89,6 +98,7 @@ interface Props {
   breadcrumbLabel?: string;
   metaItems?: string[];
   embedded?: boolean;
+  categoryTabs?: CategoryTab[];
 }
 
 interface CatalogItem {
@@ -139,6 +149,7 @@ export function AllProductsPage({
   breadcrumbLabel = 'All Products',
   metaItems = ['Crafted in Spain', 'Full-Grain Leather'],
   embedded = false,
+  categoryTabs = [...DEFAULT_CATEGORY_TABS],
 }: Props) {
   const [view, setView] = useState<2 | 3 | 4>(4);
   const [filterOpen, setFilterOpen] = useState(false);
@@ -146,7 +157,7 @@ export function AllProductsPage({
   const [scrolled, setScrolled] = useState(false);
   const [wishlist, setWishlist] = useState<string[]>([]);
   const [adding, setAdding] = useState<string[]>([]);
-  const [activeCategory, setActiveCategory] = useState<CategoryKey>('all');
+  const [activeCategory, setActiveCategory] = useState<CategoryKey>(categoryTabs[0]?.key ?? 'all');
   const [activePrices, setActivePrices] = useState<string[]>([]);
   const [activeColors, setActiveColors] = useState<string[]>([]);
   const [activeMaterials, setActiveMaterials] = useState<string[]>([]);
@@ -181,6 +192,12 @@ export function AllProductsPage({
       window.removeEventListener('storage', syncWishlist);
     };
   }, []);
+
+  useEffect(() => {
+    if (!categoryTabs.some(tab => tab.key === activeCategory)) {
+      setActiveCategory(categoryTabs[0]?.key ?? 'all');
+    }
+  }, [activeCategory, categoryTabs]);
 
   const catalog = useMemo<CatalogItem[]>(
     () => products.map(product => {
@@ -370,7 +387,7 @@ export function AllProductsPage({
       )}
 
       <div className="cl-cat-tabs">
-        {CATEGORY_TABS.map(({ key, label }) => (
+        {categoryTabs.map(({ key, label }) => (
           <button
             key={key}
             type="button"
@@ -430,7 +447,7 @@ export function AllProductsPage({
         <div className="cl-summary">
           {activeCategory !== 'all' && (
             <button type="button" className="cl-summary-chip" onClick={() => selectCategory('all')}>
-              {CATEGORY_TABS.find(tab => tab.key === activeCategory)?.label}
+              {categoryTabs.find(tab => tab.key === activeCategory)?.label}
             </button>
           )}
           {activePrices.map(range => (

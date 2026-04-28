@@ -77,7 +77,6 @@ const MAIN_NAV = [
     label: 'Gifts',
     href: '/collections/gifts',
     children: [
-      { label: 'View All', href: '/collections/gifts' },
       { label: 'For Woman', href: '/collections/woman-gifts' },
       { label: 'For Man', href: '/collections/man-gifts' },
     ],
@@ -94,6 +93,13 @@ const MAIN_NAV = [
     ],
   },
 ] as const;
+
+function shouldShowDropdownViewAll(item: (typeof MAIN_NAV)[number]) {
+  if (!('children' in item) || !item.children || !item.href) return false;
+  return !item.children.some((child) =>
+    child.href === item.href || child.label.toLowerCase() === 'view all'
+  );
+}
 ---
 
 <!doctype html>
@@ -157,7 +163,7 @@ const MAIN_NAV = [
                 </div>
                 {item.children && (
                   <ul class="sub-nav-list">
-                    {item.href && (
+                    {shouldShowDropdownViewAll(item) && (
                       <li><a href={item.href}>View All</a></li>
                     )}
                     {item.children.map((child) => (
@@ -246,7 +252,7 @@ const MAIN_NAV = [
                   </svg>
                 </button>
                 <ul class="rv-drawer-sub" data-drawer-sub={index}>
-                  {item.href && (
+                  {shouldShowDropdownViewAll(item) && (
                     <li><a href={item.href}>View All</a></li>
                   )}
                   {item.children.map((child) => (

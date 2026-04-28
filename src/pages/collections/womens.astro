@@ -23,6 +23,17 @@ const REVIEWS = [
   { text: 'The finish is stunning and the leather feels rich without being heavy. I would absolutely order again.', author: 'Giulia Moretti — Turin, Italy', stars: 5 },
 ];
 
+const WOMEN_CATEGORY_TABS = [
+  { key: 'all', label: 'All' },
+  { key: 'shoulder-bags', label: 'Shoulder Bags' },
+  { key: 'handbags', label: 'Handbags' },
+  { key: 'sling-bags', label: 'Sling Bags' },
+  { key: 'laptop-bags', label: 'Laptop Bags' },
+  { key: 'backpacks', label: 'Backpacks' },
+  { key: 'wallets', label: 'Wallet' },
+  { key: 'belts', label: 'Belt' },
+] as const;
+
 const AS_SEEN_ON = [
   {
     name: '@annabelrosendahl',
@@ -75,6 +86,7 @@ const AS_SEEN_ON = [
     breadcrumbLabel={collection?.title ?? "Women's Collection"}
     kicker="Women's Collection"
     metaItems={['Crafted in Spain', 'Full-Grain Leather']}
+    categoryTabs={[...WOMEN_CATEGORY_TABS]}
     embedded
     client:load
   />

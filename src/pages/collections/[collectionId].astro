@@ -86,6 +86,31 @@ const title = collection?.title ?? titleFromHandle(collectionId);
 const description =
   collection?.description?.trim() ||
   `Browse the ${title} collection from Riva Valencia.`;
+const categoryTabs =
+  collectionId === 'new-in'
+    ? [
+        { key: 'all', label: 'All' },
+        { key: 'man', label: 'Man' },
+        { key: 'woman', label: 'Woman' },
+      ]
+    : collectionId === 'jackets'
+      ? [
+          { key: 'all', label: 'All' },
+          { key: 'woman', label: 'Woman' },
+          { key: 'man', label: 'Man' },
+        ]
+    : collectionId === 'accessories'
+      ? [
+          { key: 'all', label: 'All' },
+          { key: 'work-essentials', label: 'Work Essentials' },
+          { key: 'techpack', label: 'Techpack' },
+          { key: 'gloves', label: 'Gloves' },
+          { key: 'belts', label: 'Belts' },
+          { key: 'mobile-case', label: 'Mobile Case' },
+          { key: 'watch-strap', label: 'Watch Strap' },
+          { key: 'keychain', label: 'Keychain' },
+        ]
+    : undefined;
 
 const pageStatus: ShopifyConnectionStatus = collection
   ? status
@@ -109,6 +134,7 @@ const pageStatus: ShopifyConnectionStatus = collection
     breadcrumbLabel={title}
     kicker="Riva Valencia Collection"
     metaItems={['Crafted in Spain', 'Full-Grain Leather']}
+    categoryTabs={categoryTabs}
     client:load
   />
 </Layout>

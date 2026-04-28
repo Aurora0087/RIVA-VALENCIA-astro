@@ -23,6 +23,15 @@ const REVIEWS = [
   { text: 'The finish, the hardware and the proportions are all spot on. It is one of the most polished men’s bags I have bought.', author: 'Luca Ferraro — Florence, Italy', stars: 5 },
 ];
 
+const MEN_CATEGORY_TABS = [
+  { key: 'all', label: 'All' },
+  { key: 'briefcases', label: 'Briefcases' },
+  { key: 'backpacks', label: 'Backpacks' },
+  { key: 'sling-bags', label: 'Slings Bags' },
+  { key: 'wallets', label: 'Wallets' },
+  { key: 'belts', label: 'Belt' },
+] as const;
+
 const AS_SEEN_ON = [
   {
     name: '@claudiobreitscheidel',
@@ -76,6 +85,7 @@ const AS_SEEN_ON = [
     breadcrumbLabel={collection?.title ?? "Men's Collection"}
     kicker="Men's Collection"
     metaItems={['Crafted in Spain', 'Full-Grain Leather']}
+    categoryTabs={[...MEN_CATEGORY_TABS]}
     embedded
     client:load
   />
