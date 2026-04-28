@@ -1,0 +1,11 @@
+---
+import CartPage from '@/components/CartPage.astro';
+import Layout from '@/layouts/Layout.astro';
+import { getAllProducts } from '@/lib/shopify';
+
+const { products } = await getAllProducts(20);
+---
+
+<Layout title="Your Bag — RIVA VALENCIA" description="Review your selected Riva Valencia pieces, update quantities, and continue to secure checkout.">
+  <CartPage suggestions={products} />
+</Layout>

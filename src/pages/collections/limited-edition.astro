@@ -1,0 +1,422 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import { ProductGrid } from '@/components/ProductGrid';
+import { formatPrice } from '@/lib/format';
+import {
+  getAllProducts,
+  getCollectionByHandle,
+  type ShopifyProduct,
+} from '@/lib/shopify';
+
+const COLLECTION_HANDLE = 'limited-edition';
+const EDITION_PIECES = 50;
+const COUNTDOWN_TARGET = '2026-06-30T23:59:59+05:30';
+
+const HERO_FALLBACK =
+  'https://cdn.shopify.com/s/files/1/0812/7738/7010/files/Gemini_Generated_Image_o7rv3fo7rv3fo7rv.png?v=1776093365';
+const DETAIL_FALLBACKS = [
+  'https://cdn.shopify.com/s/files/1/0812/7738/7010/files/Gemini_Generated_Image_n17qn0n17qn0n17q.png?v=1776004987',
+  'https://cdn.shopify.com/s/files/1/0812/7738/7010/files/Gemini_Generated_Image_t6anpt6anpt6anpt.png?v=1776009709',
+  'https://cdn.shopify.com/s/files/1/0812/7738/7010/files/Gemini_Generated_Image_jvsu4qjvsu4qjvsu.png?v=1776006386',
+];
+
+const { collection, status } = await getCollectionByHandle(COLLECTION_HANDLE);
+const { products: allProducts } = await getAllProducts(100);
+
+const collectionProducts = collection?.products.edges.map((edge) => edge.node) ?? [];
+
+function hasLimitedTag(product: ShopifyProduct) {
+  return product.tags.some((tag) =>
+    ['limited', 'limited-edition', 'limited edition', 'executive-collection', 'executive collection']
+      .includes(tag.toLowerCase())
+  );
+}
+
+function firstImage(product?: ShopifyProduct | null) {
+  return product?.images.edges[0]?.node ?? null;
+}
+
+const taggedLimitedProducts = collectionProducts.length
+  ? []
+  : allProducts.filter(hasLimitedTag);
+
+const limitedProducts = collectionProducts.length > 0
+  ? collectionProducts
+  : taggedLimitedProducts;
+
+const limitedIds = new Set(limitedProducts.map((product) => product.id));
+const atelierProducts = allProducts
+  .filter((product) => !limitedIds.has(product.id))
+  .slice(0, 8);
+
+const heroImage = collection?.image?.url ?? firstImage(limitedProducts[0])?.url ?? HERO_FALLBACK;
+const heroAlt = collection?.image?.altText ?? firstImage(limitedProducts[0])?.altText ?? 'Limited Edition Collection';
+const detailImageOne = firstImage(limitedProducts[0])?.url ?? DETAIL_FALLBACKS[0];
+const detailImageTwo = firstImage(limitedProducts[1])?.url ?? DETAIL_FALLBACKS[1];
+const bespokeImage = firstImage(limitedProducts[2])?.url ?? DETAIL_FALLBACKS[2];
+
+const collectionTitle = collection?.title ?? 'Limited Edition Collection';
+const collectionDescription =
+  collection?.description?.trim() ||
+  'A numbered release of handcrafted leather pieces, designed as a collector collection for clients who want something rarer, slower, and more enduring.';
+
+const releaseCount = limitedProducts.length;
+const statementCopy = collection?.description?.trim() ||
+  'Each piece in this release is part of a numbered run, finished in small quantities, and created from specially selected leather reserved for our rarest drops. This is a quieter kind of luxury: fewer pieces, deeper character, and craftsmanship built to outlast seasons.';
+---
+
+<Layout
+  title={`${collectionTitle} — RIVA VALENCIA`}
+  description="Discover the Riva Valencia limited-edition collection: numbered leather pieces, handcrafted in Spain, with secure cart, wishlist, and live product actions."
+>
+  <section class="le-hero">
+    <img class="le-hero-bg" src={heroImage} alt={heroAlt ?? collectionTitle} />
+    <div class="le-hero-grad"></div>
+    <div class="le-hero-shimmer"></div>
+
+    <div class="le-hero-content">
+      <div class="le-hero-eyebrow">Riva Valencia · Numbered Release</div>
+      <span class="le-hero-h1">
+        Limited
+        <span>Edition</span>
+      </span>
+      <div class="le-hero-sub">A collector collection of rare leather pieces, handcrafted in Spain.</div>
+      <div class="le-hero-meta">
+        <a href="#le-collection" class="le-hero-cta">Explore the Collection</a>
+        <div class="le-hero-pieces">
+          <strong>{EDITION_PIECES}</strong>
+          Pieces<br />Worldwide
+        </div>
+      </div>
+    </div>
+
+    <div class="le-scroll-hint" aria-hidden="true">
+      <div class="le-scroll-line"></div>
+      Scroll
+    </div>
+  </section>
+
+  <section class="le-statement">
+    <div class="le-statement-left rv-reveal rv-reveal-l">
+      <span class="le-statement-eyebrow">The Collection</span>
+      <h2 class="le-statement-h2">When Craft Becomes<br /><em>Collectible</em></h2>
+      <p class="le-statement-p">{statementCopy}</p>
+      <a href="#le-collection" class="le-statement-link">View the Pieces →</a>
+    </div>
+
+    <div class="le-statement-right rv-reveal rv-reveal-r">
+      <div class="le-statement-img">
+        <img src={detailImageOne} alt="Limited edition craftsmanship" loading="lazy" />
+      </div>
+      <div class="le-statement-img">
+        <img src={detailImageTwo} alt="Limited edition leather detail" loading="lazy" />
+      </div>
+    </div>
+  </section>
+
+  <section class="le-numbers">
+    <div class="le-num rv-reveal">
+      <span class="le-num-val">{EDITION_PIECES}<span>+</span></span>
+      <span class="le-num-label">Pieces in the Run</span>
+    </div>
+    <div class="le-num rv-reveal rv-reveal-delay1">
+      <span class="le-num-val">18<span>mo</span></span>
+      <span class="le-num-label">Leather Ageing</span>
+    </div>
+    <div class="le-num rv-reveal rv-reveal-delay2">
+      <span class="le-num-val">03<span>rd</span></span>
+      <span class="le-num-label">Edition for 2026</span>
+    </div>
+    <div class="le-num rv-reveal rv-reveal-delay3">
+      <span class="le-num-val">{releaseCount || 0}<span>st</span></span>
+      <span class="le-num-label">Styles Live on Site</span>
+    </div>
+  </section>
+
+  <section class="le-countdown" data-le-countdown={COUNTDOWN_TARGET}>
+    <span class="le-countdown-label">Collection Closes on June 30, 2026</span>
+    <div class="le-countdown-units">
+      <div class="le-cd-unit">
+        <span class="le-cd-num" id="leD">00</span>
+        <span class="le-cd-lbl">Days</span>
+      </div>
+      <div class="le-cd-unit">
+        <span class="le-cd-num" id="leH">00</span>
+        <span class="le-cd-lbl">Hours</span>
+      </div>
+      <div class="le-cd-unit">
+        <span class="le-cd-num" id="leM">00</span>
+        <span class="le-cd-lbl">Mins</span>
+      </div>
+      <div class="le-cd-unit">
+        <span class="le-cd-num" id="leS">00</span>
+        <span class="le-cd-lbl">Secs</span>
+      </div>
+    </div>
+  </section>
+
+  <section id="le-collection">
+    <div class="rv-sh rv-reveal">
+      <h2>{collectionTitle}</h2>
+      <p>Live cart, wishlist, and product links using the same product cards as all products</p>
+    </div>
+
+    {!collection && limitedProducts.length > 0 && (
+      <p class="le-collection-note rv-reveal">
+        Showing limited-edition tagged products while the collection handle is being prepared.
+      </p>
+    )}
+
+    {limitedProducts.length > 0 ? (
+      <ProductGrid products={limitedProducts} client:load />
+    ) : (
+      <div class="le-empty rv-reveal">
+        <h3>No Limited Pieces Are Live Yet</h3>
+        <p>{status.ok ? collectionDescription : status.message}</p>
+        <div class="le-empty-actions">
+          <a href="/collections/all" class="le-empty-btn">Shop All Pieces</a>
+          <a href="/pages/bespoke" class="le-empty-btn alt">Begin a Bespoke Request</a>
+        </div>
+      </div>
+    )}
+  </section>
+
+  <section class="le-process">
+    <div class="le-process-head rv-reveal">
+      <span class="le-process-eyebrow">The Making</span>
+      <h2 class="le-process-h2">Handcrafted in Four Acts</h2>
+    </div>
+
+    <div class="le-process-grid">
+      <div class="le-process-item rv-reveal">
+        <div class="le-process-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.1">
+            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+            <polyline points="14 2 14 8 20 8" />
+            <line x1="16" y1="13" x2="8" y2="13" />
+            <line x1="16" y1="17" x2="8" y2="17" />
+          </svg>
+        </div>
+        <span class="le-process-num">01</span>
+        <span class="le-process-title">Selection</span>
+        <p class="le-process-desc">Each hide is chosen for grain depth, tone, and the way it will age over years rather than weeks.</p>
+      </div>
+
+      <div class="le-process-item rv-reveal rv-reveal-delay1">
+        <div class="le-process-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.1">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+          </svg>
+        </div>
+        <span class="le-process-num">02</span>
+        <span class="le-process-title">Cutting</span>
+        <p class="le-process-desc">Patterns are laid and cut by hand to preserve the character of every panel and every seam line.</p>
+      </div>
+
+      <div class="le-process-item rv-reveal rv-reveal-delay2">
+        <div class="le-process-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.1">
+            <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" />
+          </svg>
+        </div>
+        <span class="le-process-num">03</span>
+        <span class="le-process-title">Stitching</span>
+        <p class="le-process-desc">Edges are painted, burnished, and stitched for structure, elegance, and long-term durability.</p>
+      </div>
+
+      <div class="le-process-item rv-reveal rv-reveal-delay3">
+        <div class="le-process-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.1">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+          </svg>
+        </div>
+        <span class="le-process-num">04</span>
+        <span class="le-process-title">Numbering</span>
+        <p class="le-process-desc">Finished pieces are numbered for the release, making each order part of a genuinely small run.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="le-bespoke rv-reveal">
+    <img class="le-bespoke-bg" src={bespokeImage} alt="Commission a bespoke piece" loading="lazy" />
+    <div class="le-bespoke-ov"></div>
+    <div class="le-bespoke-content">
+      <span class="le-bespoke-eyebrow">Exclusive Service</span>
+      <span class="le-bespoke-h2">Commission<br />Your Own Piece</span>
+      <span class="le-bespoke-sub">Prefer something even rarer? Work with our atelier on a bespoke leather piece tailored to your brief.</span>
+      <a href="/pages/bespoke" class="le-bespoke-cta">Begin Your Commission</a>
+    </div>
+  </section>
+
+  {atelierProducts.length > 0 && (
+    <>
+      <div class="rv-orn rv-reveal"><span>✦</span></div>
+      <div class="rv-sh rv-reveal">
+        <h2>From the Atelier</h2>
+        <p>Permanent collection favourites</p>
+      </div>
+
+      <div class="rv-hscroll">
+        <div class="rv-htrack" id="rvLeTrack">
+          {atelierProducts.map((product) => {
+            const image = firstImage(product);
+            return (
+              <div class="rv-hcard">
+                <a class="rv-pc" href={`/products/${product.handle}`}>
+                  <div class="rv-pc-inner">
+                    <div class="rv-pc-wrap">
+                      {image ? (
+                        <img src={image.url} alt={image.altText ?? product.title} loading="lazy" />
+                      ) : (
+                        <div class="rv-pc-ph"><span>{product.productType || 'Leather Goods'}</span></div>
+                      )}
+                    </div>
+                    <div class="rv-pc-info">
+                      <span class="rv-pc-col">{product.vendor || product.productType || 'Leather Goods'}</span>
+                      <span class="rv-pc-name">{product.title}</span>
+                      <span class="rv-pc-price">
+                        {formatPrice(
+                          product.priceRange.minVariantPrice.amount,
+                          product.priceRange.minVariantPrice.currencyCode
+                        )}
+                      </span>
+                    </div>
+                  </div>
+                </a>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </>
+  )}
+
+  <div class="rv-trust">
+    <div class="rv-trust-item rv-reveal">
+      <span class="rv-trust-icon">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+        </svg>
+      </span>
+      <p class="rv-trust-h">Numbered Release</p>
+      <p class="rv-trust-p">A deliberately small run reserved for the rarest pieces in the collection.</p>
+    </div>
+    <div class="rv-trust-item rv-reveal rv-reveal-delay1">
+      <span class="rv-trust-icon">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+        </svg>
+      </span>
+      <p class="rv-trust-h">Secure Checkout</p>
+      <p class="rv-trust-p">The same live cart and checkout flow used across the rest of the store.</p>
+    </div>
+    <div class="rv-trust-item rv-reveal rv-reveal-delay2">
+      <span class="rv-trust-icon">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+          <rect x="1" y="3" width="15" height="13" rx="1" />
+          <path d="M16 8h3l4 4v4h-7V8z" />
+          <circle cx="5.5" cy="18.5" r="2.5" />
+          <circle cx="18.5" cy="18.5" r="2.5" />
+        </svg>
+      </span>
+      <p class="rv-trust-h">Complimentary Delivery</p>
+      <p class="rv-trust-p">White-glove delivery on qualifying orders with careful protective packaging.</p>
+    </div>
+    <div class="rv-trust-item rv-reveal rv-reveal-delay3">
+      <span class="rv-trust-icon">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+          <polyline points="23 4 23 10 17 10" />
+          <path d="M20.49 15a9 9 0 11-2.12-9.36L23 10" />
+        </svg>
+      </span>
+      <p class="rv-trust-h">Lifetime Care</p>
+      <p class="rv-trust-p">Pieces are made to age beautifully, and our team can help you care for them over time.</p>
+    </div>
+  </div>
+
+  <div class="rv-payment rv-reveal">
+    {['VISA', 'MASTERCARD', 'AMEX', 'APPLE PAY', 'GOOGLE PAY', 'UPI', 'RAZORPAY'].map((item, index, items) => (
+      <>
+        <span class="rv-payment-logo">{item}</span>
+        {index < items.length - 1 && index % 2 === 1 && <span class="rv-payment-sep"></span>}
+      </>
+    ))}
+  </div>
+
+  <section class="rv-nl rv-reveal">
+    <span class="rv-nl-tag">Early Access</span>
+    <h2>Be First to the Next Edition</h2>
+    <span class="rv-nl-sub">Email our team to join the limited-edition priority list.</span>
+    <form class="rv-nl-form" id="leNotifyForm">
+      <input type="email" class="rv-nl-input" id="leNotifyEmail" placeholder="Your email address" />
+      <button class="rv-nl-btn" type="submit">Join</button>
+    </form>
+    <p class="rv-nl-note">This opens your mail app with a pre-filled message to our team.</p>
+  </section>
+
+  <script is:inline>
+    (function() {
+      var countdown = document.querySelector('[data-le-countdown]');
+      if (!countdown) return;
+
+      var target = countdown.getAttribute('data-le-countdown');
+      var dayEl = document.getElementById('leD');
+      var hourEl = document.getElementById('leH');
+      var minuteEl = document.getElementById('leM');
+      var secondEl = document.getElementById('leS');
+      var end = new Date(target || '');
+
+      function fmt(value) {
+        return String(Math.max(0, value)).padStart(2, '0');
+      }
+
+      function tick() {
+        var now = new Date();
+        var diff = end.getTime() - now.getTime();
+
+        if (diff <= 0) {
+          dayEl.textContent = '00';
+          hourEl.textContent = '00';
+          minuteEl.textContent = '00';
+          secondEl.textContent = '00';
+          return;
+        }
+
+        var d = Math.floor(diff / 86400000);
+        var h = Math.floor((diff % 86400000) / 3600000);
+        var m = Math.floor((diff % 3600000) / 60000);
+        var s = Math.floor((diff % 60000) / 1000);
+
+        dayEl.textContent = fmt(d);
+        hourEl.textContent = fmt(h);
+        minuteEl.textContent = fmt(m);
+        secondEl.textContent = fmt(s);
+      }
+
+      tick();
+      setInterval(tick, 1000);
+    })();
+
+    (function() {
+      var form = document.getElementById('leNotifyForm');
+      var input = document.getElementById('leNotifyEmail');
+      if (!form || !input) return;
+
+      form.addEventListener('submit', function(event) {
+        event.preventDefault();
+        var email = input.value.trim();
+        if (!email) {
+          input.focus();
+          return;
+        }
+
+        var subject = 'Limited Edition Early Access';
+        var body = 'Please add ' + email + ' to the early access list for future limited-edition drops.';
+        window.location.href = 'mailto:corporate@rivavalencia.com?subject='
+          + encodeURIComponent(subject)
+          + '&body='
+          + encodeURIComponent(body);
+      });
+    })();
+  </script>
+</Layout>

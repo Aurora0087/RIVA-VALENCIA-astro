@@ -1,0 +1,14 @@
+---
+import BespokePage from '@/components/BespokePage.astro';
+import Layout from '@/layouts/Layout.astro';
+import { getAllProducts } from '@/lib/shopify';
+
+const { products } = await getAllProducts(12);
+---
+
+<Layout
+  title="Bespoke Atelier — RIVA VALENCIA"
+  description="Create a made-to-order Riva Valencia leather piece with custom silhouette, leather, colour, hardware and personal finishing."
+>
+  <BespokePage inspirations={products} />
+</Layout>

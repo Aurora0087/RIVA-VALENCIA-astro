@@ -1,0 +1,8 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import { AccountDashboard } from '@/components/AccountDashboard';
+---
+
+<Layout title="My Account — RIVA VALENCIA" description="Manage your Riva Valencia account, view orders and saved addresses.">
+  <AccountDashboard client:load />
+</Layout>

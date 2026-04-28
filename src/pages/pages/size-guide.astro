@@ -1,0 +1,73 @@
+---
+import Layout from '@/layouts/Layout.astro';
+
+const sizeGroups = [
+  {
+    title: 'Bags',
+    items: [
+      'Mini: best for phone, cardholder, keys and small essentials.',
+      'Medium: ideal for daily essentials, compact notebook and cosmetics.',
+      'Large: suited for workday carry including tablet, documents and more.',
+    ],
+  },
+  {
+    title: 'Laptop and Brief Bags',
+    items: [
+      '13 inch fit: best for compact laptops and slim accessories.',
+      '14 to 15 inch fit: suitable for most standard laptops and chargers.',
+      '16 inch fit: choose only when the product description clearly lists a larger interior.',
+    ],
+  },
+  {
+    title: 'Belts',
+    items: [
+      'Measure a belt you already wear from the buckle pin to your most-used hole.',
+      'If choosing by trouser size, selecting one size up usually offers the most comfortable fit.',
+      'Between sizes: choose the larger option for more adjustment room.',
+    ],
+  },
+  {
+    title: 'Jackets',
+    items: [
+      'Prefer a close silhouette: choose your usual size.',
+      'Prefer layering with knits or hoodies: consider sizing up.',
+      'Check product details for fit notes, as structured and relaxed cuts differ by style.',
+    ],
+  },
+];
+---
+
+<Layout
+  title="Size Guide — RIVA VALENCIA"
+  description="Find fit guidance for bags, belts, jackets and work-ready leather pieces."
+>
+  <section class="lp-shell">
+    <div class="lp-hero rv-reveal">
+      <span class="lp-eyebrow">Support</span>
+      <h1 class="lp-title">Size Guide</h1>
+      <p class="lp-intro">Use this guide to choose the right bag, belt or jacket size before placing your order.</p>
+      <p class="lp-updated">Last updated: April 28, 2026</p>
+    </div>
+
+    <div class="sg-grid">
+      {sizeGroups.map((group, index) => (
+        <section class:list={['sg-card', 'rv-reveal', index % 2 === 0 ? 'rv-reveal-l' : 'rv-reveal-r']}>
+          <h2>{group.title}</h2>
+          <ul>
+            {group.items.map((item) => <li>{item}</li>)}
+          </ul>
+        </section>
+      ))}
+    </div>
+
+    <section class="lp-extra rv-reveal">
+      <h2>Need Personal Advice?</h2>
+      <p>If you are deciding between two sizes or comparing styles for work, gifting or travel, our support team can help you narrow it down.</p>
+      <ul>
+        <li><a href="/pages/faq">Browse the FAQ</a></li>
+        <li><a href="/pages/shipping">Read Shipping Policy</a></li>
+        <li><a href="/pages/returns">Read Return Policy</a></li>
+      </ul>
+    </section>
+  </section>
+</Layout>

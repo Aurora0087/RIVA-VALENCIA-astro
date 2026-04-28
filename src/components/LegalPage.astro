@@ -1,0 +1,48 @@
+---
+interface Section {
+  heading: string;
+  body?: string[];
+  items?: string[];
+}
+
+interface Props {
+  eyebrow?: string;
+  title: string;
+  intro: string;
+  updated: string;
+  sections: Section[];
+}
+
+const {
+  eyebrow = 'Legal Information',
+  title,
+  intro,
+  updated,
+  sections,
+} = Astro.props;
+---
+
+<section class="lp-shell">
+  <div class="lp-hero rv-reveal">
+    <span class="lp-eyebrow">{eyebrow}</span>
+    <h1 class="lp-title">{title}</h1>
+    <p class="lp-intro">{intro}</p>
+    <p class="lp-updated">Last updated: {updated}</p>
+  </div>
+
+  <div class="lp-grid">
+    {sections.map((section, index) => (
+      <section class:list={['lp-card', 'rv-reveal', index % 2 === 0 ? 'rv-reveal-l' : 'rv-reveal-r']}>
+        <h2>{section.heading}</h2>
+        {section.body?.map((paragraph) => <p>{paragraph}</p>)}
+        {section.items && (
+          <ul>
+            {section.items.map((item) => <li>{item}</li>)}
+          </ul>
+        )}
+      </section>
+    ))}
+  </div>
+
+  <slot />
+</section>

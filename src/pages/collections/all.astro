@@ -1,0 +1,11 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import { getAllProducts } from '@/lib/shopify';
+import { AllProductsPage } from '@/components/AllProductsPage';
+
+const { products, status } = await getAllProducts(50);
+---
+
+<Layout title="All Products — RIVA VALENCIA" description="Browse the complete Riva Valencia leather collection — bags, wallets, belts and accessories crafted in Spain.">
+  <AllProductsPage products={products} status={status} client:load />
+</Layout>

@@ -1,0 +1,794 @@
+---
+import { formatPrice, type ShopifyProduct } from '@/lib/shopify';
+
+interface Props {
+  suggestions: ShopifyProduct[];
+}
+
+const { suggestions } = Astro.props;
+
+const suggestionPayload = suggestions.map((product) => {
+  const image = product.images.edges[0]?.node;
+  const price = product.priceRange.minVariantPrice;
+  const firstVariant = product.variants.edges.find(({ node }) => node.availableForSale)?.node ?? product.variants.edges[0]?.node;
+  return {
+    id: product.id,
+    handle: product.handle,
+    title: product.title,
+    vendor: product.vendor,
+    productType: product.productType,
+    imageUrl: image?.url ?? '',
+    imageAlt: image?.altText ?? product.title,
+    priceLabel: formatPrice(price.amount, price.currencyCode),
+    firstVariantId: firstVariant?.id ?? '',
+    tags: product.tags,
+  };
+});
+---
+
+<div class="rv-cart-page" data-cart-root>
+  <div class="rv-cart-header rv-reveal">
+    <div>
+      <span class="rv-cart-eyebrow">Your Selection</span>
+      <span class="rv-cart-title">Your Bag</span>
+    </div>
+    <div class="rv-cart-header-right">
+      <span class="rv-cart-count" data-cart-count>Loading your selection</span>
+      <a href="/collections/all" class="rv-cart-continue">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+        Continue Shopping
+      </a>
+    </div>
+  </div>
+
+  <div class="rv-cart-empty" data-cart-empty hidden>
+    <div class="rv-cart-empty-ornament"><span>✦</span></div>
+    <span class="rv-cart-empty-title">Your Bag is Empty</span>
+    <span class="rv-cart-empty-sub">Discover our handcrafted Spanish leather collections</span>
+    <a href="/collections/all" class="rv-cart-empty-btn">Explore the Collections →</a>
+  </div>
+
+  <div class="rv-cart-grid" data-cart-grid hidden>
+    <div>
+      <div class="rv-cart-items" data-cart-items>
+        <div class="rv-cart-loading">Loading your bag…</div>
+      </div>
+
+      <div class="rv-cart-gift">
+        <button type="button" class="rv-cart-gift-toggle" data-gift-toggle>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          Add a Gift Message
+        </button>
+        <div class="rv-cart-gift-body" data-gift-body>
+          <textarea class="rv-cart-gift-textarea" data-cart-note rows="3" placeholder="Write your personal message here…"></textarea>
+          <span class="rv-cart-gift-note">Your message will be printed on a luxury Riva Valencia card included with your order.</span>
+          <span class="rv-cart-note-status" data-note-status></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="rv-cart-summary rv-reveal">
+      <span class="rv-cart-summary-title">Order Summary</span>
+
+      <div class="rv-cart-summary-rows">
+        <div class="rv-cart-summary-row">
+          <span class="rv-cart-summary-label">Subtotal</span>
+          <span class="rv-cart-summary-val" data-cart-subtotal>₹0</span>
+        </div>
+        <div class="rv-cart-summary-row" data-discount-row hidden>
+          <span class="rv-cart-summary-label">Discount</span>
+          <span class="rv-cart-summary-val green" data-cart-discount>₹0</span>
+        </div>
+        <div class="rv-cart-summary-row">
+          <span class="rv-cart-summary-label">Delivery</span>
+          <span class="rv-cart-summary-val" data-cart-delivery>Calculated at checkout</span>
+        </div>
+        <div class="rv-cart-summary-row rv-cart-summary-row-note" data-free-shipping-row hidden>
+          <span data-free-shipping-message></span>
+        </div>
+      </div>
+
+      <div class="rv-cart-total-row">
+        <span class="rv-cart-total-label">Total</span>
+        <span class="rv-cart-total-price" data-cart-total>₹0</span>
+      </div>
+      <span class="rv-cart-total-tax">Inclusive of all taxes (GST)</span>
+
+      <div class="rv-cart-promo">
+        <span class="rv-cart-promo-label">Promo Code</span>
+        <div class="rv-cart-promo-row">
+          <input type="text" class="rv-cart-promo-input" placeholder="Enter code" data-promo-input>
+          <button type="button" class="rv-cart-promo-btn" data-promo-apply>Apply</button>
+        </div>
+        <span class="rv-cart-promo-msg" data-promo-message></span>
+      </div>
+
+      <a href="/checkout" class="rv-cart-checkout" data-checkout-link>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"></path>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <path d="M16 10a4 4 0 01-8 0"></path>
+        </svg>
+        Proceed to Checkout — <span data-checkout-total>₹0</span>
+      </a>
+
+      <button type="button" class="rv-cart-paypal" data-paypal-button>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M6.5 10.5h6a4 4 0 000-8H5l-2 14h4l.5-3.5"></path>
+          <path d="M11.5 10.5h5a4 4 0 010 8H12l-1.5-8"></path>
+        </svg>
+        Pay with PayPal
+      </button>
+
+      <div class="rv-cart-pay-logos">
+        <span class="rv-cart-pay-logo">UPI</span>
+        <span class="rv-cart-pay-sep"></span>
+        <span class="rv-cart-pay-logo">Visa</span>
+        <span class="rv-cart-pay-logo">Mastercard</span>
+        <span class="rv-cart-pay-sep"></span>
+        <span class="rv-cart-pay-logo">Razorpay</span>
+        <span class="rv-cart-pay-sep"></span>
+        <span class="rv-cart-pay-logo">Klarna</span>
+      </div>
+
+      <div class="rv-cart-secure">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="3" y="11" width="18" height="11" rx="2"></rect>
+          <path d="M7 11V7a5 5 0 0110 0v4"></path>
+        </svg>
+        256-bit SSL · Secure Checkout
+      </div>
+
+      <div class="rv-cart-upsell" data-upsell-wrap hidden>
+        <span class="rv-cart-upsell-label">You May Also Love</span>
+        <div data-upsell-items></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="rv-cart-related" data-related-wrap hidden>
+  <div class="rv-sh rv-reveal">
+    <h2>Complete the Look</h2>
+    <p>Pieces that pair beautifully with your selection</p>
+  </div>
+  <div class="rv-hscroll">
+    <div class="rv-htrack" data-related-track></div>
+  </div>
+</div>
+
+<div class="rv-payment rv-reveal">
+  <span class="rv-payment-logo">VISA</span>
+  <span class="rv-payment-logo">MASTERCARD</span>
+  <span class="rv-payment-sep"></span>
+  <span class="rv-payment-logo">AMEX</span>
+  <span class="rv-payment-sep"></span>
+  <span class="rv-payment-logo">APPLE PAY</span>
+  <span class="rv-payment-logo">GOOGLE PAY</span>
+  <span class="rv-payment-sep"></span>
+  <span class="rv-payment-logo">PAYPAL</span>
+  <span class="rv-payment-logo">KLARNA</span>
+  <span class="rv-payment-sep"></span>
+  <span class="rv-payment-logo">UPI</span>
+  <span class="rv-payment-logo">RAZORPAY</span>
+</div>
+
+<style is:global>
+  .rv-announce{background:#000;color:#fff;text-align:center;padding:10px 20px;font-size:10px;letter-spacing:0.32em;text-transform:uppercase;font-weight:400;overflow:hidden}
+  .rv-announce-track{display:inline-flex;gap:80px;animation:rvMarquee 28s linear infinite;white-space:nowrap}
+  @keyframes rvMarquee{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+  .rv-cart-page{min-height:70vh;padding:64px 48px 100px}
+  .rv-cart-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:8px;padding-bottom:28px;border-bottom:1px solid #e8e4de}
+  .rv-cart-eyebrow{font-size:9px;letter-spacing:0.36em;text-transform:uppercase;color:#c9a96e;font-weight:500;display:block;margin-bottom:10px}
+  .rv-cart-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,6vw,72px);letter-spacing:0.08em;color:#1a1008;font-weight:400;line-height:1;display:block}
+  .rv-cart-header-right{display:flex;flex-direction:column;align-items:flex-end;gap:10px}
+  .rv-cart-count{font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:#8a7660;font-weight:400;padding-bottom:4px}
+  .rv-cart-continue{display:inline-flex;align-items:center;gap:9px;font-size:9px;letter-spacing:0.28em;text-transform:uppercase;color:#1a1008;border-bottom:1px solid #c9a96e;padding-bottom:3px;transition:gap 0.3s,letter-spacing 0.3s;font-weight:500}
+  .rv-cart-continue:hover{gap:14px;letter-spacing:0.32em}
+  .rv-cart-grid{display:grid;grid-template-columns:1fr 380px;gap:64px;align-items:start}
+  .rv-cart-items{display:flex;flex-direction:column}
+  .rv-cart-loading{padding:32px 0;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#8a7660}
+  .rv-cart-item{display:grid;grid-template-columns:120px 1fr;gap:24px;padding:32px 0;border-bottom:1px solid #e8e4de;position:relative;opacity:0;transform:translateX(-20px);transition:opacity 0.6s ease,transform 0.6s cubic-bezier(0.16,1,0.3,1)}
+  .rv-cart-item.in{opacity:1;transform:translateX(0)}
+  .rv-cart-item-img-wrap{overflow:hidden;background:#edebe6;position:relative;display:block}
+  .rv-cart-item-img-wrap img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block;transition:transform 8s cubic-bezier(0.25,0.46,0.45,0.94)}
+  .rv-cart-item:hover .rv-cart-item-img-wrap img{transform:scale(1.06)}
+  .rv-cart-item-img-badge{position:absolute;top:10px;left:0;background:#1a1008;color:#fafaf8;font-size:7px;letter-spacing:0.2em;text-transform:uppercase;padding:3px 10px;font-weight:600}
+  .rv-cart-item-img-badge.new{background:#3d5c35}
+  .rv-cart-item-body{display:flex;flex-direction:column;justify-content:space-between;padding:4px 0}
+  .rv-cart-item-top{margin-bottom:auto}
+  .rv-cart-item-vendor{font-size:9px;letter-spacing:0.24em;text-transform:uppercase;color:#8a7660;font-weight:400;display:block;margin-bottom:6px}
+  .rv-cart-item-name{font-size:16px;font-weight:400;color:#1a1008;letter-spacing:0.04em;line-height:1.35;display:block;margin-bottom:8px}
+  .rv-cart-item-name:hover{color:#8a7660}
+  .rv-cart-item-variant{font-size:11px;color:#b8b0a6;font-weight:300;letter-spacing:0.1em;margin-bottom:16px;display:flex;flex-wrap:wrap;gap:6px}
+  .rv-cart-item-prop{background:#f2eee8;padding:3px 10px;font-size:10px;letter-spacing:0.12em}
+  .rv-cart-item-bottom{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px}
+  .rv-cart-item-price-wrap{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+  .rv-cart-item-price{font-size:16px;font-weight:300;color:#1a1008;letter-spacing:0.06em}
+  .rv-cart-item-price-old{font-size:13px;color:#b8b0a6;text-decoration:line-through;font-weight:300}
+  .rv-cart-item-price-save{font-size:8px;letter-spacing:0.18em;text-transform:uppercase;background:#8b3a2a;color:#fafaf8;padding:2px 8px;font-weight:500}
+  .rv-cart-item-actions{display:flex;align-items:center;gap:16px}
+  .rv-qty{display:flex;align-items:center;border:1px solid #e8e4de}
+  .rv-qty-btn{width:38px;height:38px;background:none;border:none;cursor:pointer;font-size:16px;color:#1a1008;display:flex;align-items:center;justify-content:center;transition:background 0.2s;font-family:'Jost',sans-serif;font-weight:300}
+  .rv-qty-btn:hover{background:#f5f2ec}
+  .rv-qty-val{width:44px;text-align:center;font-size:13px;letter-spacing:0.1em;color:#1a1008;border:none;border-left:1px solid #e8e4de;border-right:1px solid #e8e4de;height:38px;background:none;font-family:'Jost',sans-serif;font-weight:400}
+  .rv-cart-remove{background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:5px;font-family:'Jost',sans-serif;font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:#b8b0a6;padding:0;transition:color 0.2s}
+  .rv-cart-remove:hover{color:#8b3a2a}
+  .rv-cart-item.removing{opacity:0!important;transform:translateX(-40px)!important;pointer-events:none;transition:opacity 0.4s ease,transform 0.4s cubic-bezier(0.16,1,0.3,1)!important}
+  .rv-cart-gift{margin-top:8px;padding:24px 0;border-bottom:1px solid #e8e4de}
+  .rv-cart-gift-toggle{display:flex;align-items:center;gap:10px;cursor:pointer;background:none;border:none;font-family:'Jost',sans-serif;font-size:10px;letter-spacing:0.22em;text-transform:uppercase;color:#1a1008;font-weight:500;padding:0;transition:color 0.2s}
+  .rv-cart-gift-toggle:hover{color:#8a7660}
+  .rv-cart-gift-toggle svg{flex-shrink:0;transition:transform 0.35s cubic-bezier(0.34,1.56,0.64,1)}
+  .rv-cart-gift-toggle.open svg{transform:rotate(45deg)}
+  .rv-cart-gift-body{overflow:hidden;max-height:0;transition:max-height 0.5s cubic-bezier(0.16,1,0.3,1)}
+  .rv-cart-gift-body.open{max-height:220px}
+  .rv-cart-gift-textarea{width:100%;border:none;border-bottom:1px solid #d4cfc8;outline:none;font-family:'Jost',sans-serif;font-size:13px;font-weight:300;color:#1a1008;background:transparent;padding:16px 0 10px;resize:none;letter-spacing:0.04em;margin-top:16px;line-height:1.6}
+  .rv-cart-gift-textarea::placeholder{color:#c8c0b4}
+  .rv-cart-gift-note,.rv-cart-note-status{font-size:10px;letter-spacing:0.1em;color:#b8b0a6;margin-top:8px;display:block;font-weight:300}
+  .rv-cart-summary{position:sticky;top:90px;background:#f5f2ec;padding:40px 36px}
+  .rv-cart-summary-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.14em;color:#1a1008;font-weight:400;margin-bottom:28px;display:block}
+  .rv-cart-summary-rows{display:flex;flex-direction:column;gap:0;margin-bottom:28px;border-top:1px solid #e8e4de}
+  .rv-cart-summary-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid #e8e4de}
+  .rv-cart-summary-row-note{justify-content:flex-start;background:rgba(201,169,110,0.06);padding-left:0;padding-right:0}
+  .rv-cart-summary-label{font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:#8a7660;font-weight:400}
+  .rv-cart-summary-val{font-size:13px;color:#1a1008;font-weight:400;letter-spacing:0.06em}
+  .rv-cart-summary-val.green{color:#3d5c35;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;font-weight:500}
+  .rv-cart-total-row{display:flex;align-items:baseline;justify-content:space-between;padding:20px 0;border-top:2px solid #1a1008;margin-bottom:24px}
+  .rv-cart-total-label{font-size:10px;letter-spacing:0.28em;text-transform:uppercase;color:#1a1008;font-weight:600}
+  .rv-cart-total-price{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:0.06em;color:#1a1008;font-weight:400}
+  .rv-cart-total-tax{font-size:10px;color:#8a7660;font-weight:300;letter-spacing:0.08em;display:block;margin-top:-12px;margin-bottom:20px}
+  .rv-cart-promo{margin-bottom:24px}
+  .rv-cart-promo-label{font-size:9px;letter-spacing:0.28em;text-transform:uppercase;color:#1a1008;font-weight:600;margin-bottom:12px;display:block}
+  .rv-cart-promo-row{display:flex;border-bottom:1.5px solid #1a1008}
+  .rv-cart-promo-input{flex:1;border:none;outline:none;background:transparent;font-family:'Jost',sans-serif;font-size:13px;font-weight:300;color:#1a1008;padding:12px 4px;letter-spacing:0.06em}
+  .rv-cart-promo-input::placeholder{color:#b8b0a6}
+  .rv-cart-promo-btn{background:none;border:none;cursor:pointer;font-family:'Jost',sans-serif;font-size:9px;letter-spacing:0.26em;text-transform:uppercase;color:#1a1008;font-weight:500;padding:12px 0 12px 12px;transition:letter-spacing 0.3s}
+  .rv-cart-promo-btn:hover{letter-spacing:0.32em}
+  .rv-cart-promo-msg{font-size:10px;margin-top:8px;display:block;letter-spacing:0.1em;color:#8a7660;min-height:14px}
+  .rv-cart-checkout{width:100%;background:#1a1008;color:#fafaf8;border:none;cursor:pointer;font-family:'Jost',sans-serif;font-size:10px;letter-spacing:0.36em;text-transform:uppercase;padding:22px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:10px;position:relative;overflow:hidden;transition:letter-spacing 0.4s,background 0.3s;margin-bottom:12px}
+  .rv-cart-checkout::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(201,169,110,0.14),transparent);opacity:0;transition:opacity 0.4s}
+  .rv-cart-checkout:hover::before{opacity:1}
+  .rv-cart-checkout:hover{letter-spacing:0.42em;background:#2e1f0f}
+  .rv-cart-checkout::after{content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.07),transparent);transition:left 0.7s}
+  .rv-cart-checkout:hover::after{left:140%}
+  .rv-cart-paypal{width:100%;background:transparent;border:1px solid #e8e4de;cursor:pointer;font-family:'Jost',sans-serif;font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:#1a1008;padding:16px;display:flex;align-items:center;justify-content:center;gap:8px;transition:border-color 0.3s,background 0.3s}
+  .rv-cart-paypal:hover{border-color:#1a1008;background:#f5f2ec}
+  .rv-cart-pay-logos{display:flex;align-items:center;justify-content:center;gap:14px;padding-top:16px;flex-wrap:wrap}
+  .rv-cart-pay-logo{font-size:8px;letter-spacing:0.18em;text-transform:uppercase;color:#b8b0a6;font-weight:500}
+  .rv-cart-pay-sep{width:1px;height:10px;background:#e8e4de}
+  .rv-cart-secure{display:flex;align-items:center;justify-content:center;gap:6px;padding-top:14px;font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:#b8b0a6;font-weight:300}
+  .rv-cart-upsell{margin-top:32px;padding-top:28px;border-top:1px solid #e8e4de}
+  .rv-cart-upsell-label{font-size:8px;letter-spacing:0.32em;text-transform:uppercase;color:#c9a96e;font-weight:500;display:block;margin-bottom:16px}
+  .rv-cart-upsell-item{display:flex;gap:14px;align-items:center;padding:12px 0;border-bottom:1px solid #f2eee8;transition:opacity 0.2s}
+  .rv-cart-upsell-item:last-child{border-bottom:none}
+  .rv-cart-upsell-item:hover{opacity:0.7}
+  .rv-cart-upsell-img{width:56px;height:68px;object-fit:cover;background:#edebe6;flex-shrink:0}
+  .rv-cart-upsell-info{flex:1}
+  .rv-cart-upsell-name{font-size:12px;font-weight:400;color:#1a1008;letter-spacing:0.04em;display:block;margin-bottom:3px;line-height:1.3}
+  .rv-cart-upsell-price{font-size:11px;color:#8a7660;font-weight:300;letter-spacing:0.06em}
+  .rv-cart-upsell-add{background:none;border:1px solid #e8e4de;cursor:pointer;font-family:'Jost',sans-serif;font-size:8px;letter-spacing:0.2em;text-transform:uppercase;color:#1a1008;padding:7px 12px;transition:all 0.25s;white-space:nowrap}
+  .rv-cart-upsell-add:hover{background:#1a1008;color:#fafaf8;border-color:#1a1008}
+  .rv-cart-empty{text-align:center;padding:96px 20px}
+  .rv-cart-empty-ornament{display:flex;align-items:center;justify-content:center;gap:20px;margin-bottom:32px;color:#c9a96e;font-size:12px}
+  .rv-cart-empty-ornament::before,.rv-cart-empty-ornament::after{content:'';width:80px;height:1px;background:linear-gradient(to right,transparent,#c9a96e,transparent)}
+  .rv-cart-empty-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,5vw,56px);letter-spacing:0.1em;color:#1a1008;margin-bottom:12px;display:block}
+  .rv-cart-empty-sub{font-size:12px;letter-spacing:0.14em;text-transform:uppercase;color:#8a7660;margin-bottom:40px;display:block;font-weight:300}
+  .rv-cart-empty-btn{display:inline-flex;align-items:center;gap:12px;background:#1a1008;color:#fafaf8;font-family:'Jost',sans-serif;font-size:9px;letter-spacing:0.32em;text-transform:uppercase;padding:18px 48px;font-weight:600;transition:letter-spacing 0.35s,background 0.3s}
+  .rv-cart-empty-btn:hover{background:#2e1f0f;letter-spacing:0.38em}
+  .rv-cart-related{border-top:1px solid #e8e4de}
+  .rv-hscroll{padding:0 48px 80px}
+  .rv-htrack{display:flex;gap:20px;overflow-x:auto;scrollbar-width:none;padding-bottom:8px;cursor:grab;-webkit-overflow-scrolling:touch}
+  .rv-htrack::-webkit-scrollbar{display:none}
+  .rv-hcard{flex-shrink:0;width:240px}
+  .rv-pc{display:block;color:#1a1008;perspective:1000px;transform-style:preserve-3d}
+  .rv-pc-inner{transition:transform 0.5s cubic-bezier(0.34,1.56,0.64,1);transform-style:preserve-3d}
+  .rv-pc:hover .rv-pc-inner{transform:translateY(-8px) rotateX(2deg)}
+  .rv-pc-wrap{overflow:hidden;position:relative;background:#edebe6;box-shadow:0 0 0 rgba(26,16,8,0);transition:box-shadow 0.5s}
+  .rv-pc:hover .rv-pc-wrap{box-shadow:0 20px 48px rgba(26,16,8,0.14)}
+  .rv-pc img,.rv-pc-ph{width:100%;aspect-ratio:3/4;object-fit:cover;display:block;transition:transform 8s cubic-bezier(0.25,0.46,0.45,0.94)}
+  .rv-pc:hover img{transform:scale(1.05)}
+  .rv-pc-badge{position:absolute;top:12px;left:0;background:#1a1008;color:#fafaf8;font-size:8px;letter-spacing:0.2em;text-transform:uppercase;padding:4px 12px;font-weight:500}
+  .rv-pc-badge.new{background:#3d5c35}
+  .rv-pc-info{padding:16px 2px 8px}
+  .rv-pc-col{font-size:9px;letter-spacing:0.24em;text-transform:uppercase;color:#8a7660;display:block;margin-bottom:4px;font-weight:400}
+  .rv-pc-name{font-size:13px;font-weight:400;color:#1a1008;display:block;margin-bottom:6px;line-height:1.3;letter-spacing:0.02em}
+  .rv-pc-price{font-size:12px;color:#5a4a3a;letter-spacing:0.06em;font-weight:400}
+  .rv-sh{text-align:center;padding:64px 20px 40px}
+  .rv-sh h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(34px,5.5vw,60px);letter-spacing:0.1em;color:#1a1008;font-weight:400;margin-bottom:10px}
+  .rv-sh p{font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#8a7660;font-weight:400}
+  .rv-payment{background:#f2eee8;border-top:1px solid #e8e4de;border-bottom:1px solid #e8e4de;padding:20px 48px;display:flex;align-items:center;justify-content:center;gap:32px;flex-wrap:wrap}
+  .rv-payment-logo{font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#8a7660;font-weight:500;opacity:0.7;transition:opacity 0.2s}
+  .rv-payment-logo:hover{opacity:1}
+  .rv-payment-sep{width:1px;height:16px;background:#c8c0b4}
+  @media(max-width:960px){
+    .rv-cart-page{padding:40px 20px 80px}
+    .rv-cart-grid{grid-template-columns:1fr;gap:40px}
+    .rv-cart-summary{position:relative;top:0;padding:28px 24px}
+    .rv-cart-header{flex-direction:column;align-items:flex-start;gap:12px}
+    .rv-cart-header-right{align-items:flex-start}
+    .rv-cart-item{grid-template-columns:96px 1fr;gap:16px;padding:24px 0}
+    .rv-hscroll{padding:0 20px 60px}
+    .rv-hcard{width:200px}
+    .rv-sh{padding:52px 20px 36px}
+    .rv-payment{padding:18px 20px;gap:18px}
+  }
+  @media(max-width:520px){
+    .rv-cart-item{grid-template-columns:80px 1fr;gap:12px}
+    .rv-cart-item-bottom{align-items:flex-start}
+    .rv-cart-item-actions{flex-wrap:wrap;gap:12px}
+  }
+</style>
+
+<script
+  is:inline
+  define:vars={{ suggestionData: suggestionPayload }}
+>
+  (async () => {
+  const cartApi = window.RivaCart || await window.RivaCartReady;
+  const FREE_SHIPPING_THRESHOLD = 5000;
+  const cartRoot = document.querySelector('[data-cart-root]');
+
+  if (cartRoot) {
+    const cartCountEls = document.querySelectorAll('[data-cart-count]');
+    const emptyState = cartRoot.querySelector('[data-cart-empty]');
+    const grid = cartRoot.querySelector('[data-cart-grid]');
+    const itemsWrap = cartRoot.querySelector('[data-cart-items]');
+    const noteTextarea = cartRoot.querySelector('[data-cart-note]');
+    const noteStatus = cartRoot.querySelector('[data-note-status]');
+    const giftToggle = cartRoot.querySelector('[data-gift-toggle]');
+    const giftBody = cartRoot.querySelector('[data-gift-body]');
+    const subtotalEl = cartRoot.querySelector('[data-cart-subtotal]');
+    const totalEl = cartRoot.querySelector('[data-cart-total]');
+    const checkoutTotalEl = cartRoot.querySelector('[data-checkout-total]');
+    const discountRow = cartRoot.querySelector('[data-discount-row]');
+    const discountEl = cartRoot.querySelector('[data-cart-discount]');
+    const deliveryEl = cartRoot.querySelector('[data-cart-delivery]');
+    const freeShippingRow = cartRoot.querySelector('[data-free-shipping-row]');
+    const freeShippingMessage = cartRoot.querySelector('[data-free-shipping-message]');
+    const checkoutLink = cartRoot.querySelector('[data-checkout-link]');
+    const paypalButton = cartRoot.querySelector('[data-paypal-button]');
+    const promoInput = cartRoot.querySelector('[data-promo-input]');
+    const promoApply = cartRoot.querySelector('[data-promo-apply]');
+    const promoMessage = cartRoot.querySelector('[data-promo-message]');
+    const upsellWrap = cartRoot.querySelector('[data-upsell-wrap]');
+    const upsellItems = cartRoot.querySelector('[data-upsell-items]');
+    const relatedWrap = document.querySelector('[data-related-wrap]');
+    const relatedTrack = document.querySelector('[data-related-track]');
+
+    let cartState = null;
+    let currentDiscountCode = '';
+    let noteTimer = null;
+
+    const formatMoney = (amount, currency = 'INR') => new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency,
+      maximumFractionDigits: 2,
+    }).format(Number(amount) || 0);
+
+    const getCartLines = (cart) => cart?.lines?.edges?.map((edge) => edge.node) || [];
+
+    const getCartDiscount = (cart) => getCartLines(cart).reduce((total, line) => {
+      const compareAt = Number(line.cost.compareAtAmountPerQuantity?.amount || 0);
+      const price = Number(line.cost.amountPerQuantity.amount || 0);
+      if (compareAt <= price) return total;
+      return total + (compareAt - price) * line.quantity;
+    }, 0);
+
+    const setNavCartCount = (count) => {
+      const cartLink = document.querySelector('.rv-nav-right a[aria-label="Cart"]');
+      if (!cartLink) return;
+      let badge = cartLink.querySelector('.rv-cart-nav-badge');
+      if (count > 0) {
+        if (!badge) {
+          badge = document.createElement('span');
+          badge.className = 'rv-cart-nav-badge';
+          badge.style.position = 'absolute';
+          badge.style.top = '2px';
+          badge.style.right = '2px';
+          badge.style.width = '14px';
+          badge.style.height = '14px';
+          badge.style.background = '#c9a96e';
+          badge.style.borderRadius = '50%';
+          badge.style.fontSize = '8px';
+          badge.style.display = 'flex';
+          badge.style.alignItems = 'center';
+          badge.style.justifyContent = 'center';
+          badge.style.color = '#1a1008';
+          badge.style.fontWeight = '700';
+          badge.style.letterSpacing = '0';
+          cartLink.style.position = 'relative';
+          cartLink.appendChild(badge);
+        }
+        badge.textContent = String(count);
+      } else if (badge) {
+        badge.remove();
+      }
+    };
+
+    const escapeHtml = (value) => String(value ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+
+    const getItemImage = (item) => {
+      if (item.featured_image?.url) return item.featured_image.url;
+      if (typeof item.image === 'string') return item.image;
+      return '';
+    };
+
+    const getItemBadge = (item) => {
+      const matchedProduct = suggestionData.find((product) => product.handle === item.merchandise.product.handle);
+      const merged = (matchedProduct?.tags || []).map((tag) => String(tag).toLowerCase());
+      if (merged.includes('new') || merged.includes('new-in')) return { text: 'New In', cls: 'new' };
+      if (merged.includes('bestseller')) return { text: 'Best Seller', cls: '' };
+      return null;
+    };
+
+    const getVariantProps = (item) => {
+      return (item.merchandise.selectedOptions || [])
+        .filter((option) => option.value && option.value !== 'Default Title')
+        .map((option) => `${escapeHtml(option.name)}: ${escapeHtml(option.value)}`);
+    };
+
+    const renderItems = (cart) => {
+      const currency = cart.cost.totalAmount.currencyCode || 'INR';
+      const lines = getCartLines(cart);
+      if (!itemsWrap) return;
+
+      if (!lines.length) {
+        itemsWrap.innerHTML = '';
+        return;
+      }
+
+      itemsWrap.innerHTML = lines.map((item) => {
+        const imageUrl = item.merchandise.image?.url || item.merchandise.product.featuredImage?.url || '';
+        const props = getVariantProps(item);
+        const badge = getItemBadge(item);
+        const compareAt = Number(item.cost.compareAtAmountPerQuantity?.amount || 0);
+        const price = Number(item.cost.amountPerQuantity.amount || 0);
+        const savings = compareAt > price ? (compareAt - price) * item.quantity : 0;
+        const originalLineAmount = compareAt > price ? compareAt * item.quantity : 0;
+        return `
+          <div class="rv-cart-item" data-cart-item data-line-id="${escapeHtml(item.id)}">
+            <a href="/products/${escapeHtml(item.merchandise.product.handle)}" class="rv-cart-item-img-wrap">
+              ${imageUrl ? `<img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(item.merchandise.product.title)}" loading="lazy">` : `<div style="width:100%;aspect-ratio:3/4;background:#edebe6;"></div>`}
+              ${badge ? `<span class="rv-cart-item-img-badge ${badge.cls}">${badge.text}</span>` : ''}
+            </a>
+            <div class="rv-cart-item-body">
+              <div class="rv-cart-item-top">
+                <span class="rv-cart-item-vendor">${escapeHtml(item.merchandise.product.productType || item.merchandise.product.vendor || 'Leather Goods')}</span>
+                <a href="/products/${escapeHtml(item.merchandise.product.handle)}" class="rv-cart-item-name">${escapeHtml(item.merchandise.product.title)}</a>
+                ${props.length ? `<div class="rv-cart-item-variant">
+                  ${props.map((prop) => `<span class="rv-cart-item-prop">${prop}</span>`).join('')}
+                </div>` : ''}
+              </div>
+              <div class="rv-cart-item-bottom">
+                <div class="rv-cart-item-price-wrap">
+                  <span class="rv-cart-item-price">${formatMoney(item.cost.totalAmount.amount, currency)}</span>
+                  ${originalLineAmount > Number(item.cost.totalAmount.amount) ? `<span class="rv-cart-item-price-old">${formatMoney(originalLineAmount, currency)}</span>` : ''}
+                  ${savings > 0 ? `<span class="rv-cart-item-price-save">Save ${formatMoney(savings, currency)}</span>` : ''}
+                </div>
+                <div class="rv-cart-item-actions">
+                  <div class="rv-qty">
+                    <button type="button" class="rv-qty-btn" data-qty-change="-1" data-line-id="${escapeHtml(item.id)}" aria-label="Decrease quantity">−</button>
+                    <input class="rv-qty-val" type="number" min="0" max="20" value="${item.quantity}" data-qty-input data-line-id="${escapeHtml(item.id)}" aria-label="Quantity">
+                    <button type="button" class="rv-qty-btn" data-qty-change="1" data-line-id="${escapeHtml(item.id)}" aria-label="Increase quantity">+</button>
+                  </div>
+                  <button type="button" class="rv-cart-remove" data-remove-item data-line-id="${escapeHtml(item.id)}" aria-label="Remove ${escapeHtml(item.merchandise.product.title)}">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    Remove
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      Array.from(itemsWrap.querySelectorAll('[data-cart-item]')).forEach((item, index) => {
+        window.setTimeout(() => item.classList.add('in'), 100 + index * 80);
+      });
+    };
+
+    const renderSuggestions = (cart) => {
+      if (!cart.totalQuantity) {
+        if (upsellWrap) upsellWrap.hidden = true;
+        if (upsellItems) upsellItems.innerHTML = '';
+        if (relatedWrap) relatedWrap.hidden = true;
+        if (relatedTrack) relatedTrack.innerHTML = '';
+        return;
+      }
+
+      const cartHandles = new Set(getCartLines(cart).map((item) => item.merchandise.product.handle));
+      const filtered = suggestionData.filter((product) => !cartHandles.has(product.handle));
+      const upsells = filtered.slice(0, 2);
+      const related = filtered.slice(0, 8);
+
+      if (upsellWrap && upsellItems) {
+        if (upsells.length) {
+          upsellWrap.hidden = false;
+          upsellItems.innerHTML = upsells.map((product) => `
+            <div class="rv-cart-upsell-item" data-upsell-card data-handle="${escapeHtml(product.handle)}">
+              ${product.imageUrl ? `<img class="rv-cart-upsell-img" src="${escapeHtml(product.imageUrl)}" alt="${escapeHtml(product.imageAlt)}">` : `<div class="rv-cart-upsell-img"></div>`}
+              <div class="rv-cart-upsell-info">
+                <a href="/products/${escapeHtml(product.handle)}" class="rv-cart-upsell-name">${escapeHtml(product.title)}</a>
+                <span class="rv-cart-upsell-price">${escapeHtml(product.priceLabel)}</span>
+              </div>
+              <button type="button" class="rv-cart-upsell-add" data-upsell-add data-handle="${escapeHtml(product.handle)}">+ Add</button>
+            </div>
+          `).join('');
+        } else {
+          upsellWrap.hidden = true;
+          upsellItems.innerHTML = '';
+        }
+      }
+
+      if (relatedWrap && relatedTrack) {
+        if (related.length) {
+          relatedWrap.hidden = false;
+          relatedTrack.innerHTML = related.map((product, index) => {
+            const tags = (product.tags || []).map((tag) => String(tag).toLowerCase());
+            let badge = '';
+            if (tags.includes('new') || tags.includes('new-in')) badge = `<span class="rv-pc-badge new">New In</span>`;
+            else if (tags.includes('bestseller')) badge = `<span class="rv-pc-badge">Best Seller</span>`;
+            return `
+              <div class="rv-hcard rv-reveal ${index % 3 === 1 ? 'rv-reveal-delay1' : index % 3 === 2 ? 'rv-reveal-delay2' : ''}">
+                <a class="rv-pc" href="/products/${escapeHtml(product.handle)}">
+                  <div class="rv-pc-inner">
+                    <div class="rv-pc-wrap">
+                      ${product.imageUrl ? `<img src="${escapeHtml(product.imageUrl)}" alt="${escapeHtml(product.imageAlt)}" loading="lazy">` : `<div class="rv-pc-ph"></div>`}
+                      ${badge}
+                    </div>
+                    <div class="rv-pc-info">
+                      <span class="rv-pc-col">${escapeHtml(product.productType || product.vendor || 'Leather Goods')}</span>
+                      <span class="rv-pc-name">${escapeHtml(product.title)}</span>
+                      <span class="rv-pc-price">${escapeHtml(product.priceLabel)}</span>
+                    </div>
+                  </div>
+                </a>
+              </div>
+            `;
+          }).join('');
+          observeReveals(relatedWrap.querySelectorAll('.rv-reveal'));
+        } else {
+          relatedWrap.hidden = true;
+          relatedTrack.innerHTML = '';
+        }
+      }
+    };
+
+    const updateSummary = (cart) => {
+      const currency = cart.cost.totalAmount.currencyCode || 'INR';
+      const discountAmount = getCartDiscount(cart);
+      const totalAmount = Number(cart.cost.totalAmount.amount || 0);
+      cartCountEls.forEach((el) => {
+        el.textContent = `${cart.totalQuantity} ${cart.totalQuantity === 1 ? 'piece' : 'pieces'} selected`;
+      });
+      if (subtotalEl) subtotalEl.textContent = formatMoney(cart.cost.subtotalAmount.amount, currency);
+      if (totalEl) totalEl.textContent = formatMoney(totalAmount, currency);
+      if (checkoutTotalEl) checkoutTotalEl.textContent = formatMoney(totalAmount, currency);
+      if (discountRow && discountEl) {
+        const hasDiscount = discountAmount > 0;
+        discountRow.hidden = !hasDiscount;
+        discountEl.textContent = hasDiscount ? `− ${formatMoney(discountAmount, currency)}` : '';
+      }
+      if (deliveryEl) {
+        const free = totalAmount >= FREE_SHIPPING_THRESHOLD;
+        deliveryEl.textContent = free ? 'Free' : 'Calculated at checkout';
+        deliveryEl.classList.toggle('green', free);
+      }
+      if (freeShippingRow && freeShippingMessage) {
+        const needed = FREE_SHIPPING_THRESHOLD - totalAmount;
+        freeShippingRow.hidden = needed <= 0;
+        freeShippingMessage.textContent = needed > 0 ? `Add ${formatMoney(needed, currency)} more for free delivery` : '';
+      }
+      if (noteTextarea && document.activeElement !== noteTextarea) {
+        noteTextarea.value = cart.note || '';
+      }
+      if (checkoutLink) {
+        const checkoutUrl = new URL(cart.checkoutUrl);
+        if (currentDiscountCode) checkoutUrl.searchParams.set('discount', currentDiscountCode);
+        checkoutLink.href = checkoutUrl.toString();
+      }
+      setNavCartCount(cart.totalQuantity);
+    };
+
+    const applyCartVisibility = (cart) => {
+      const isEmpty = cart.totalQuantity === 0;
+      if (emptyState) emptyState.hidden = !isEmpty;
+      if (grid) grid.hidden = isEmpty;
+      if (relatedWrap) relatedWrap.hidden = isEmpty;
+    };
+
+    const renderCart = (cart) => {
+      cartState = cart;
+      updateSummary(cart);
+      applyCartVisibility(cart);
+      renderItems(cart);
+      renderSuggestions(cart);
+      observeReveals(cartRoot.querySelectorAll('.rv-reveal'));
+    };
+
+    const loadCart = async () => {
+      try {
+        const cart = await cartApi.getCart();
+        if (!cart) throw new Error('Cart request failed');
+        renderCart(cart);
+      } catch {
+        if (itemsWrap) itemsWrap.innerHTML = '<div class="rv-cart-loading">We could not load your bag right now.</div>';
+        cartCountEls.forEach((el) => { el.textContent = 'Bag unavailable'; });
+      }
+    };
+
+    const updateLineItem = async (lineId, quantity) => {
+      if (!cartState) return;
+      const itemEl = itemsWrap?.querySelector(`[data-line-id="${CSS.escape(lineId)}"]`);
+      if (quantity === 0 && itemEl) itemEl.classList.add('removing');
+      const cart = quantity === 0
+        ? await cartApi.removeCartLine(lineId)
+        : await cartApi.updateCartLine(lineId, quantity);
+      renderCart(cart);
+    };
+
+    const addUpsell = async (handle, button) => {
+      const product = suggestionData.find((item) => item.handle === handle);
+      if (!product?.firstVariantId) return;
+
+      await cartApi.addToCart(product.firstVariantId, 1);
+
+      button.textContent = 'Added ✓';
+      button.disabled = true;
+      const cart = await cartApi.getCart();
+      if (!cart) return;
+      renderCart(cart);
+    };
+
+    const applyPromo = () => {
+      const code = String(promoInput?.value || '').trim().toUpperCase();
+      if (!promoMessage || !checkoutLink) return;
+      if (!code) {
+        promoMessage.textContent = 'Please enter a promo code.';
+        promoMessage.style.color = '#b8b0a6';
+        return;
+      }
+      currentDiscountCode = code;
+      promoMessage.textContent = `Code "${code}" will be applied at checkout.`;
+      promoMessage.style.color = '#3d5c35';
+      const url = new URL(checkoutLink.href, window.location.origin);
+      url.searchParams.set('discount', code);
+      checkoutLink.href = url.pathname + url.search;
+    };
+
+    const observeReveals = (elements) => {
+      if (!('IntersectionObserver' in window)) {
+        Array.from(elements).forEach((el) => el.classList.add('in'));
+        return;
+      }
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add('in');
+          observer.unobserve(entry.target);
+        });
+      }, { threshold: 0.06 });
+      Array.from(elements).forEach((el) => {
+        if (!el.classList.contains('in')) observer.observe(el);
+      });
+    };
+
+    cartRoot.addEventListener('click', async (event) => {
+      const qtyButton = event.target.closest('[data-qty-change]');
+      if (qtyButton) {
+        const lineId = qtyButton.getAttribute('data-line-id');
+        const delta = Number(qtyButton.getAttribute('data-qty-change'));
+        const item = getCartLines(cartState).find((entry) => entry.id === lineId);
+        if (!item) return;
+        const nextQty = Math.max(item.quantity + delta, 0);
+        try {
+          await updateLineItem(lineId, nextQty);
+        } catch {}
+        return;
+      }
+
+      const removeButton = event.target.closest('[data-remove-item]');
+      if (removeButton) {
+        const lineId = removeButton.getAttribute('data-line-id');
+        if (!lineId) return;
+        try {
+          await updateLineItem(lineId, 0);
+        } catch {}
+        return;
+      }
+
+      const upsellButton = event.target.closest('[data-upsell-add]');
+      if (upsellButton) {
+        const handle = upsellButton.getAttribute('data-handle');
+        if (!handle) return;
+        try {
+          await addUpsell(handle, upsellButton);
+        } catch {}
+        return;
+      }
+    });
+
+    cartRoot.addEventListener('change', async (event) => {
+      const qtyInput = event.target.closest('[data-qty-input]');
+      if (qtyInput) {
+        const lineId = qtyInput.getAttribute('data-line-id');
+        const nextQty = Math.max(Number(qtyInput.value) || 0, 0);
+        if (!lineId) return;
+        try {
+          await updateLineItem(lineId, nextQty);
+        } catch {}
+      }
+    });
+
+    giftToggle?.addEventListener('click', () => {
+      giftToggle.classList.toggle('open');
+      giftBody?.classList.toggle('open');
+    });
+
+    noteTextarea?.addEventListener('input', () => {
+      if (noteStatus) {
+        noteStatus.textContent = 'Saving message…';
+        noteStatus.style.color = '#8a7660';
+      }
+      window.clearTimeout(noteTimer);
+      noteTimer = window.setTimeout(async () => {
+        try {
+          const cart = await cartApi.updateCartNote(noteTextarea.value);
+          renderCart(cart);
+          if (noteStatus) {
+            noteStatus.textContent = 'Gift message saved';
+            noteStatus.style.color = '#3d5c35';
+          }
+        } catch {
+          if (noteStatus) {
+            noteStatus.textContent = 'Could not save message';
+            noteStatus.style.color = '#8b3a2a';
+          }
+        }
+      }, 500);
+    });
+
+    promoApply?.addEventListener('click', applyPromo);
+    promoInput?.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        applyPromo();
+      }
+    });
+
+    paypalButton?.addEventListener('click', () => {
+      window.location.href = checkoutLink?.href || '/checkout';
+    });
+
+    document.querySelectorAll('.rv-htrack').forEach((track) => {
+      let isDown = false;
+      let startX = 0;
+      let scrollLeft = 0;
+      track.addEventListener('mousedown', (event) => {
+        isDown = true;
+        startX = event.pageX - track.offsetLeft;
+        scrollLeft = track.scrollLeft;
+      });
+      track.addEventListener('mouseleave', () => { isDown = false; });
+      track.addEventListener('mouseup', () => { isDown = false; });
+      track.addEventListener('mousemove', (event) => {
+        if (!isDown) return;
+        event.preventDefault();
+        track.scrollLeft = scrollLeft - (event.pageX - track.offsetLeft - startX) * 1.6;
+      });
+    });
+
+    loadCart();
+  }
+  })();
+</script>

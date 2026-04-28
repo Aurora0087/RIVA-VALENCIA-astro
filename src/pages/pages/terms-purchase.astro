@@ -1,0 +1,61 @@
+---
+import LegalPage from '@/components/LegalPage.astro';
+import Layout from '@/layouts/Layout.astro';
+
+const sections = [
+  {
+    heading: 'Scope',
+    body: [
+      'These Terms and Conditions of Purchase apply to orders placed through the Riva Valencia website for products offered for personal or business use.',
+      'By placing an order, you confirm that the information you provide is accurate and that you are authorized to use the selected payment method.',
+    ],
+  },
+  {
+    heading: 'Orders and Availability',
+    body: [
+      'All orders are subject to availability, payment approval and review by our team. We may contact you if additional information is needed before dispatch.',
+      'If a product becomes unavailable after purchase, we will notify you and arrange a refund or a suitable alternative if you prefer.',
+    ],
+  },
+  {
+    heading: 'Pricing and Payment',
+    body: [
+      'Prices displayed on the website are shown in the applicable storefront currency and may be updated from time to time.',
+      'Taxes, duties, shipping charges and any promotional discounts are shown at checkout where applicable before you confirm your order.',
+    ],
+  },
+  {
+    heading: 'Delivery and Returns',
+    body: [
+      'Estimated delivery times are provided for guidance only and may vary depending on destination, product availability and customs processing.',
+      'Return eligibility, exceptions and practical steps for returning a purchase are described in our returns and shipping information and may differ for bespoke or personalized pieces.',
+    ],
+  },
+  {
+    heading: 'Cancellations and Refunds',
+    body: [
+      'If you need to cancel or amend an order, please contact us as soon as possible. Once processing or shipment has started, changes may be limited.',
+      'Approved refunds are issued back to the original payment method. Processing time may vary depending on your payment provider.',
+    ],
+  },
+  {
+    heading: 'Support',
+    body: [
+      'Questions about an order, invoice, refund or delivery can be directed to our customer care team through the contact details published on the site.',
+    ],
+  },
+];
+---
+
+<Layout
+  title="Terms and Conditions of Purchase — RIVA VALENCIA"
+  description="Read the terms that apply when purchasing from Riva Valencia online."
+>
+  <LegalPage
+    eyebrow="Purchase Terms"
+    title="Terms and Conditions of Purchase"
+    intro="These terms explain the main conditions that apply when you place an order with Riva Valencia through our online store."
+    updated="April 28, 2026"
+    sections={sections}
+  />
+</Layout>

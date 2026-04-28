@@ -1,0 +1,58 @@
+---
+import LegalPage from '@/components/LegalPage.astro';
+import Layout from '@/layouts/Layout.astro';
+
+const sections = [
+  {
+    heading: 'What Cookies Are',
+    body: [
+      'Cookies are small text files stored on your device that help websites remember actions, preferences and technical information across sessions or visits.',
+    ],
+  },
+  {
+    heading: 'How We Use Cookies',
+    body: [
+      'We use cookies and similar technologies to keep the site functioning, maintain account sessions, understand storefront performance and improve the shopping experience.',
+      'Some cookies are essential for security and core checkout behavior, while others support analytics, personalization or campaign measurement.',
+    ],
+  },
+  {
+    heading: 'Types of Cookies',
+    items: [
+      'Essential cookies that enable basic site functions and secure use of the storefront.',
+      'Preference cookies that remember selections such as region, language or interface state.',
+      'Analytics cookies that help us understand traffic, navigation and page performance.',
+      'Marketing-related technologies that may measure campaigns or tailor communications where permitted.',
+    ],
+  },
+  {
+    heading: 'Managing Cookies',
+    body: [
+      'You can manage cookie preferences through our Cookie Settings page and through controls offered by your browser or device.',
+      'Blocking certain cookies may affect site functionality, saved preferences or the quality of personalized experiences.',
+    ],
+  },
+];
+---
+
+<Layout
+  title="Cookies Policy — RIVA VALENCIA"
+  description="Learn how Riva Valencia uses cookies and similar technologies."
+>
+  <LegalPage
+    eyebrow="Cookie Policy"
+    title="Cookies Policy"
+    intro="This policy explains the role of cookies and similar technologies across the Riva Valencia website."
+    updated="April 28, 2026"
+    sections={sections}
+  >
+    <section class="lp-extra rv-reveal">
+      <h2>Cookie Controls</h2>
+      <p>To update your choice, visit the dedicated settings page below.</p>
+      <ul>
+        <li><a href="/pages/cookie-settings">Open Cookie Settings</a></li>
+        <li><a href="/pages/privacy-management">Go to Privacy Management</a></li>
+      </ul>
+    </section>
+  </LegalPage>
+</Layout>

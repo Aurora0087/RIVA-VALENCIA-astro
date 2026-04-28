@@ -1,0 +1,88 @@
+---
+import Layout from '@/layouts/Layout.astro';
+
+const sitemapGroups = [
+  {
+    title: 'Shop',
+    links: [
+      ['/collections/all', 'All Products'],
+      ['/collections/womens', 'Women'],
+      ['/collections/mens', 'Men'],
+      ['/collections/accessories', 'Accessories'],
+      ['/collections/jackets', 'Jackets'],
+      ['/collections/limited-edition', 'Limited Edition'],
+      ['/collections/sale', 'Sale'],
+    ],
+  },
+  {
+    title: 'Collections',
+    links: [
+      ['/collections/new-in', 'New In'],
+      ['/collections/ss26', "SS'26"],
+      ['/collections/briefcases', 'Briefcases'],
+      ['/collections/handbags', 'Handbags'],
+      ['/collections/back-packs', 'Backpacks'],
+      ['/collections/gifts', 'Gifts'],
+      ['/collections/travel-items', 'Bespoke Collection'],
+    ],
+  },
+  {
+    title: 'Brand and Support',
+    links: [
+      ['/pages/about', 'Our Story'],
+      ['/pages/bespoke', 'Bespoke'],
+      ['/pages/corporategifts', 'Corporate Gifts'],
+      ['/pages/contact', 'Contact'],
+      ['/pages/faq', 'FAQ'],
+      ['/pages/size-guide', 'Size Guide'],
+      ['/pages/shipping', 'Shipping Policy'],
+      ['/pages/returns', 'Return Policy'],
+      ['/account/login', 'Account Login'],
+      ['/wishlist', 'Wishlist'],
+      ['/cart', 'Cart'],
+      ['/search', 'Search'],
+    ],
+  },
+  {
+    title: 'Legal',
+    links: [
+      ['/pages/terms-purchase', 'Terms and Conditions of Purchase'],
+      ['/pages/terms', 'Terms and Conditions'],
+      ['/pages/privacy', 'Privacy Policy'],
+      ['/pages/privacy-management', 'Privacy Management'],
+      ['/pages/cookies', 'Cookies Policy'],
+      ['/pages/cookie-settings', 'Cookie Settings'],
+      ['/pages/sitemap', 'Sitemap'],
+    ],
+  },
+];
+---
+
+<Layout
+  title="Sitemap — RIVA VALENCIA"
+  description="Browse the key pages, collections and legal information across the Riva Valencia website."
+>
+  <section class="lp-shell">
+    <div class="lp-hero rv-reveal">
+      <span class="lp-eyebrow">Navigation</span>
+      <h1 class="lp-title">Sitemap</h1>
+      <p class="lp-intro">A structured overview of the main shopping, brand and legal pages across the Riva Valencia website.</p>
+      <p class="lp-updated">Last updated: April 28, 2026</p>
+    </div>
+
+    <div class="lp-grid">
+      {sitemapGroups.map((group, index) => (
+        <section class:list={['lp-card', 'rv-reveal', index % 2 === 0 ? 'rv-reveal-l' : 'rv-reveal-r']}>
+          <h2>{group.title}</h2>
+          <ul style="list-style:none;margin:0">
+            {group.links.map(([href, label]) => (
+              <li style="margin-top:10px">
+                <a href={href} class="rv-inline-link">{label}</a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))}
+    </div>
+  </section>
+</Layout>

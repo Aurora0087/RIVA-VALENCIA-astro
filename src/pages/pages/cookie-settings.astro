@@ -1,0 +1,54 @@
+---
+import LegalPage from '@/components/LegalPage.astro';
+import Layout from '@/layouts/Layout.astro';
+
+const sections = [
+  {
+    heading: 'Your Current Choice',
+    body: [
+      'Riva Valencia stores a simple preference so the cookie notice does not repeatedly interrupt your visit once you have accepted it.',
+      'You can reset that choice below at any time and reopen the cookie notice.',
+    ],
+  },
+  {
+    heading: 'Browser Controls',
+    body: [
+      'Many browsers let you block, limit or remove cookies through privacy and security settings. Please note that disabling essential cookies may affect sign-in, cart persistence and other storefront functions.',
+    ],
+  },
+  {
+    heading: 'Related Information',
+    body: [
+      'For more detail about how cookie technologies are used and how data-related requests are handled, refer to our Cookies Policy and Privacy Policy.',
+    ],
+  },
+];
+---
+
+<Layout
+  title="Cookie Settings — RIVA VALENCIA"
+  description="Manage the cookie preference stored by the Riva Valencia website."
+>
+  <LegalPage
+    eyebrow="Cookie Controls"
+    title="Cookie Settings"
+    intro="Use this page to review and reset the cookie preference saved by this website."
+    updated="April 28, 2026"
+    sections={sections}
+  >
+    <section class="lp-extra rv-reveal">
+      <h2>Reset Preference</h2>
+      <p id="rvCookieStatus">Your saved cookie choice can be cleared from this device using the button below.</p>
+      <div class="rv-cookie-actions" style="margin-top:18px;justify-content:flex-start">
+        <button
+          type="button"
+          class="rv-cookie-accept"
+          onclick="localStorage.removeItem('rv_cookie_consent_v1'); window.RivaCookieBanner?.show(); document.getElementById('rvCookieStatus').textContent = 'Cookie choice reset. The notice is visible again.';"
+        >
+          Reset Cookie Choice
+        </button>
+        <a href="/pages/cookies" class="rv-cookie-link">Read Cookies Policy</a>
+      </div>
+    </section>
+  </LegalPage>
+</Layout>

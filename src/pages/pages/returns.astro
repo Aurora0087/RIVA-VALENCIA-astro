@@ -1,0 +1,50 @@
+---
+import LegalPage from '@/components/LegalPage.astro';
+import Layout from '@/layouts/Layout.astro';
+
+const sections = [
+  {
+    heading: 'Return Window',
+    body: [
+      'Eligible items may be returned within 30 days of delivery provided they remain unused, in their original condition and accompanied by original packaging and accessories.',
+    ],
+  },
+  {
+    heading: 'Non-Returnable Items',
+    body: [
+      'For hygiene, customization or production reasons, personalized, monogrammed, bespoke or otherwise made-to-order pieces may not be eligible for return unless faulty.',
+    ],
+  },
+  {
+    heading: 'How to Start a Return',
+    body: [
+      'To request a return, contact customer care with your order number and reason for return. We will guide you through the next steps and, where applicable, provide return instructions.',
+    ],
+  },
+  {
+    heading: 'Condition Review',
+    body: [
+      'Returned products are inspected once received. If an item shows clear signs of wear, use or damage not caused in transit, the return may be declined or adjusted in line with the condition found.',
+    ],
+  },
+  {
+    heading: 'Refunds',
+    body: [
+      'Approved refunds are sent to the original payment method. Timing depends on your payment provider and can vary after the return has been processed.',
+    ],
+  },
+];
+---
+
+<Layout
+  title="Return Policy — RIVA VALENCIA"
+  description="Read the return policy for eligible items, return requests and refunds."
+>
+  <LegalPage
+    eyebrow="Support"
+    title="Return Policy"
+    intro="This page explains return eligibility, how to request a return and what to expect during the refund process."
+    updated="April 28, 2026"
+    sections={sections}
+  />
+</Layout>

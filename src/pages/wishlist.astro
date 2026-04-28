@@ -1,0 +1,14 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import WishlistPage from '@/components/WishlistPage.astro';
+import { getAllProducts } from '@/lib/shopify';
+
+const { products } = await getAllProducts(20);
+---
+
+<Layout
+  title="Wishlist — RIVA VALENCIA"
+  description="Review your saved Riva Valencia pieces, share your wishlist, and add favourites to your bag."
+>
+  <WishlistPage suggestions={products} />
+</Layout>

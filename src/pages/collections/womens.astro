@@ -1,0 +1,339 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import { getCollectionByHandle, getAllCollections, formatPrice, isOnSale } from '@/lib/shopify';
+import { ProductGrid } from '@/components/ProductGrid';
+import { AllProductsPage } from '@/components/AllProductsPage';
+
+const COLLECTION_HANDLE = 'womens-collections';
+const { collection, status } = await getCollectionByHandle(COLLECTION_HANDLE);
+const products = collection?.products.edges.map((e) => e.node) ?? [];
+
+const BEST_TAGS = new Set(['best', 'best-seller', 'bestseller', 'best seller']);
+const bestSellers = products.filter((p) =>
+  p.tags.some((t) => BEST_TAGS.has(t.toLowerCase()))
+);
+
+const allCollections =
+  status.ok && (!collection || products.length === 0) ? await getAllCollections() : [];
+
+const REVIEWS = [
+  { text: 'The shoulder bag is soft, sculptural and beautifully made. It has that quiet luxury feeling that is hard to find.', author: 'Isabel Romero — Barcelona, Spain', stars: 5 },
+  { text: 'Everything felt elegant, from the replies to the packaging to the final piece. The whole experience was very considered.', author: 'Chiara Bellini — Rome, Italy', stars: 5 },
+  { text: 'I ordered a handbag for daily wear and the proportions are perfect. It feels timeless and very easy to style.', author: 'Lucia Navarro — Seville, Spain', stars: 5 },
+  { text: 'The finish is stunning and the leather feels rich without being heavy. I would absolutely order again.', author: 'Giulia Moretti — Turin, Italy', stars: 5 },
+];
+
+const AS_SEEN_ON = [
+  {
+    name: '@annabelrosendahl',
+    href: '/collections/womens?cat=shoulder-bags',
+    img: 'https://cdn.shopify.com/s/files/1/0812/7738/7010/files/Gemini_Generated_Image_qyjmyeqyjmyeqyjm.png?v=1775935488',
+  },
+  {
+    name: '@tamaramory',
+    href: '/collections/womens?cat=handbags',
+    img: 'https://cdn.shopify.com/s/files/1/0812/7738/7010/files/Gemini_Generated_Image_n17qn0n17qn0n17q.png?v=1776004987',
+  },
+  {
+    name: '@leiasfez',
+    href: '/collections/womens?cat=sling-bags',
+    img: 'https://cdn.shopify.com/s/files/1/0812/7738/7010/files/Gemini_Generated_Image_ohy6lqohy6lqohy6.png?v=1776001569',
+  },
+  {
+    name: '@styledbylucy',
+    href: '/collections/womens?cat=laptop-bags',
+    img: 'https://cdn.shopify.com/s/files/1/0812/7738/7010/files/download_21.jpg?v=1777064998',
+  },
+];
+---
+
+<Layout title={`${collection?.title ?? "Women's Collection"} — RIVA VALENCIA`}>
+
+  <!-- ── HERO ── -->
+  <a class="rv-hero" href="/collections/womens">
+    <img
+      src="https://cdn.shopify.com/s/files/1/0812/7738/7010/files/Gemini_Generated_Image_qyjmyeqyjmyeqyjm.png?v=1775935488"
+      alt="Women's Collection — Spring / Summer 2026"
+    />
+    <div class="rv-hero-grad"></div>
+    <div class="rv-hero-content">
+      <span class="rv-hero-eyebrow">Spring / Summer 2026</span>
+      <span class="rv-hero-h1">Women's<br>Leather</span>
+      <span class="rv-hero-sub">Crafted in the heart of Spain</span>
+      <span class="rv-hero-btn">Discover the Collection →</span>
+    </div>
+  </a>
+
+  <div class="rv-sh rv-reveal">
+    <h2>Shop the Full Collection</h2>
+    <p>Filter, sort and explore every piece in the women&apos;s collection</p>
+  </div>
+  <AllProductsPage
+    products={products}
+    status={status}
+    title={collection?.title ?? "Women's Collection"}
+    breadcrumbLabel={collection?.title ?? "Women's Collection"}
+    kicker="Women's Collection"
+    metaItems={['Crafted in Spain', 'Full-Grain Leather']}
+    embedded
+    client:load
+  />
+
+  <!-- ── NEW ARRIVALS ── -->
+  <div class="rv-sh rv-reveal">
+    <h2>New Arrivals</h2>
+    <p>The finest Spanish leather, crafted for the modern woman</p>
+  </div>
+  <div class="rv-g2">
+    <a class="rv-ec rv-reveal rv-reveal-l" href="/collections/womens?cat=shoulder-bags">
+      <img
+        src="https://cdn.shopify.com/s/files/1/0812/7738/7010/files/Gemini_Generated_Image_ohy6lqohy6lqohy6.png?v=1776001569"
+        alt="Shoulder Bags — New In"
+        loading="lazy"
+      />
+      <div class="rv-ec-grad"></div>
+      <div class="rv-ec-body">
+        <span class="rv-ec-tag">New In · Spring 2026</span>
+        <span class="rv-ec-title">Shoulder Bags</span>
+        <span class="rv-ec-cta">Shop Now →</span>
+      </div>
+    </a>
+    <a class="rv-ec rv-reveal rv-reveal-r" href="/collections/womens?cat=handbags">
+      <img
+        src="https://cdn.shopify.com/s/files/1/0812/7738/7010/files/Gemini_Generated_Image_n17qn0n17qn0n17q.png?v=1776004987"
+        alt="Handbags — New In"
+        loading="lazy"
+      />
+      <div class="rv-ec-grad"></div>
+      <div class="rv-ec-body">
+        <span class="rv-ec-tag">New In · Spring 2026</span>
+        <span class="rv-ec-title">Handbags</span>
+        <span class="rv-ec-cta">Shop Now →</span>
+      </div>
+    </a>
+  </div>
+
+  <!-- ── BEST SELLERS ── -->
+  <div class="rv-sh rv-reveal">
+    <h2>Best Sellers</h2>
+    <p>Our most loved pieces — timeless by design</p>
+  </div>
+
+  {/* Connection diagnostic — shown only when products are missing */}
+  {status.ok && !collection && allCollections.length > 0 && (
+    <div class="rv-diag">
+      <h3>Collection handle mismatch — update COLLECTION_HANDLE in womens.astro</h3>
+      <table>
+        <thead><tr><th>Handle</th><th>Title</th><th>Has products</th></tr></thead>
+        <tbody>
+          {allCollections.map(c => (
+            <tr><td>{c.handle}</td><td>{c.title}</td><td>{c.productsCount > 0 ? '✓' : '—'}</td></tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )}
+  {!status.ok && status.reason === 'not_configured' && (
+    <div class="rv-diag">
+      <h3>Shopify not connected</h3>
+      <p style="font-size:12px;color:#92400e;padding:4px 0">
+        Set PUBLIC_SHOPIFY_STORE_DOMAIN and PUBLIC_SHOPIFY_STOREFRONT_TOKEN in .env, then restart the dev server.
+      </p>
+    </div>
+  )}
+
+  {bestSellers.length > 0
+    ? <ProductGrid products={bestSellers} client:load />
+    : <ProductGrid products={products} client:load />
+  }
+
+  <!-- ── VIDEO ── -->
+  <div class="rv-vid">
+    <video autoplay muted loop playsinline>
+      <source src="https://cdn.shopify.com/videos/c/o/v/6b863cf816834b5ca830823360449c38.mp4" type="video/mp4" />
+    </video>
+    <div class="rv-vid-overlay">
+      <span class="rv-vid-label">Our Craftsmanship</span>
+      <span class="rv-vid-title">Designed<br>In Spain</span>
+      <span class="rv-vid-body">
+        Every bag cut, stitched and finished<br>by artisan hands in Valencia
+      </span>
+      <a href="/pages/craftsmanship" class="rv-vid-btn">Discover Our Story</a>
+    </div>
+  </div>
+
+  <!-- ── FEATURE GRID ── -->
+  <div class="rv-sh rv-reveal">
+    <h2>The Collections</h2>
+    <p>Every category, every occasion</p>
+  </div>
+  <div class="rv-feat">
+    <a class="rv-ec rv-reveal rv-reveal-l" href="/collections/womens?cat=handbags" style="height:100%">
+      <img
+        src="https://cdn.shopify.com/s/files/1/0812/7738/7010/files/Gemini_Generated_Image_ohy6lqohy6lqohy6.png?v=1776001569"
+        alt="Handbags Collection"
+        style="aspect-ratio:unset;height:100%;min-height:600px"
+        loading="lazy"
+      />
+      <div class="rv-ec-grad"></div>
+      <div class="rv-ec-body">
+        <span class="rv-ec-tag">Collection</span>
+        <span class="rv-ec-title">Handbags</span>
+        <span class="rv-ec-cta">Explore →</span>
+      </div>
+    </a>
+    <div class="rv-feat-r">
+      <a class="rv-ec rv-reveal rv-reveal-r" href="/collections/womens?cat=backpacks">
+        <img
+          src="https://cdn.shopify.com/s/files/1/0812/7738/7010/files/4a8acfb5a7916c96b74de5368e47df1c.jpg?v=1775999513"
+          alt="Backpacks"
+          style="aspect-ratio:unset;height:100%;min-height:280px"
+          loading="lazy"
+        />
+        <div class="rv-ec-grad"></div>
+        <div class="rv-ec-body">
+          <span class="rv-ec-tag">Everyday Essential</span>
+          <span class="rv-ec-title">Backpacks</span>
+          <span class="rv-ec-cta">Explore →</span>
+        </div>
+      </a>
+      <a class="rv-ec rv-reveal rv-reveal-r rv-reveal-delay2" href="/collections/womens?cat=wallets">
+        <img
+          src="https://cdn.shopify.com/s/files/1/0812/7738/7010/files/Gemini_Generated_Image_2qiani2qiani2qia.png?v=1775996042"
+          alt="Wallets & Belts"
+          style="aspect-ratio:unset;height:100%;min-height:280px"
+          loading="lazy"
+        />
+        <div class="rv-ec-grad"></div>
+        <div class="rv-ec-body">
+          <span class="rv-ec-tag">Small Leather Goods</span>
+          <span class="rv-ec-title">Wallets & Belts</span>
+          <span class="rv-ec-cta">Explore →</span>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <!-- ── AS SEEN ON ── -->
+  <section class="rv-seen">
+    <div class="rv-seen-head rv-reveal">
+      <h2>AS SEEN ON</h2>
+    </div>
+    <div class="rv-seen-grid">
+      {AS_SEEN_ON.map(({ name, href, img }, index) => (
+        <a class:list={['rv-seen-card', 'rv-reveal', index % 2 === 0 ? 'rv-reveal-l' : 'rv-reveal-r']} href={href}>
+          <img src={img} alt={`As seen on ${name}`} loading="lazy" />
+          <div class="rv-seen-overlay"></div>
+          <span class="rv-seen-handle">{name}</span>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <!-- ── FULL BANNER ── -->
+  <a class="rv-fbanner rv-reveal" href="/collections/limited-edition">
+    <img
+      src="https://cdn.shopify.com/s/files/1/0812/7738/7010/files/Gemini_Generated_Image_jvsu4qjvsu4qjvsu.png?v=1776006386"
+      alt="Bespoke Collection"
+      loading="lazy"
+    />
+    <div class="rv-fbanner-ov"></div>
+    <div class="rv-fbanner-c">
+      <span class="rv-fbanner-tag">Limited Edition · 2026</span>
+      <span class="rv-fbanner-h2">The Bespoke<br>Collection</span>
+      <span class="rv-fbanner-cta">Explore Now</span>
+    </div>
+  </a>
+
+  <!-- ── TRUST BAR ── -->
+  <div class="rv-trust">
+    <div class="rv-trust-item rv-reveal">
+      <span class="rv-trust-icon">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+          <rect x="1" y="3" width="15" height="13" rx="1"/>
+          <path d="M16 8h3l4 4v4h-7V8z"/>
+          <circle cx="5.5" cy="18.5" r="2.5"/>
+          <circle cx="18.5" cy="18.5" r="2.5"/>
+        </svg>
+      </span>
+      <p class="rv-trust-h">Delivery</p>
+      <p class="rv-trust-p">Worldwide shipping available with great shipping rates.</p>
+    </div>
+    <div class="rv-trust-item rv-reveal rv-reveal-delay1">
+      <span class="rv-trust-icon">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+          <rect x="1" y="4" width="22" height="16" rx="2"/>
+          <line x1="1" y1="10" x2="23" y2="10"/>
+        </svg>
+      </span>
+      <p class="rv-trust-h">Secure Payment</p>
+      <p class="rv-trust-p">Pay in installments. Several payment methods available.</p>
+    </div>
+    <div class="rv-trust-item rv-reveal rv-reveal-delay2">
+      <span class="rv-trust-icon">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+          <polyline points="23 4 23 10 17 10"/>
+          <path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/>
+        </svg>
+      </span>
+      <p class="rv-trust-h">Returns</p>
+      <p class="rv-trust-p">Easy returns within 30 days.</p>
+    </div>
+    <div class="rv-trust-item rv-reveal rv-reveal-delay3">
+      <span class="rv-trust-icon">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+          <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+        </svg>
+      </span>
+      <p class="rv-trust-h">Customer Service</p>
+      <p class="rv-trust-p">Our team is here to help. Contact us by email.</p>
+    </div>
+  </div>
+
+  <!-- ── PAYMENT LOGOS ── -->
+  <div class="rv-payment rv-reveal">
+    {['VISA','MASTERCARD','AMEX','APPLE PAY','GOOGLE PAY','PAYPAL','KLARNA','UPI'].map((p, i, arr) => (
+      <>
+        <span class="rv-payment-logo">{p}</span>
+        {i < arr.length - 1 && i % 2 === 1 && <span class="rv-payment-sep"></span>}
+      </>
+    ))}
+  </div>
+
+  <!-- ── REVIEWS ── -->
+  <div class="rv-rev">
+    <div class="rv-rev-head rv-reveal">
+      <h2>What Our Clients Say</h2>
+      <p class="rv-rev-stars-big">★★★★★</p>
+      <p>4.9 / 5 · Based on 214 reviews</p>
+    </div>
+    <div class="swiper rv-rev-swiper">
+      <div class="swiper-wrapper">
+        {REVIEWS.map(({ text, author, stars }) => (
+          <div class="swiper-slide">
+            <div class="rv-rev-card rv-reveal">
+              <div class="rv-rev-stars">
+                {Array.from({ length: stars }).map(() => <span>★</span>)}
+              </div>
+              <p class="rv-rev-text">"{text}"</p>
+              <p class="rv-rev-author">— {author}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+
+  <!-- ── NEWSLETTER ── -->
+  <div class="rv-nl">
+    <span class="rv-nl-tag rv-reveal">Exclusive Access</span>
+    <h2 class="rv-reveal">Stay in the Know</h2>
+    <span class="rv-nl-sub rv-reveal">New arrivals, private sales and stories from our artisans</span>
+    <form class="rv-nl-form" onsubmit="return false">
+      <input type="email" class="rv-nl-input" placeholder="Your email address" />
+      <button type="submit" class="rv-nl-btn">Subscribe</button>
+    </form>
+    <p class="rv-nl-note">No spam. Unsubscribe anytime. Read our <a href="/pages/privacy" class="rv-inline-link">Privacy Policy</a>.</p>
+  </div>
+
+</Layout>

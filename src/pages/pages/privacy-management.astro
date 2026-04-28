@@ -1,0 +1,57 @@
+---
+import LegalPage from '@/components/LegalPage.astro';
+import Layout from '@/layouts/Layout.astro';
+
+const sections = [
+  {
+    heading: 'Managing Your Information',
+    body: [
+      'You can contact us to request access to the personal information we hold about you, ask us to correct inaccuracies or request deletion where applicable.',
+      'Some requests may be subject to identity verification and legal or operational exceptions.',
+    ],
+  },
+  {
+    heading: 'Marketing Preferences',
+    body: [
+      'Email and promotional preferences can be updated using the unsubscribe links in our communications or by contacting customer care.',
+      'Transactional messages related to purchases, service and account security may still be sent where necessary.',
+    ],
+  },
+  {
+    heading: 'Cookie and Tracking Controls',
+    body: [
+      'Cookie choices can be managed separately through our Cookie Settings page and browser-level privacy controls.',
+      'Disabling some technologies may affect parts of the website such as saved preferences, sign-in convenience or analytics-based improvements.',
+    ],
+  },
+  {
+    heading: 'Regional Rights',
+    body: [
+      'Depending on your location, you may have additional rights regarding portability, restriction of processing, objection to certain uses or complaint rights with a supervisory authority.',
+    ],
+  },
+];
+---
+
+<Layout
+  title="Privacy Management — RIVA VALENCIA"
+  description="Manage your privacy choices and understand your data rights at Riva Valencia."
+>
+  <LegalPage
+    eyebrow="Privacy Controls"
+    title="Privacy Management"
+    intro="This page summarizes the controls available to help you manage your personal information, communication preferences and privacy-related choices."
+    updated="April 28, 2026"
+    sections={sections}
+  >
+    <section class="lp-extra rv-reveal">
+      <h2>Quick Links</h2>
+      <ul>
+        <li><a href="/pages/privacy">Read the Privacy Policy</a></li>
+        <li><a href="/pages/cookie-settings">Manage Cookie Settings</a></li>
+        <li><a href="/pages/cookies">Read the Cookies Policy</a></li>
+        <li><a href="/pages/contact">Contact Customer Care</a></li>
+      </ul>
+    </section>
+  </LegalPage>
+</Layout>

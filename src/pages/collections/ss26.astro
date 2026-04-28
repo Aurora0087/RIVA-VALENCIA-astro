@@ -1,0 +1,413 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import { ProductGrid } from '@/components/ProductGrid';
+import {
+  getAllProducts,
+  getCollectionByHandle,
+  type ShopifyProduct,
+} from '@/lib/shopify';
+
+const COLLECTION_HANDLE = 'ss26';
+
+const HERO_FALLBACK =
+  'https://cdn.shopify.com/s/files/1/0812/7738/7010/files/Gemini_Generated_Image_qyjmyeqyjmyeqyjm.png?v=1775935488';
+const DETAIL_FALLBACKS = [
+  'https://cdn.shopify.com/s/files/1/0812/7738/7010/files/men1.png?v=1775979639',
+  'https://cdn.shopify.com/s/files/1/0812/7738/7010/files/Gemini_Generated_Image_t6anpt6anpt6anpt.png?v=1776009709',
+  'https://cdn.shopify.com/s/files/1/0812/7738/7010/files/download_10.jpg?v=1776007318',
+];
+
+const { collection, status } = await getCollectionByHandle(COLLECTION_HANDLE);
+const { products: allProducts } = await getAllProducts(120);
+
+const collectionProducts = collection?.products.edges.map((edge) => edge.node) ?? [];
+
+function hasSs26Tag(product: ShopifyProduct) {
+  return product.tags.some((tag) =>
+    ['ss26', "ss'26", 'ss-26', 'spring-summer-2026', 'spring summer 2026', 'spring-summer']
+      .includes(tag.toLowerCase())
+  );
+}
+
+function firstImage(product?: ShopifyProduct | null) {
+  return product?.images.edges[0]?.node ?? null;
+}
+
+const taggedProducts = collectionProducts.length > 0 ? [] : allProducts.filter(hasSs26Tag);
+const ss26Products = collectionProducts.length > 0 ? collectionProducts : taggedProducts;
+
+const heroImage =
+  collection?.image?.url ??
+  firstImage(ss26Products[0])?.url ??
+  HERO_FALLBACK;
+const heroAlt =
+  collection?.image?.altText ??
+  firstImage(ss26Products[0])?.altText ??
+  "Riva Valencia SS'26 collection";
+
+const detailOne = firstImage(ss26Products[1])?.url ?? DETAIL_FALLBACKS[0];
+const detailTwo = firstImage(ss26Products[2])?.url ?? DETAIL_FALLBACKS[1];
+const detailThree = firstImage(ss26Products[3])?.url ?? DETAIL_FALLBACKS[2];
+
+const pageTitle = collection?.title ?? "SS'26";
+const pageDescription =
+  collection?.description?.trim() ||
+  "Discover Riva Valencia SS'26: lighter silhouettes, warm neutrals, travel-ready leather pieces, and the same live product card experience as the all-products collection.";
+
+const featuredTypes = Array.from(
+  new Set(
+    ss26Products
+      .map((product) => product.productType || product.vendor || 'Leather Goods')
+      .filter(Boolean)
+  )
+).slice(0, 3);
+---
+
+<Layout
+  title={`${pageTitle} — RIVA VALENCIA`}
+  description={pageDescription}
+>
+  <section class="ss26-hero">
+    <img class="ss26-hero-bg" src={heroImage} alt={heroAlt ?? pageTitle} />
+    <div class="ss26-hero-ov"></div>
+    <div class="ss26-hero-grid">
+      <div class="ss26-hero-copy">
+        <span class="ss26-eyebrow">Spring Summer 2026</span>
+        <h1>SS'26</h1>
+        <p>
+          Soft structure, lighter palettes, and leather pieces designed for longer days,
+          warmer cities, and travel that starts before sunset.
+        </p>
+        <div class="ss26-hero-actions">
+          <a href="#ss26-collection" class="ss26-btn ss26-btn-dark">Shop the Season</a>
+          <a href="/pages/bespoke" class="ss26-btn ss26-btn-light">Bespoke for SS'26</a>
+        </div>
+      </div>
+
+      <div class="ss26-hero-note">
+        <span class="ss26-note-kicker">Season Notes</span>
+        <div class="ss26-note-lines">
+          <p><span>Palette</span><strong>Sand, tobacco, bone, espresso</strong></p>
+          <p><span>Focus</span><strong>Travel-ready leather essentials</strong></p>
+          <p><span>Craft</span><strong>Designed and finished in Spain</strong></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="ss26-marquee" aria-label="SS26 highlights">
+    <div class="ss26-marquee-track">
+      <span>
+        SPRING SUMMER 2026 · LIGHTER LEATHER LAYERS · DESIGNED IN SPAIN · CITY TO COAST ·
+        SPRING SUMMER 2026 · LIGHTER LEATHER LAYERS · DESIGNED IN SPAIN · CITY TO COAST
+      </span>
+    </div>
+  </section>
+
+  <section class="ss26-story">
+    <div class="ss26-story-copy">
+      <span class="ss26-eyebrow">The Mood</span>
+      <h2>The season shifts lighter.</h2>
+      <p>
+        SS'26 is built around movement: easy leather shapes, refined utility,
+        and a warmer visual language that feels right from early meetings to late dinners.
+      </p>
+      <p>
+        Expect tactile finishes, lighter carry profiles, and pieces that hold structure
+        without ever feeling heavy.
+      </p>
+    </div>
+
+    <div class="ss26-story-media">
+      <div class="ss26-story-stack">
+        <img src={detailOne} alt="SS'26 editorial detail one" loading="lazy" />
+        <img src={detailTwo} alt="SS'26 editorial detail two" loading="lazy" />
+      </div>
+    </div>
+  </section>
+
+  <section class="ss26-pillars">
+    <article class="ss26-pillar">
+      <span class="ss26-pillar-no">01</span>
+      <h3>Warm Minimalism</h3>
+      <p>Neutral tones and quiet hardware designed to work across tailoring, denim, and resort layers.</p>
+    </article>
+    <article class="ss26-pillar">
+      <span class="ss26-pillar-no">02</span>
+      <h3>Soft Utility</h3>
+      <p>Structured silhouettes stay practical, with pockets, straps, and proportions built for everyday movement.</p>
+    </article>
+    <article class="ss26-pillar">
+      <span class="ss26-pillar-no">03</span>
+      <h3>Travel Rhythm</h3>
+      <p>Pieces made to move cleanly from city mornings to airport lounges to summer evenings abroad.</p>
+    </article>
+  </section>
+
+  <section class="ss26-editorial">
+    <div class="ss26-editorial-main">
+      <img src={detailThree} alt="SS'26 feature campaign" loading="lazy" />
+      <div class="ss26-editorial-copy">
+        <span class="ss26-eyebrow">Collection Focus</span>
+        <h2>Refined for longer days.</h2>
+        <p>
+          This drop is less about excess and more about balance: lighter tones, easier carry,
+          and silhouettes that feel polished without feeling formal.
+        </p>
+      </div>
+    </div>
+    <div class="ss26-editorial-aside">
+      <span class="ss26-eyebrow">Key Categories</span>
+      <ul>
+        {(featuredTypes.length ? featuredTypes : ['Shoulder Bags', 'Travel Bags', 'Small Leather Goods']).map((item) => (
+          <li>{item}</li>
+        ))}
+      </ul>
+      <a href="#ss26-collection" class="ss26-text-link">View all SS'26 pieces →</a>
+    </div>
+  </section>
+
+  <section class="ss26-collection" id="ss26-collection">
+    <div class="rv-sh">
+      <h2>{pageTitle}</h2>
+      <p>Same live product cards as /collections/all</p>
+    </div>
+
+    {!collection && ss26Products.length > 0 && (
+      <p class="ss26-note">
+        Showing SS'26-tagged products while the dedicated collection content is being finalized.
+      </p>
+    )}
+
+    {ss26Products.length > 0 ? (
+      <ProductGrid products={ss26Products} client:load />
+    ) : (
+      <div class="ss26-empty">
+        <h3>No SS'26 pieces are live yet</h3>
+        <p>{status.ok ? pageDescription : status.message}</p>
+        <div class="ss26-empty-actions">
+          <a href="/collections/all" class="ss26-btn ss26-btn-dark">Shop All Products</a>
+          <a href="/pages/contact" class="ss26-btn ss26-btn-light">Contact the Atelier</a>
+        </div>
+      </div>
+    )}
+  </section>
+
+  <section class="ss26-banner">
+    <div class="ss26-banner-copy">
+      <span class="ss26-eyebrow">After the Season</span>
+      <h2>Need a variation on a piece you love?</h2>
+      <p>
+        Continue the SS'26 mood through our bespoke service with custom leather,
+        hardware, monogramming, and made-to-order finishing.
+      </p>
+      <a href="/pages/bespoke" class="ss26-btn ss26-btn-dark">Begin Bespoke</a>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .ss26-hero{
+    position:relative;min-height:92vh;display:flex;align-items:flex-end;overflow:hidden;
+    background:#1a1008;color:#fafaf8;
+  }
+  .ss26-hero-bg{
+    position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.8;
+    transform:scale(1.04);transition:transform 10s ease;
+  }
+  .ss26-hero:hover .ss26-hero-bg{transform:scale(1.09)}
+  .ss26-hero-ov{
+    position:absolute;inset:0;
+    background:linear-gradient(90deg,rgba(15,10,5,0.78) 0%,rgba(15,10,5,0.2) 55%,rgba(15,10,5,0.68) 100%);
+  }
+  .ss26-hero-grid{
+    position:relative;z-index:1;width:100%;
+    display:grid;grid-template-columns:minmax(0,1.2fr) minmax(280px,360px);
+    gap:32px;align-items:end;padding:72px 48px 56px;
+  }
+  .ss26-eyebrow{
+    display:block;font-size:9px;letter-spacing:0.38em;text-transform:uppercase;
+    color:#d6bc89;font-weight:500;margin-bottom:18px;
+  }
+  .ss26-hero-copy h1{
+    font-family:'Bebas Neue',sans-serif;font-size:clamp(84px,15vw,176px);
+    line-height:0.88;letter-spacing:0.04em;font-weight:400;margin-bottom:18px;
+  }
+  .ss26-hero-copy p{
+    max-width:560px;font-size:14px;line-height:1.9;letter-spacing:0.05em;
+    color:rgba(250,250,248,0.82);margin-bottom:30px;font-weight:300;
+  }
+  .ss26-hero-actions{display:flex;flex-wrap:wrap;gap:14px}
+  .ss26-btn{
+    display:inline-flex;align-items:center;justify-content:center;
+    min-height:50px;padding:0 28px;border:1px solid #1a1008;
+    font-size:10px;letter-spacing:0.28em;text-transform:uppercase;font-weight:500;
+    transition:background 0.28s,color 0.28s,border-color 0.28s,transform 0.28s;
+  }
+  .ss26-btn:hover{transform:translateY(-2px)}
+  .ss26-btn-dark{background:#1a1008;color:#fafaf8;border-color:#1a1008}
+  .ss26-btn-dark:hover{background:#2f2011}
+  .ss26-btn-light{background:rgba(250,250,248,0.08);color:#fafaf8;border-color:rgba(250,250,248,0.42)}
+  .ss26-btn-light:hover{background:rgba(250,250,248,0.16)}
+  .ss26-hero-note{
+    background:rgba(250,250,248,0.08);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+    border:1px solid rgba(250,250,248,0.14);padding:28px 26px 24px;
+  }
+  .ss26-note-kicker{
+    display:block;font-size:9px;letter-spacing:0.28em;text-transform:uppercase;
+    color:#d6bc89;margin-bottom:14px;
+  }
+  .ss26-note-lines{border-top:1px solid rgba(250,250,248,0.16)}
+  .ss26-note-lines p{
+    display:flex;flex-direction:column;gap:5px;padding:14px 0;border-bottom:1px solid rgba(250,250,248,0.12);
+  }
+  .ss26-note-lines span{
+    font-size:8px;letter-spacing:0.24em;text-transform:uppercase;color:rgba(250,250,248,0.52);
+  }
+  .ss26-note-lines strong{
+    font-size:13px;line-height:1.5;letter-spacing:0.05em;color:#fafaf8;font-weight:400;
+  }
+  .ss26-marquee{
+    overflow:hidden;background:#f1ebe1;border-top:1px solid #e7e0d6;border-bottom:1px solid #e7e0d6;
+    padding:14px 0;
+  }
+  .ss26-marquee-track{
+    display:flex;width:max-content;min-width:100%;animation:ss26-marquee 28s linear infinite;
+  }
+  .ss26-marquee-track span{
+    white-space:nowrap;padding-right:72px;font-size:10px;letter-spacing:0.26em;
+    text-transform:uppercase;color:#6f5d49;
+  }
+  @keyframes ss26-marquee{
+    0%{transform:translateX(0)}
+    100%{transform:translateX(-50%)}
+  }
+  .ss26-story{
+    display:grid;grid-template-columns:minmax(0,0.95fr) minmax(0,1.05fr);
+    gap:3px;align-items:stretch;padding:0 48px;background:#fafaf8;
+  }
+  .ss26-story-copy{
+    background:#f5f2ec;padding:84px 64px;display:flex;flex-direction:column;justify-content:center;
+  }
+  .ss26-story-copy h2,
+  .ss26-editorial-copy h2,
+  .ss26-banner-copy h2,
+  .ss26-empty h3{
+    font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,5vw,68px);
+    letter-spacing:0.08em;line-height:0.94;font-weight:400;color:#1a1008;margin-bottom:18px;
+  }
+  .ss26-story-copy p,
+  .ss26-editorial-copy p,
+  .ss26-banner-copy p,
+  .ss26-empty p{
+    font-size:14px;line-height:1.9;letter-spacing:0.04em;color:#5a4a3a;font-weight:300;
+  }
+  .ss26-story-copy p + p{margin-top:14px}
+  .ss26-story-media{min-width:0}
+  .ss26-story-stack{
+    display:grid;grid-template-columns:1fr 1fr;gap:3px;height:100%;
+  }
+  .ss26-story-stack img{
+    width:100%;height:100%;min-height:540px;object-fit:cover;display:block;
+  }
+  .ss26-pillars{
+    display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+    border-top:1px solid #e8e4de;border-bottom:1px solid #e8e4de;background:#fafaf8;
+  }
+  .ss26-pillar{
+    padding:40px 30px;border-right:1px solid #e8e4de;text-align:center;
+  }
+  .ss26-pillar:last-child{border-right:none}
+  .ss26-pillar-no{
+    display:block;font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:0.08em;
+    color:#c9a96e;margin-bottom:10px;
+  }
+  .ss26-pillar h3{
+    font-size:11px;letter-spacing:0.24em;text-transform:uppercase;color:#1a1008;
+    font-weight:600;margin-bottom:12px;
+  }
+  .ss26-pillar p{
+    font-size:12px;line-height:1.8;letter-spacing:0.04em;color:#8a7660;font-weight:300;
+  }
+  .ss26-editorial{
+    display:grid;grid-template-columns:minmax(0,1.4fr) minmax(260px,0.6fr);
+    gap:3px;padding:72px 48px;background:#fafaf8;
+  }
+  .ss26-editorial-main{position:relative;overflow:hidden;min-height:540px}
+  .ss26-editorial-main img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .ss26-editorial-main::after{
+    content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(15,10,5,0.72),rgba(15,10,5,0.08) 48%,transparent);
+  }
+  .ss26-editorial-copy{
+    position:absolute;left:32px;right:32px;bottom:32px;z-index:1;max-width:560px;
+  }
+  .ss26-editorial-copy h2,
+  .ss26-editorial-copy p{color:#fafaf8}
+  .ss26-editorial-copy p{color:rgba(250,250,248,0.8)}
+  .ss26-editorial-aside{
+    background:#f3ede4;padding:34px 30px;display:flex;flex-direction:column;justify-content:center;
+  }
+  .ss26-editorial-aside ul{list-style:none;margin:6px 0 24px;padding:0}
+  .ss26-editorial-aside li{
+    border-bottom:1px solid #e1d8cb;padding:14px 0;
+    font-size:13px;letter-spacing:0.08em;text-transform:uppercase;color:#1a1008;
+  }
+  .ss26-text-link{
+    display:inline-flex;align-items:center;gap:10px;align-self:flex-start;
+    font-size:10px;letter-spacing:0.24em;text-transform:uppercase;color:#1a1008;
+    border-bottom:1px solid #c9a96e;padding-bottom:4px;
+  }
+  .ss26-collection{padding:0 0 88px;background:#fafaf8}
+  .ss26-collection .rv-sh{padding-top:76px}
+  .ss26-collection .cl-grid-wrap{padding-top:0}
+  .ss26-note{
+    text-align:center;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;
+    color:#8a7660;padding:0 20px 24px;
+  }
+  .ss26-empty{
+    text-align:center;padding:24px 48px 20px;max-width:760px;margin:0 auto;
+  }
+  .ss26-empty-actions{
+    display:flex;justify-content:center;flex-wrap:wrap;gap:14px;margin-top:28px;
+  }
+  .ss26-banner{
+    padding:0 48px 92px;background:#fafaf8;
+  }
+  .ss26-banner-copy{
+    background:linear-gradient(135deg,#f4ede3 0%,#efe5d8 100%);
+    border:1px solid #e7ddd0;padding:54px 48px;max-width:980px;margin:0 auto;text-align:center;
+  }
+  .ss26-banner-copy p{max-width:640px;margin:0 auto 28px}
+
+  @media (max-width: 1100px){
+    .ss26-hero-grid,
+    .ss26-story,
+    .ss26-editorial{grid-template-columns:1fr}
+    .ss26-story-stack img{min-height:420px}
+    .ss26-pillars{grid-template-columns:1fr}
+    .ss26-pillar{border-right:none;border-bottom:1px solid #e8e4de}
+    .ss26-pillar:last-child{border-bottom:none}
+    .ss26-hero-note{max-width:420px}
+  }
+  @media (max-width: 820px){
+    .ss26-hero{min-height:780px}
+    .ss26-hero-grid,
+    .ss26-story,
+    .ss26-editorial,
+    .ss26-banner{padding-left:20px;padding-right:20px}
+    .ss26-hero-grid{padding-top:96px;padding-bottom:36px}
+    .ss26-story-copy{padding:52px 28px}
+    .ss26-story-stack{grid-template-columns:1fr}
+    .ss26-story-stack img{min-height:360px}
+    .ss26-editorial{padding-top:56px}
+    .ss26-editorial-aside{padding:28px 24px}
+    .ss26-banner-copy{padding:42px 28px}
+  }
+  @media (max-width: 520px){
+    .ss26-hero-copy h1{font-size:92px}
+    .ss26-hero-actions,
+    .ss26-empty-actions{flex-direction:column}
+    .ss26-btn{width:100%}
+    .ss26-hero-note{max-width:none}
+  }
+</style>

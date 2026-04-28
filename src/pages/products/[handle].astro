@@ -1,0 +1,36 @@
+---
+import ProductDetailPage from '@/components/ProductDetailPage.astro';
+import Layout from '@/layouts/Layout.astro';
+import { getAllProducts, getProductByHandle, getProductRecommendations, type ShopifyProduct } from '@/lib/shopify';
+
+export async function getStaticPaths() {
+  const { products } = await getAllProducts(100);
+
+  return products.map((product) => ({
+    params: { handle: product.handle },
+  }));
+}
+
+const handle = Astro.params.handle ?? '';
+const { product, status } = await getProductByHandle(handle);
+
+let recommendedProducts: ShopifyProduct[] = [];
+
+if (product) {
+  const recommended = await getProductRecommendations(product.id);
+  recommendedProducts = recommended.filter((item) => item.handle !== product.handle);
+
+  if (recommendedProducts.length < 6) {
+    const { products: fallbackProducts } = await getAllProducts(24);
+    const fallback = fallbackProducts.filter((item) => item.handle !== product.handle && !recommendedProducts.some((entry) => entry.handle === item.handle));
+    recommendedProducts = [...recommendedProducts, ...fallback].slice(0, 6);
+  }
+}
+
+const title = product ? `${product.title} — RIVA VALENCIA` : 'Product — RIVA VALENCIA';
+const description = product?.description || 'Discover handcrafted leather goods from Riva Valencia.';
+---
+
+<Layout title={title} description={description}>
+  <ProductDetailPage product={product} recommendedProducts={recommendedProducts} status={status} />
+</Layout>

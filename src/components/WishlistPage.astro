@@ -1,0 +1,588 @@
+---
+import { formatPrice, isOnSale, type ShopifyProduct } from '@/lib/shopify';
+import { wishlistItemFromProduct } from '@/lib/wishlist';
+
+interface Props {
+  suggestions: ShopifyProduct[];
+}
+
+const { suggestions = [] } = Astro.props;
+const suggestionItems = suggestions.slice(0, 8).map((product) => ({
+  product,
+  item: wishlistItemFromProduct(product),
+  image: product.images.edges[0]?.node,
+  price: product.priceRange.minVariantPrice,
+  compareAt: product.compareAtPriceRange.minVariantPrice,
+  onSale: isOnSale(product),
+}));
+---
+
+<div class="rv-wishlist" data-wishlist-root>
+  <div class="rv-wl-toast" data-wl-toast>
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12" /></svg>
+    <span data-wl-toast-message>Updated</span>
+  </div>
+
+  <div class="rv-wl-modal" data-wl-modal>
+    <button class="rv-wl-modal-bg" type="button" data-wl-close aria-label="Close share modal"></button>
+    <div class="rv-wl-modal-box" role="dialog" aria-modal="true" aria-labelledby="rvWlShareTitle">
+      <button class="rv-wl-modal-close" type="button" data-wl-close aria-label="Close">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+      </button>
+      <span class="rv-wl-modal-eyebrow">Share Your List</span>
+      <span class="rv-wl-modal-title" id="rvWlShareTitle">Share Wishlist</span>
+      <span class="rv-wl-modal-sub">Send your curated selection to anyone</span>
+      <div class="rv-wl-modal-link-row">
+        <input class="rv-wl-modal-link-input" data-wl-share-url readonly value="" aria-label="Wishlist share link" />
+        <button class="rv-wl-modal-copy" type="button" data-wl-copy>Copy Link</button>
+      </div>
+      <div class="rv-wl-modal-share-row">
+        <button class="rv-wl-modal-share-btn" type="button" data-wl-share="whatsapp">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z" /></svg>
+          WhatsApp
+        </button>
+        <button class="rv-wl-modal-share-btn" type="button" data-wl-share="email">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" /></svg>
+          Email
+        </button>
+        <button class="rv-wl-modal-share-btn" type="button" data-wl-share="native">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle cx="18" cy="19" r="3" /><line x1="8.59" y1="13.51" x2="15.42" y2="17.49" /><line x1="15.41" y1="6.51" x2="8.59" y2="10.49" /></svg>
+          Share
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <section class="rv-wl-page">
+    <div class="rv-wl-header rv-reveal">
+      <div>
+        <span class="rv-wl-eyebrow">My Collection</span>
+        <span class="rv-wl-title">Wishlist</span>
+        <span class="rv-wl-count" data-wl-count>0 saved pieces</span>
+      </div>
+      <div class="rv-wl-header-actions">
+        <button class="rv-wl-clear" type="button" data-wl-clear>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6" /><path d="M10 11v6" /><path d="M14 11v6" /></svg>
+          Clear All
+        </button>
+        <button class="rv-wl-share" type="button" data-wl-open-share>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle cx="18" cy="19" r="3" /><line x1="8.59" y1="13.51" x2="15.42" y2="17.49" /><line x1="15.41" y1="6.51" x2="8.59" y2="10.49" /></svg>
+          Share Wishlist
+        </button>
+      </div>
+    </div>
+
+    <div class="rv-wl-toolbar">
+      <button class="rv-wl-sort" type="button" data-wl-sort>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="3" y1="6" x2="21" y2="6" /><line x1="6" y1="12" x2="18" y2="12" /><line x1="9" y1="18" x2="15" y2="18" /></svg>
+        <span data-wl-sort-label>Sort: Recently Added</span>
+      </button>
+      <div class="rv-wl-view" aria-label="Wishlist grid view">
+        {[2, 3, 4].map((cols) => (
+          <button class:list={['rv-wl-vb', cols === 4 && 'active']} type="button" data-wl-view={cols} title={`${cols} columns`}>
+            {cols === 2 && <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor"><rect x="0" y="0" width="6" height="14" rx="1" /><rect x="8" y="0" width="6" height="14" rx="1" /></svg>}
+            {cols === 3 && <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor"><rect x="0" y="0" width="3.5" height="14" rx="0.5" /><rect x="5.25" y="0" width="3.5" height="14" rx="0.5" /><rect x="10.5" y="0" width="3.5" height="14" rx="0.5" /></svg>}
+            {cols === 4 && <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor"><rect x="0" y="0" width="2.5" height="14" rx="0.5" /><rect x="3.8" y="0" width="2.5" height="14" rx="0.5" /><rect x="7.6" y="0" width="2.5" height="14" rx="0.5" /><rect x="11.4" y="0" width="2.5" height="14" rx="0.5" /></svg>}
+          </button>
+        ))}
+      </div>
+    </div>
+
+    <div class="rv-wl-empty" data-wl-empty>
+      <div class="rv-wl-empty-orn"><span>♡</span></div>
+      <span class="rv-wl-empty-title">Your Wishlist is Empty</span>
+      <span class="rv-wl-empty-sub">Save pieces you love and come back to them anytime</span>
+      <a href="/collections/all" class="rv-wl-empty-btn">Discover the Collection →</a>
+    </div>
+
+    <div class="cl-grid-wrap rv-wl-grid-wrap">
+      <div class="cl-grid rv-wl-grid" data-wl-grid></div>
+    </div>
+  </section>
+
+  {suggestionItems.length > 0 && (
+    <>
+      <div class="rv-orn rv-reveal"><span>✦</span></div>
+      <section class="rv-sh rv-reveal">
+        <h2>You May Also Love</h2>
+        <p>Pieces that pair perfectly</p>
+      </section>
+      <section class="rv-hscroll" aria-label="Suggested products">
+        <div class="rv-htrack" data-wl-suggest-track>
+          {suggestionItems.map(({ product, item, image, price, compareAt, onSale }) => (
+            <article class="rv-hcard">
+              <div class="rv-pc">
+                <div class="rv-pc-inner">
+                  <div class="rv-pc-wrap">
+                    <a href={`/products/${product.handle}`} aria-label={product.title}>
+                      {image ? (
+                        <img src={image.url} alt={image.altText ?? product.title} loading="lazy" />
+                      ) : (
+                        <div class="rv-pc-img-ph"></div>
+                      )}
+                    </a>
+                    {onSale && <span class="rv-pc-badge">Sale</span>}
+                    <button class="rv-pc-wish" type="button" data-wl-suggestion={JSON.stringify(item)} aria-label={`Save ${product.title}`}>
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" /></svg>
+                    </button>
+                  </div>
+                  <div class="rv-pc-info">
+                    <span class="rv-pc-col">{product.productType || product.vendor || 'Leather Goods'}</span>
+                    <a class="rv-pc-name" href={`/products/${product.handle}`}>{product.title}</a>
+                    <span class="rv-pc-price">
+                      {formatPrice(price.amount, price.currencyCode)}
+                      {onSale && <span class="rv-pc-price-old">{formatPrice(compareAt.amount, compareAt.currencyCode)}</span>}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+    </>
+  )}
+</div>
+
+<style>
+  .rv-wishlist{background:#fafaf8;color:#1a1008}
+  .rv-announce{background:#1a1008;color:#fafaf8;text-align:center;padding:10px 20px;font-size:10px;letter-spacing:0.32em;text-transform:uppercase;font-weight:400;overflow:hidden}
+  .rv-announce-track{display:inline-flex;gap:80px;animation:rvMarquee 28s linear infinite;white-space:nowrap}
+  @keyframes rvMarquee{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+  .rv-wl-page{min-height:70vh;padding:64px 48px 100px}
+  .rv-wl-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:8px;padding-bottom:28px;border-bottom:1px solid #e8e4de}
+  .rv-wl-eyebrow{font-size:9px;letter-spacing:0.36em;text-transform:uppercase;color:#c9a96e;font-weight:500;display:block;margin-bottom:10px}
+  .rv-wl-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,6vw,72px);letter-spacing:0.08em;color:#1a1008;font-weight:400;line-height:1;display:block}
+  .rv-wl-count{font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:#8a7660;font-weight:400;margin-top:8px;display:block}
+  .rv-wl-header-actions{display:flex;align-items:center;gap:20px;padding-bottom:4px}
+  .rv-wl-clear{background:none;border:none;cursor:pointer;font-family:'Jost',sans-serif;font-size:9px;letter-spacing:0.24em;text-transform:uppercase;color:#b8b0a6;font-weight:400;transition:color 0.2s;display:flex;align-items:center;gap:6px}
+  .rv-wl-clear:hover{color:#8b3a2a}
+  .rv-wl-share{display:inline-flex;align-items:center;gap:8px;font-size:9px;letter-spacing:0.24em;text-transform:uppercase;color:#1a1008;border:none;border-bottom:1px solid #c9a96e;padding-bottom:3px;transition:gap 0.3s;font-weight:500;cursor:pointer;background:none;font-family:'Jost',sans-serif}
+  .rv-wl-share:hover{gap:12px}
+  .rv-wl-toolbar{display:flex;align-items:center;justify-content:space-between;padding:18px 0;margin-bottom:32px;border-bottom:1px solid #f0ece6}
+  .rv-wl-sort{background:none;border:none;font-family:'Jost',sans-serif;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#8a7660;cursor:pointer;display:flex;align-items:center;gap:6px;transition:color 0.2s}
+  .rv-wl-sort:hover{color:#1a1008}
+  .rv-wl-view{display:flex;gap:4px}
+  .rv-wl-vb{background:none;border:1px solid transparent;cursor:pointer;padding:7px;color:#b8b0a6;transition:all 0.2s;display:flex;align-items:center}
+  .rv-wl-vb.active,.rv-wl-vb:hover{border-color:#e8e4de;color:#1a1008}
+  .rv-wl-grid-wrap{padding:0}
+  .rv-wl-grid{perspective:1200px}
+  .rv-wl-card{opacity:0;transform:translateY(36px) scale(0.97);transition:opacity 0.7s ease,transform 0.7s cubic-bezier(0.16,1,0.3,1)}
+  .rv-wl-card.in{opacity:1;transform:translateY(0) scale(1)}
+  .rv-wl-card-inner{transition:transform 0.5s cubic-bezier(0.34,1.56,0.64,1);transform-style:preserve-3d}
+  .rv-wl-card:hover .rv-wl-card-inner{transform:translateY(-10px) rotateX(2deg) rotateY(-1deg);box-shadow:0 24px 52px rgba(26,16,8,0.14)}
+  .rv-wl-card-img-wrap{position:relative;overflow:hidden;background:#edebe6}
+  .rv-wl-card-img-wrap img,.rv-wl-card-img-ph{width:100%;aspect-ratio:3/4;object-fit:cover;display:block;transition:transform 9s cubic-bezier(0.25,0.46,0.45,0.94);background:#edebe6}
+  .rv-wl-card:hover .rv-wl-card-img-wrap img{transform:scale(1.07)}
+  .rv-wl-badge{position:absolute;top:12px;left:0;background:#1a1008;color:#fafaf8;font-size:8px;letter-spacing:0.2em;text-transform:uppercase;padding:4px 12px;font-weight:500;z-index:2}
+  .rv-wl-badge.sale{background:#8b3a2a}
+  .rv-wl-badge.new{background:#4a6741}
+  .rv-wl-remove-btn{position:absolute;top:12px;right:12px;width:38px;height:38px;background:rgba(250,250,248,0.92);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#8b3a2a;transition:transform 0.4s cubic-bezier(0.34,1.56,0.64,1),background 0.2s;z-index:2;backdrop-filter:blur(8px)}
+  .rv-wl-remove-btn:hover{transform:scale(1.14);background:#fff}
+  .rv-wl-remove-btn svg{fill:#8b3a2a;stroke:#8b3a2a}
+  .rv-wl-remove-action{color:#8b3a2a}
+  .rv-wl-remove-action svg{fill:#8b3a2a;stroke:#8b3a2a}
+  .rv-wl-card-actions{position:absolute;bottom:0;left:0;right:0;display:flex;flex-direction:column;gap:0;opacity:0;transform:translateY(100%);transition:opacity 0.35s,transform 0.4s cubic-bezier(0.16,1,0.3,1);z-index:2}
+  .rv-wl-card:hover .rv-wl-card-actions{opacity:1;transform:translateY(0)}
+  .rv-wl-atc{width:100%;background:rgba(26,16,8,0.92);color:#fafaf8;border:none;cursor:pointer;font-family:'Jost',sans-serif;font-size:9px;letter-spacing:0.3em;text-transform:uppercase;padding:14px;font-weight:500;transition:background 0.2s,letter-spacing 0.3s}
+  .rv-wl-atc:hover{background:#1a1008;letter-spacing:0.36em}
+  .rv-wl-atc.done{background:#3d5c35}
+  .rv-wl-card-info{padding:16px 4px 8px}
+  .rv-wl-card-cat{font-size:9px;letter-spacing:0.24em;text-transform:uppercase;color:#8a7660;display:block;margin-bottom:5px;font-weight:400}
+  .rv-wl-card-name{font-size:14px;font-weight:400;color:#1a1008;display:block;margin-bottom:8px;line-height:1.35;letter-spacing:0.02em;transition:color 0.2s}
+  .rv-wl-card:hover .rv-wl-card-name{color:#8a7660}
+  .rv-wl-card-bottom{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+  .rv-wl-card-price{font-size:14px;color:#1a1008;letter-spacing:0.06em;font-weight:400}
+  .rv-wl-card-price-old{font-size:12px;color:#b8b0a6;text-decoration:line-through;margin-left:6px;font-weight:300}
+  .rv-wl-toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(80px);background:#1a1008;color:#fafaf8;font-size:10px;letter-spacing:0.22em;text-transform:uppercase;padding:14px 28px;z-index:2000;opacity:0;transition:opacity 0.4s,transform 0.4s cubic-bezier(0.16,1,0.3,1);pointer-events:none;white-space:nowrap;font-family:'Jost',sans-serif;display:flex;align-items:center;gap:8px}
+  .rv-wl-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .rv-wl-toast.green{background:#3d5c35}
+  .rv-wl-empty{text-align:center;padding:96px 20px;display:none}
+  .rv-wl-empty.show{display:block}
+  .rv-wl-empty-orn{display:flex;align-items:center;justify-content:center;gap:20px;margin-bottom:32px;color:#c9a96e;font-size:12px}
+  .rv-wl-empty-orn::before,.rv-wl-empty-orn::after{content:'';width:80px;height:1px;background:linear-gradient(to right,transparent,#c9a96e,transparent)}
+  .rv-wl-empty-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,5vw,56px);letter-spacing:0.1em;color:#1a1008;margin-bottom:12px;display:block}
+  .rv-wl-empty-sub{font-size:12px;letter-spacing:0.14em;text-transform:uppercase;color:#8a7660;margin-bottom:40px;display:block;font-weight:300}
+  .rv-wl-empty-btn{display:inline-flex;align-items:center;gap:12px;background:#1a1008;color:#fafaf8;font-family:'Jost',sans-serif;font-size:9px;letter-spacing:0.32em;text-transform:uppercase;padding:18px 48px;font-weight:600;transition:letter-spacing 0.35s,background 0.3s}
+  .rv-wl-empty-btn:hover{background:#2e1f0f;letter-spacing:0.38em}
+  .rv-wl-modal{position:fixed;inset:0;z-index:2000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.4s}
+  .rv-wl-modal.open{opacity:1;pointer-events:all}
+  .rv-wl-modal-bg{position:absolute;inset:0;background:rgba(15,10,5,0.6);backdrop-filter:blur(4px);border:none}
+  .rv-wl-modal-box{position:relative;background:#fafaf8;padding:52px 48px;max-width:480px;width:90vw;transform:translateY(24px) scale(0.96);transition:transform 0.4s cubic-bezier(0.34,1.56,0.64,1)}
+  .rv-wl-modal.open .rv-wl-modal-box{transform:translateY(0) scale(1)}
+  .rv-wl-modal-close{position:absolute;top:20px;right:20px;background:none;border:none;cursor:pointer;color:#8a7660;transition:transform 0.3s,color 0.2s}
+  .rv-wl-modal-close:hover{transform:rotate(90deg);color:#1a1008}
+  .rv-wl-modal-eyebrow{font-size:9px;letter-spacing:0.32em;text-transform:uppercase;color:#c9a96e;font-weight:500;display:block;margin-bottom:12px}
+  .rv-wl-modal-title{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:0.1em;color:#1a1008;margin-bottom:8px;display:block}
+  .rv-wl-modal-sub{font-size:12px;color:#8a7660;letter-spacing:0.1em;font-weight:300;margin-bottom:28px;display:block}
+  .rv-wl-modal-link-row{display:flex;border:1px solid #e8e4de;margin-bottom:24px}
+  .rv-wl-modal-link-input{flex:1;border:none;outline:none;font-family:'Jost',sans-serif;font-size:12px;font-weight:300;color:#1a1008;padding:12px 14px;background:transparent;letter-spacing:0.04em;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;min-width:0}
+  .rv-wl-modal-copy{background:#1a1008;color:#fafaf8;border:none;cursor:pointer;font-family:'Jost',sans-serif;font-size:9px;letter-spacing:0.24em;text-transform:uppercase;padding:12px 18px;font-weight:500;transition:background 0.25s;white-space:nowrap}
+  .rv-wl-modal-copy:hover{background:#3d2a1a}
+  .rv-wl-modal-share-row{display:flex;gap:10px}
+  .rv-wl-modal-share-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;border:1px solid #e8e4de;background:none;cursor:pointer;font-family:'Jost',sans-serif;font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:#1a1008;padding:13px;transition:border-color 0.25s,background 0.2s;font-weight:400}
+  .rv-wl-modal-share-btn:hover{border-color:#1a1008;background:#f5f2ec}
+  .rv-orn{display:flex;align-items:center;justify-content:center;gap:20px;padding:56px 48px;color:#c9a96e;font-size:12px}
+  .rv-orn::before,.rv-orn::after{content:'';flex:1;max-width:240px;height:1px;background:linear-gradient(to right,transparent,#c9a96e,transparent)}
+  .rv-sh{text-align:center;padding:72px 20px 48px}
+  .rv-sh h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(34px,5.5vw,64px);letter-spacing:0.1em;color:#1a1008;font-weight:400;margin-bottom:10px}
+  .rv-sh p{font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#8a7660;font-weight:400}
+  .rv-hscroll{padding:0 48px 80px}
+  .rv-htrack{display:flex;gap:20px;overflow-x:auto;scrollbar-width:none;padding-bottom:8px;cursor:grab;-webkit-overflow-scrolling:touch}
+  .rv-htrack::-webkit-scrollbar{display:none}
+  .rv-htrack:active{cursor:grabbing}
+  .rv-hcard{flex-shrink:0;width:240px}
+  .rv-pc{display:block;color:#1a1008;perspective:1000px;transform-style:preserve-3d}
+  .rv-pc-inner{transition:transform 0.5s cubic-bezier(0.34,1.56,0.64,1);transform-style:preserve-3d}
+  .rv-pc:hover .rv-pc-inner{transform:translateY(-8px) rotateX(2deg)}
+  .rv-pc-wrap{overflow:hidden;position:relative;background:#edebe6;box-shadow:0 0 0 rgba(26,16,8,0);transition:box-shadow 0.5s}
+  .rv-pc:hover .rv-pc-wrap{box-shadow:0 20px 48px rgba(26,16,8,0.14)}
+  .rv-pc img,.rv-pc-img-ph{width:100%;aspect-ratio:3/4;object-fit:cover;display:block;transition:transform 8s cubic-bezier(0.25,0.46,0.45,0.94);background:#edebe6}
+  .rv-pc:hover img{transform:scale(1.05)}
+  .rv-pc-badge{position:absolute;top:12px;left:0;background:#8b3a2a;color:#fafaf8;font-size:8px;letter-spacing:0.2em;text-transform:uppercase;padding:4px 12px;font-weight:500}
+  .rv-pc-wish{position:absolute;top:12px;right:12px;width:34px;height:34px;border:none;background:rgba(250,250,248,0.92);display:flex;align-items:center;justify-content:center;color:#1a1008;cursor:pointer;transition:transform 0.3s}
+  .rv-pc-wish:hover,.rv-pc-wish.wished{transform:scale(1.1);color:#8b3a2a}
+  .rv-pc-wish.wished svg{fill:#8b3a2a;stroke:#8b3a2a}
+  .rv-pc-info{padding:16px 2px 8px}
+  .rv-pc-col{font-size:9px;letter-spacing:0.24em;text-transform:uppercase;color:#8a7660;display:block;margin-bottom:5px;font-weight:400}
+  .rv-pc-name{font-size:14px;font-weight:400;color:#1a1008;display:block;margin-bottom:6px;line-height:1.3;letter-spacing:0.02em}
+  .rv-pc-price{font-size:13px;color:#5a4a3a;letter-spacing:0.06em;font-weight:400}
+  .rv-pc-price-old{font-size:11px;color:#b8b0a6;text-decoration:line-through;margin-left:7px}
+  @media(max-width:960px){
+    .rv-wl-page{padding:40px 20px 80px}
+    .rv-hscroll{padding:0 20px 64px}
+    .rv-hcard{width:200px}
+    .rv-orn{padding:40px 20px}
+    .rv-sh{padding:52px 20px 36px}
+  }
+  @media(max-width:520px){
+    .rv-wl-header{flex-direction:column;align-items:flex-start;gap:20px}
+    .rv-wl-header-actions{width:100%;justify-content:space-between}
+    .rv-wl-modal-box{padding:44px 24px}
+    .rv-wl-modal-share-row{display:grid;grid-template-columns:1fr}
+  }
+</style>
+
+<script is:inline>
+  (async function() {
+    var root = document.querySelector('[data-wishlist-root]');
+    if (!root) return;
+
+    var wishlistApi = window.RivaWishlist || await window.RivaWishlistReady;
+    var cartApi = window.RivaCart || await window.RivaCartReady;
+    var grid = root.querySelector('[data-wl-grid]');
+    var empty = root.querySelector('[data-wl-empty]');
+    var count = root.querySelector('[data-wl-count]');
+    var clearButton = root.querySelector('[data-wl-clear]');
+    var sortButton = root.querySelector('[data-wl-sort]');
+    var sortLabel = root.querySelector('[data-wl-sort-label]');
+    var modal = root.querySelector('[data-wl-modal]');
+    var shareInput = root.querySelector('[data-wl-share-url]');
+    var toast = root.querySelector('[data-wl-toast]');
+    var toastMessage = root.querySelector('[data-wl-toast-message]');
+    var sortMode = 'recent';
+    var toastTimer;
+
+    function escapeHtml(value) {
+      return String(value || '').replace(/[&<>"']/g, function(char) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char];
+      });
+    }
+
+    function formatMoney(amount, currency) {
+      return new Intl.NumberFormat('en-IN', {
+        style: 'currency',
+        currency: currency || 'INR',
+        maximumFractionDigits: 0,
+      }).format(Number(amount || 0));
+    }
+
+    function showToast(message, green) {
+      if (!toast || !toastMessage) return;
+      toastMessage.textContent = message;
+      toast.className = 'rv-wl-toast' + (green ? ' green' : '');
+      requestAnimationFrame(function() { toast.classList.add('show'); });
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(function() { toast.classList.remove('show'); }, 2500);
+    }
+
+    function sortedItems() {
+      var items = wishlistApi.getWishlist().slice();
+      if (sortMode === 'price-asc') items.sort(function(a, b) { return Number(a.priceAmount || 0) - Number(b.priceAmount || 0); });
+      if (sortMode === 'price-desc') items.sort(function(a, b) { return Number(b.priceAmount || 0) - Number(a.priceAmount || 0); });
+      if (sortMode === 'recent') items.sort(function(a, b) { return Number(b.addedAt || 0) - Number(a.addedAt || 0); });
+      return items;
+    }
+
+    function render() {
+      var items = sortedItems();
+      if (count) count.textContent = items.length + ' saved piece' + (items.length === 1 ? '' : 's');
+      if (clearButton) clearButton.hidden = items.length === 0;
+      if (!grid) return;
+
+      if (!items.length) {
+        grid.innerHTML = '';
+        empty?.classList.add('show');
+        syncSuggestionButtons();
+        return;
+      }
+
+      empty?.classList.remove('show');
+      grid.innerHTML = items.map(function(item, index) {
+        var sale = Number(item.compareAtAmount || 0) > Number(item.priceAmount || 0);
+        var isNew = (item.tags || []).some(function(tag) { return ['new', 'new-in'].includes(String(tag).toLowerCase()); });
+        var badges = '';
+        if (isNew) badges += '<span class="cl-card-badge new">New In</span>';
+        else if (sale) badges += '<span class="cl-card-badge sale">Sale</span>';
+        if (!item.availableForSale) badges += '<span class="cl-card-badge">Sold Out</span>';
+        var quickButton = item.availableForSale
+          ? '<button class="cl-card-quick" type="button" data-wl-add-cart="' + escapeHtml(item.id) + '">'
+            + (item.variantId
+              ? 'Quick Add — ' + escapeHtml(formatMoney(item.priceAmount, item.currencyCode))
+              : 'View Product →')
+            + '</button>'
+          : '';
+        return '<article class="cl-card" data-wl-card data-id="' + escapeHtml(item.id) + '" style="transition-delay:' + ((index % 4) * 0.07) + 's">'
+          + '<div class="cl-card-inner">'
+          + '<div class="cl-card-img-wrap">'
+          + '<a href="' + escapeHtml(item.url) + '" aria-label="' + escapeHtml(item.title) + '">'
+          + (item.image ? '<img src="' + escapeHtml(item.image) + '" alt="' + escapeHtml(item.imageAlt || item.title) + '" loading="lazy">' : '<div class="cl-card-img-ph"></div>')
+          + '</a>'
+          + badges
+          + '<div class="cl-card-actions">'
+          + '<button class="cl-card-action" type="button" data-wl-remove="' + escapeHtml(item.id) + '" title="Remove from wishlist">'
+          + '<svg width="15" height="15" viewBox="0 0 24 24" fill="#8b3a2a" stroke="#8b3a2a" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>'
+          + '</button>'
+          + '<button class="cl-card-action" type="button" data-wl-open-product="' + escapeHtml(item.id) + '" title="Quick view">'
+          + '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>'
+          + '</button>'
+          + '</div>'
+          + quickButton
+          + '</div>'
+          + '<div class="cl-card-info">'
+          + '<span class="cl-card-cat">' + escapeHtml(item.type || item.vendor || 'Leather Goods') + '</span>'
+          + '<a class="cl-card-name" href="' + escapeHtml(item.url) + '">' + escapeHtml(item.title) + '</a>'
+          + '<div class="cl-card-bottom"><span><span class="cl-card-price">' + escapeHtml(formatMoney(item.priceAmount, item.currencyCode)) + '</span>'
+          + (sale ? '<span class="cl-card-price-old">' + escapeHtml(formatMoney(item.compareAtAmount, item.currencyCode)) + '</span>' : '')
+          + '</span></div>'
+          + '</div>'
+          + '</div>'
+          + '</article>';
+      }).join('');
+
+      requestAnimationFrame(function() {
+        grid.querySelectorAll('[data-wl-card]').forEach(function(card) { card.classList.add('in'); });
+      });
+      syncSuggestionButtons();
+    }
+
+    function makeShareUrl() {
+      var items = wishlistApi.getWishlist();
+      var base = window.location.origin + window.location.pathname;
+      if (!items.length) return base;
+      var encoded = btoa(unescape(encodeURIComponent(JSON.stringify(items))));
+      return base + '#wishlist=' + encodeURIComponent(encoded);
+    }
+
+    function importSharedWishlist() {
+      if (!window.location.hash.startsWith('#wishlist=')) return;
+      try {
+        var payload = decodeURIComponent(window.location.hash.replace('#wishlist=', ''));
+        var items = JSON.parse(decodeURIComponent(escape(atob(payload))));
+        if (Array.isArray(items) && items.length) {
+          wishlistApi.setWishlist(items);
+          showToast('Shared wishlist loaded', true);
+          history.replaceState(null, '', window.location.pathname);
+        }
+      } catch {
+        showToast('Could not load shared wishlist');
+      }
+    }
+
+    function openShareModal() {
+      if (shareInput) shareInput.value = makeShareUrl();
+      modal?.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeShareModal() {
+      modal?.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    function syncSuggestionButtons() {
+      root.querySelectorAll('[data-wl-suggestion]').forEach(function(button) {
+        try {
+          var item = JSON.parse(button.getAttribute('data-wl-suggestion') || '{}');
+          var wished = wishlistApi.isWishlisted(item.id);
+          button.classList.toggle('wished', wished);
+          var icon = button.querySelector('svg');
+          if (icon) icon.setAttribute('fill', wished ? '#8b3a2a' : 'none');
+        } catch {}
+      });
+    }
+
+    grid?.addEventListener('click', async function(event) {
+      var remove = event.target.closest('[data-wl-remove]');
+      if (remove) {
+        event.preventDefault();
+        var card = remove.closest('[data-wl-card]');
+        var id = remove.getAttribute('data-wl-remove');
+        if (card) {
+          card.style.opacity = '0';
+          card.style.transform = 'scale(0.88) translateY(-8px)';
+        }
+        setTimeout(function() {
+          wishlistApi.removeWishlistItem(id);
+          render();
+          showToast('Removed from wishlist');
+        }, 280);
+        return;
+      }
+
+      var openProduct = event.target.closest('[data-wl-open-product]');
+      if (openProduct) {
+        event.preventDefault();
+        var openItem = wishlistApi.getWishlist().find(function(entry) { return entry.id === openProduct.getAttribute('data-wl-open-product'); });
+        if (openItem) window.location.href = openItem.url;
+        return;
+      }
+
+      var add = event.target.closest('[data-wl-add-cart]');
+      if (!add) return;
+      event.preventDefault();
+      var item = wishlistApi.getWishlist().find(function(entry) { return entry.id === add.getAttribute('data-wl-add-cart'); });
+      if (!item) return;
+      if (!item.variantId || !item.availableForSale) {
+        window.location.href = item.url;
+        return;
+      }
+
+      var original = add.textContent;
+      add.classList.add('added');
+      add.textContent = 'Added ✓';
+      try {
+        await cartApi.addToCart(item.variantId, 1);
+        showToast('Added to bag', true);
+      } catch {
+        showToast('Could not add to bag');
+      }
+      setTimeout(function() {
+        add.classList.remove('added');
+        add.textContent = original;
+      }, 1800);
+    });
+
+    clearButton?.addEventListener('click', function() {
+      if (!wishlistApi.getWishlist().length) return;
+      root.querySelectorAll('[data-wl-card]').forEach(function(card, index) {
+        setTimeout(function() {
+          card.style.opacity = '0';
+          card.style.transform = 'scale(0.88)';
+        }, index * 35);
+      });
+      setTimeout(function() {
+        wishlistApi.clearWishlist();
+        render();
+        showToast('Wishlist cleared');
+      }, Math.max(320, root.querySelectorAll('[data-wl-card]').length * 35 + 240));
+    });
+
+    sortButton?.addEventListener('click', function() {
+      var modes = ['recent', 'price-asc', 'price-desc'];
+      var labels = ['Sort: Recently Added', 'Sort: Price Low to High', 'Sort: Price High to Low'];
+      sortMode = modes[(modes.indexOf(sortMode) + 1) % modes.length];
+      if (sortLabel) sortLabel.textContent = labels[modes.indexOf(sortMode)];
+      render();
+    });
+
+    root.querySelectorAll('[data-wl-view]').forEach(function(button) {
+      button.addEventListener('click', function() {
+        var cols = button.getAttribute('data-wl-view');
+        grid.classList.remove('view-2', 'view-3');
+        if (cols !== '4') grid.classList.add('view-' + cols);
+        root.querySelectorAll('[data-wl-view]').forEach(function(viewButton) { viewButton.classList.remove('active'); });
+        button.classList.add('active');
+      });
+    });
+
+    root.querySelector('[data-wl-open-share]')?.addEventListener('click', openShareModal);
+    root.querySelectorAll('[data-wl-close]').forEach(function(button) {
+      button.addEventListener('click', closeShareModal);
+    });
+
+    root.querySelector('[data-wl-copy]')?.addEventListener('click', async function() {
+      if (!shareInput) return;
+      try {
+        await navigator.clipboard.writeText(shareInput.value);
+        showToast('Link copied', true);
+      } catch {
+        shareInput.select();
+        document.execCommand('copy');
+        showToast('Link copied', true);
+      }
+    });
+
+    root.querySelectorAll('[data-wl-share]').forEach(function(button) {
+      button.addEventListener('click', async function() {
+        var url = makeShareUrl();
+        var title = 'My Riva Valencia Wishlist';
+        var channel = button.getAttribute('data-wl-share');
+        if (channel === 'native' && navigator.share) {
+          await navigator.share({ title, url }).catch(function() {});
+        } else if (channel === 'whatsapp') {
+          window.open('https://wa.me/?text=' + encodeURIComponent(title + ' ' + url), '_blank');
+        } else {
+          window.location.href = 'mailto:?subject=' + encodeURIComponent(title) + '&body=' + encodeURIComponent('Take a look at my wishlist: ' + url);
+        }
+        closeShareModal();
+      });
+    });
+
+    root.querySelectorAll('[data-wl-suggestion]').forEach(function(button) {
+      button.addEventListener('click', function() {
+        try {
+          var item = JSON.parse(button.getAttribute('data-wl-suggestion') || '{}');
+          if (wishlistApi.isWishlisted(item.id)) {
+            wishlistApi.removeWishlistItem(item.id);
+            showToast('Removed from wishlist');
+          } else {
+            wishlistApi.addWishlistItem(item);
+            showToast('Saved to wishlist', true);
+          }
+          render();
+        } catch {
+          showToast('Could not update wishlist');
+        }
+      });
+    });
+
+    var track = root.querySelector('[data-wl-suggest-track]');
+    if (track) {
+      var down = false;
+      var startX = 0;
+      var scrollLeft = 0;
+      track.addEventListener('mousedown', function(event) {
+        down = true;
+        startX = event.pageX - track.offsetLeft;
+        scrollLeft = track.scrollLeft;
+      });
+      track.addEventListener('mouseleave', function() { down = false; });
+      track.addEventListener('mouseup', function() { down = false; });
+      track.addEventListener('mousemove', function(event) {
+        if (!down) return;
+        event.preventDefault();
+        track.scrollLeft = scrollLeft - (event.pageX - track.offsetLeft - startX) * 1.6;
+      });
+    }
+
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape') closeShareModal();
+    });
+    window.addEventListener('rv:wishlist-changed', render);
+    window.addEventListener('storage', render);
+
+    importSharedWishlist();
+    render();
+  })();
+</script>

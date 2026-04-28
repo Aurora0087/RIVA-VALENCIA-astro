@@ -1,0 +1,472 @@
+---
+import { formatPrice, isOnSale, type ShopifyConnectionStatus, type ShopifyProduct } from '@/lib/shopify';
+import { wishlistItemFromProduct } from '@/lib/wishlist';
+
+interface Props {
+  products: ShopifyProduct[];
+  status: ShopifyConnectionStatus;
+}
+
+const { products = [], status } = Astro.props;
+
+const searchProducts = products.map((product) => {
+  const firstVariant =
+    product.variants.edges.find(({ node }) => node.availableForSale)?.node ??
+    product.variants.edges[0]?.node;
+  const image = product.images.edges[0]?.node;
+  const price = firstVariant?.price ?? product.priceRange.minVariantPrice;
+  const compareAt = product.compareAtPriceRange.minVariantPrice;
+
+  return {
+    id: product.id,
+    handle: product.handle,
+    title: product.title,
+    description: product.description,
+    vendor: product.vendor,
+    productType: product.productType || 'Leather Goods',
+    tags: product.tags,
+    url: `/products/${product.handle}`,
+    image: image?.url ?? '',
+    imageAlt: image?.altText ?? product.title,
+    availableForSale: product.availableForSale && firstVariant?.availableForSale !== false,
+    variantId: firstVariant?.id ?? '',
+    priceAmount: price.amount,
+    compareAtAmount: compareAt.amount,
+    currencyCode: price.currencyCode,
+    onSale: isOnSale(product),
+    wishlistItem: wishlistItemFromProduct(product, firstVariant?.id),
+    searchText: [
+      product.title,
+      product.handle,
+      product.description,
+      product.vendor,
+      product.productType,
+      ...product.tags,
+    ].join(' ').toLowerCase(),
+  };
+});
+
+const popularSearches = ['tote', 'wallet', 'belt', 'backpack', 'briefcase', 'women', 'men', 'leather'];
+---
+
+<div class="sp-page" data-search-root>
+  <div class="rv-ann">
+    <div class="rv-ann-track">
+      <span>
+        Free delivery on orders above ₹5,000 &nbsp;·&nbsp; Handcrafted in Spain &nbsp;·&nbsp;
+        Easy 30-day returns &nbsp;·&nbsp; Secure payment &nbsp;·&nbsp; Search the full collection &nbsp;·&nbsp;
+        Free delivery on orders above ₹5,000 &nbsp;·&nbsp; Handcrafted in Spain &nbsp;·&nbsp;
+        Easy 30-day returns &nbsp;·&nbsp; Secure payment &nbsp;·&nbsp; Search the full collection
+      </span>
+    </div>
+  </div>
+
+  <nav class="sp-crumb" aria-label="Breadcrumb">
+    <a href="/">Home</a>
+    <span class="sp-crumb-sep">›</span>
+    <span>Search</span>
+  </nav>
+
+  <section class="sp-head rv-reveal">
+    <span class="sp-eyebrow">Riva Valencia Search</span>
+    <h1>Find Your Piece</h1>
+    <p>Search bags, wallets, belts, accessories and limited leather goods.</p>
+    <form class="sp-search" data-search-form>
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#8a7660" stroke-width="1.4"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
+      <input type="search" data-search-input placeholder="Search bags, wallets, accessories..." autocomplete="off" />
+      <button type="button" data-search-clear aria-label="Clear search">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+      </button>
+      <button type="submit">Search</button>
+    </form>
+    <div class="sp-popular" aria-label="Popular searches">
+      <span>Popular</span>
+      {popularSearches.map((term) => (
+        <button type="button" data-search-chip={term}>{term}</button>
+      ))}
+    </div>
+  </section>
+
+  <section class="sp-results">
+    <div class="sp-bar">
+      <div>
+        <span class="sp-result-label" data-search-title>All Products</span>
+        <span class="sp-result-count" data-search-count>{products.length} pieces</span>
+      </div>
+      <div class="sp-controls">
+        <label class="sp-sort">
+          <span>Sort</span>
+          <select data-search-sort>
+            <option value="relevance">Relevance</option>
+            <option value="price-asc">Price: Low to High</option>
+            <option value="price-desc">Price: High to Low</option>
+            <option value="title-asc">Name: A to Z</option>
+          </select>
+        </label>
+        <div class="sp-view" aria-label="Search result view">
+          {[2, 3, 4].map((cols) => (
+            <button class:list={['sp-view-btn', cols === 4 && 'active']} type="button" data-search-view={cols} title={`${cols} columns`}>
+              {cols === 2 && <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor"><rect x="0" y="0" width="6" height="14" rx="1" /><rect x="8" y="0" width="6" height="14" rx="1" /></svg>}
+              {cols === 3 && <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor"><rect x="0" y="0" width="3.5" height="14" rx="0.5" /><rect x="5.25" y="0" width="3.5" height="14" rx="0.5" /><rect x="10.5" y="0" width="3.5" height="14" rx="0.5" /></svg>}
+              {cols === 4 && <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor"><rect x="0" y="0" width="2.5" height="14" rx="0.5" /><rect x="3.8" y="0" width="2.5" height="14" rx="0.5" /><rect x="7.6" y="0" width="2.5" height="14" rx="0.5" /><rect x="11.4" y="0" width="2.5" height="14" rx="0.5" /></svg>}
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+
+    {!status.ok && (
+      <div class="sp-status">
+        <strong>{status.reason === 'not_configured' ? 'Shopify not connected' : 'API error'}:</strong>{' '}
+        {status.message}
+      </div>
+    )}
+
+    <div class="sp-empty" data-search-empty hidden>
+      <div class="sp-empty-orn"><span>⌕</span></div>
+      <span class="sp-empty-title">No Results Found</span>
+      <span class="sp-empty-sub">Try a broader search like wallet, tote, leather or bag</span>
+      <button type="button" class="sp-empty-btn" data-search-reset>View All Products</button>
+    </div>
+
+    <div class="sp-grid" data-search-grid></div>
+  </section>
+
+  <div class="sp-toast" data-search-toast>
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12" /></svg>
+    <span data-search-toast-message>Updated</span>
+  </div>
+</div>
+
+<style>
+  .sp-page{background:#fafaf8;color:#1a1008;min-height:70vh}
+  .rv-ann{background:#1a1008;color:#fafaf8;text-align:center;padding:10px 20px;font-size:10px;letter-spacing:0.32em;text-transform:uppercase;font-weight:400;overflow:hidden}
+  .rv-ann-track{display:inline-flex;gap:80px;animation:spMarquee 28s linear infinite;white-space:nowrap}
+  @keyframes spMarquee{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+  .sp-crumb{padding:18px 48px;display:flex;align-items:center;gap:9px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#8a7660;border-bottom:1px solid #e8e4de}
+  .sp-crumb a:hover{color:#1a1008}
+  .sp-crumb-sep{opacity:0.3}
+  .sp-head{padding:74px 48px 50px;text-align:center;border-bottom:1px solid #e8e4de}
+  .sp-eyebrow{font-size:9px;letter-spacing:0.38em;text-transform:uppercase;color:#c9a96e;font-weight:600;display:block;margin-bottom:14px}
+  .sp-head h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(46px,7vw,82px);letter-spacing:0.08em;font-weight:400;line-height:1;margin:0 0 12px}
+  .sp-head p{font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#8a7660;font-weight:300;margin:0 auto 38px}
+  .sp-search{max-width:760px;margin:0 auto;display:flex;align-items:center;gap:14px;border-bottom:1.5px solid #1a1008;padding:0 0 10px}
+  .sp-search input{flex:1;border:none;outline:none;background:transparent;font-family:'Jost',sans-serif;font-size:24px;font-weight:300;color:#1a1008;letter-spacing:0.04em;min-width:0}
+  .sp-search input::placeholder{color:#c8c0b4}
+  .sp-search button{background:none;border:none;cursor:pointer;font-family:'Jost',sans-serif;text-transform:uppercase;color:#1a1008}
+  .sp-search button[data-search-clear]{display:flex;color:#b8b0a6;padding:8px}
+  .sp-search button[type=submit]{font-size:9px;letter-spacing:0.3em;font-weight:700;padding:12px 0 12px 16px;transition:letter-spacing 0.3s}
+  .sp-search button[type=submit]:hover{letter-spacing:0.36em}
+  .sp-popular{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:22px}
+  .sp-popular span{font-size:9px;letter-spacing:0.26em;text-transform:uppercase;color:#8a7660;margin-right:4px}
+  .sp-popular button{border:1px solid #e8e4de;background:#f5f2ec;color:#6a5f50;cursor:pointer;font-family:'Jost',sans-serif;font-size:9px;letter-spacing:0.18em;text-transform:uppercase;padding:8px 14px;transition:background 0.2s,border-color 0.2s,color 0.2s}
+  .sp-popular button:hover{background:#1a1008;border-color:#1a1008;color:#fafaf8}
+  .sp-results{padding:0 48px 96px}
+  .sp-bar{display:flex;align-items:center;justify-content:space-between;padding:20px 0 28px;border-bottom:1px solid #f0ece6;margin-bottom:32px}
+  .sp-result-label{font-size:10px;letter-spacing:0.24em;text-transform:uppercase;color:#1a1008;font-weight:600;display:block;margin-bottom:5px}
+  .sp-result-count{font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#8a7660;font-weight:300}
+  .sp-controls{display:flex;align-items:center;gap:20px}
+  .sp-sort{display:flex;align-items:center;gap:10px}
+  .sp-sort span{font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:#8a7660}
+  .sp-sort select{border:none;border-bottom:1px solid #d4cfc8;background:transparent;font-family:'Jost',sans-serif;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:#1a1008;padding:8px 20px 8px 0;outline:none}
+  .sp-view{display:flex;gap:4px}
+  .sp-view-btn{background:none;border:1px solid transparent;cursor:pointer;padding:7px;color:#b8b0a6;transition:all 0.2s;display:flex;align-items:center}
+  .sp-view-btn.active,.sp-view-btn:hover{border-color:#e8e4de;color:#1a1008}
+  .sp-status{margin:0 0 28px;background:#f5f2ec;border-left:3px solid #8b3a2a;padding:16px 18px;font-size:12px;color:#5a4a3a;letter-spacing:0.05em}
+  .sp-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:28px;perspective:1200px}
+  .sp-grid.view-2{grid-template-columns:repeat(2,1fr)}
+  .sp-grid.view-3{grid-template-columns:repeat(3,1fr)}
+  .search-card-wish.wished{color:#8b3a2a}
+  .search-card-wish.wished svg{fill:#8b3a2a;stroke:#8b3a2a}
+  .sp-card{opacity:0;transform:translateY(34px) scale(0.97);transition:opacity 0.7s ease,transform 0.7s cubic-bezier(0.16,1,0.3,1)}
+  .sp-card.in{opacity:1;transform:translateY(0) scale(1)}
+  .sp-card-inner{transition:transform 0.5s cubic-bezier(0.34,1.56,0.64,1);transform-style:preserve-3d}
+  .sp-card:hover .sp-card-inner{transform:translateY(-10px) rotateX(2deg) rotateY(-1deg);box-shadow:0 24px 52px rgba(26,16,8,0.14)}
+  .sp-card-img{position:relative;overflow:hidden;background:#edebe6}
+  .sp-card-img img,.sp-card-ph{width:100%;aspect-ratio:3/4;object-fit:cover;display:block;transition:transform 9s cubic-bezier(0.25,0.46,0.45,0.94);background:#edebe6}
+  .sp-card:hover .sp-card-img img{transform:scale(1.07)}
+  .sp-badge{position:absolute;top:12px;left:0;background:#1a1008;color:#fafaf8;font-size:8px;letter-spacing:0.2em;text-transform:uppercase;padding:4px 12px;font-weight:500;z-index:2}
+  .sp-badge.sale{background:#8b3a2a}
+  .sp-badge.new{background:#4a6741}
+  .sp-wish{position:absolute;top:12px;right:12px;width:38px;height:38px;background:rgba(250,250,248,0.92);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#1a1008;transition:transform 0.35s cubic-bezier(0.34,1.56,0.64,1),background 0.2s;z-index:2;backdrop-filter:blur(8px)}
+  .sp-wish:hover,.sp-wish.wished{transform:scale(1.12);background:#fff;color:#8b3a2a}
+  .sp-wish.wished svg{fill:#8b3a2a;stroke:#8b3a2a}
+  .sp-card-actions{position:absolute;bottom:0;left:0;right:0;opacity:0;transform:translateY(100%);transition:opacity 0.35s,transform 0.4s cubic-bezier(0.16,1,0.3,1);z-index:2}
+  .sp-card:hover .sp-card-actions{opacity:1;transform:translateY(0)}
+  .sp-atc{width:100%;background:rgba(26,16,8,0.92);color:#fafaf8;border:none;cursor:pointer;font-family:'Jost',sans-serif;font-size:9px;letter-spacing:0.3em;text-transform:uppercase;padding:14px;font-weight:500;transition:background 0.2s,letter-spacing 0.3s}
+  .sp-atc:hover{background:#1a1008;letter-spacing:0.36em}
+  .sp-atc.done{background:#3d5c35}
+  .sp-card-info{padding:16px 4px 8px}
+  .sp-card-cat{font-size:9px;letter-spacing:0.24em;text-transform:uppercase;color:#8a7660;display:block;margin-bottom:5px;font-weight:400}
+  .sp-card-name{font-size:14px;font-weight:400;color:#1a1008;display:block;margin-bottom:8px;line-height:1.35;letter-spacing:0.02em;transition:color 0.2s}
+  .sp-card:hover .sp-card-name{color:#8a7660}
+  .sp-card-price{font-size:14px;color:#1a1008;letter-spacing:0.06em;font-weight:400}
+  .sp-card-price-old{font-size:12px;color:#b8b0a6;text-decoration:line-through;margin-left:6px;font-weight:300}
+  .sp-empty{text-align:center;padding:84px 20px}
+  .sp-empty-orn{display:flex;align-items:center;justify-content:center;gap:20px;margin-bottom:30px;color:#c9a96e;font-size:14px}
+  .sp-empty-orn::before,.sp-empty-orn::after{content:'';width:80px;height:1px;background:linear-gradient(to right,transparent,#c9a96e,transparent)}
+  .sp-empty-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(34px,5vw,54px);letter-spacing:0.1em;display:block;margin-bottom:10px}
+  .sp-empty-sub{font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:#8a7660;display:block;margin-bottom:32px}
+  .sp-empty-btn{background:#1a1008;color:#fafaf8;border:none;cursor:pointer;font-family:'Jost',sans-serif;font-size:9px;letter-spacing:0.3em;text-transform:uppercase;padding:16px 34px;font-weight:600;transition:letter-spacing 0.3s}
+  .sp-empty-btn:hover{letter-spacing:0.36em}
+  .sp-toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(80px);background:#1a1008;color:#fafaf8;font-size:10px;letter-spacing:0.22em;text-transform:uppercase;padding:14px 28px;z-index:2000;opacity:0;transition:opacity 0.4s,transform 0.4s cubic-bezier(0.16,1,0.3,1);pointer-events:none;white-space:nowrap;font-family:'Jost',sans-serif;display:flex;align-items:center;gap:8px}
+  .sp-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .sp-toast.green{background:#3d5c35}
+  @media(max-width:960px){
+    .sp-crumb,.sp-head,.sp-results{padding-left:20px;padding-right:20px}
+    .sp-grid{grid-template-columns:repeat(2,1fr);gap:14px}
+    .sp-grid.view-3{grid-template-columns:repeat(2,1fr)}
+    .sp-bar{align-items:flex-start;flex-direction:column;gap:18px}
+    .sp-controls{width:100%;justify-content:space-between}
+    .sp-search input{font-size:19px}
+  }
+  @media(max-width:520px){
+    .sp-head{padding-top:48px}
+    .sp-search{gap:8px}
+    .sp-search button[type=submit]{display:none}
+    .sp-grid{gap:10px}
+    .sp-controls{display:grid;grid-template-columns:1fr;gap:12px}
+    .sp-view{justify-content:flex-end}
+  }
+</style>
+
+<script is:inline define:vars={{ searchProducts }}>
+  (async function() {
+    var root = document.querySelector('[data-search-root]');
+    if (!root) return;
+
+    var wishlistApi = window.RivaWishlist || await window.RivaWishlistReady;
+    var cartApi = window.RivaCart || await window.RivaCartReady;
+    var input = root.querySelector('[data-search-input]');
+    var form = root.querySelector('[data-search-form]');
+    var clear = root.querySelector('[data-search-clear]');
+    var grid = root.querySelector('[data-search-grid]');
+    var empty = root.querySelector('[data-search-empty]');
+    var count = root.querySelector('[data-search-count]');
+    var title = root.querySelector('[data-search-title]');
+    var sort = root.querySelector('[data-search-sort]');
+    var toast = root.querySelector('[data-search-toast]');
+    var toastMessage = root.querySelector('[data-search-toast-message]');
+    var currentQuery = '';
+    var toastTimer;
+
+    function escapeHtml(value) {
+      return String(value || '').replace(/[&<>"']/g, function(char) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char];
+      });
+    }
+
+    function normalize(value) {
+      return String(value || '').trim().toLowerCase();
+    }
+
+    function formatMoney(amount, currency) {
+      return new Intl.NumberFormat('en-IN', {
+        style: 'currency',
+        currency: currency || 'INR',
+        maximumFractionDigits: 0,
+      }).format(Number(amount || 0));
+    }
+
+    function showToast(message, green) {
+      if (!toast || !toastMessage) return;
+      toastMessage.textContent = message;
+      toast.className = 'sp-toast' + (green ? ' green' : '');
+      requestAnimationFrame(function() { toast.classList.add('show'); });
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(function() { toast.classList.remove('show'); }, 2300);
+    }
+
+    function scoreProduct(product, terms) {
+      if (!terms.length) return 1;
+      var titleText = normalize(product.title);
+      var typeText = normalize(product.productType);
+      var tagText = normalize((product.tags || []).join(' '));
+      var score = 0;
+      terms.forEach(function(term) {
+        if (titleText === term) score += 70;
+        if (titleText.includes(term)) score += 35;
+        if (typeText.includes(term)) score += 18;
+        if (tagText.includes(term)) score += 12;
+        if (product.searchText.includes(term)) score += 5;
+      });
+      return score;
+    }
+
+    function getResults() {
+      var query = normalize(currentQuery);
+      var terms = query.split(/\s+/).filter(Boolean);
+      var results = searchProducts
+        .map(function(product) {
+          return { product: product, score: scoreProduct(product, terms) };
+        })
+        .filter(function(entry) {
+          return !terms.length || entry.score > 0;
+        });
+
+      var mode = sort?.value || 'relevance';
+      if (mode === 'price-asc') results.sort(function(a, b) { return Number(a.product.priceAmount) - Number(b.product.priceAmount); });
+      else if (mode === 'price-desc') results.sort(function(a, b) { return Number(b.product.priceAmount) - Number(a.product.priceAmount); });
+      else if (mode === 'title-asc') results.sort(function(a, b) { return a.product.title.localeCompare(b.product.title); });
+      else results.sort(function(a, b) { return b.score - a.score || a.product.title.localeCompare(b.product.title); });
+
+      return results.map(function(entry) { return entry.product; });
+    }
+
+    function updateUrl(query) {
+      var url = new URL(window.location.href);
+      if (query) url.searchParams.set('q', query);
+      else url.searchParams.delete('q');
+      history.replaceState(null, '', url.pathname + url.search + url.hash);
+    }
+
+    function syncWishlistButtons() {
+      root.querySelectorAll('[data-search-wish]').forEach(function(button) {
+        var id = button.getAttribute('data-search-wish');
+        var wished = wishlistApi.isWishlisted(id);
+        button.classList.toggle('wished', wished);
+        var icon = button.querySelector('svg');
+        if (icon) icon.setAttribute('fill', wished ? '#8b3a2a' : 'none');
+        if (icon) icon.setAttribute('stroke', wished ? '#8b3a2a' : 'currentColor');
+      });
+    }
+
+    function render() {
+      var results = getResults();
+      var query = currentQuery.trim();
+      if (count) count.textContent = results.length + ' piece' + (results.length === 1 ? '' : 's');
+      if (title) title.textContent = query ? 'Results for "' + query + '"' : 'All Products';
+
+      if (!grid) return;
+      if (!results.length) {
+        grid.innerHTML = '';
+        empty.hidden = false;
+        return;
+      }
+      empty.hidden = true;
+
+      grid.innerHTML = results.map(function(product, index) {
+        var sale = Number(product.compareAtAmount || 0) > Number(product.priceAmount || 0);
+        var isNew = (product.tags || []).some(function(tag) { return /^(new|new-in)$/i.test(tag); });
+        var badge = isNew ? '<span class="cl-card-badge new">New In</span>' : sale ? '<span class="cl-card-badge sale">Sale</span>' : '';
+        return '<article class="cl-card" data-search-card style="transition-delay:' + ((index % 4) * 0.06) + 's">'
+          + '<div class="cl-card-inner">'
+          + '<div class="cl-card-img-wrap">'
+          + '<a href="' + escapeHtml(product.url) + '" aria-label="' + escapeHtml(product.title) + '">'
+          + (product.image ? '<img src="' + escapeHtml(product.image) + '" alt="' + escapeHtml(product.imageAlt || product.title) + '" loading="lazy">' : '<div class="cl-card-img-ph"></div>')
+          + '</a>'
+          + badge
+          + '<div class="cl-card-actions">'
+          + '<button class="cl-card-action search-card-wish" type="button" data-search-wish="' + escapeHtml(product.id) + '" aria-label="Save ' + escapeHtml(product.title) + '">'
+          + '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>'
+          + '</button>'
+          + '</div>'
+          + '<button class="cl-card-quick" type="button" data-search-atc="' + escapeHtml(product.id) + '">' + (product.variantId && product.availableForSale ? 'Quick Add — ' + escapeHtml(formatMoney(product.priceAmount, product.currencyCode)) : 'View Product') + '</button>'
+          + '</div>'
+          + '<div class="cl-card-info">'
+          + '<span class="cl-card-cat">' + escapeHtml(product.productType || product.vendor || 'Leather Goods') + '</span>'
+          + '<a class="cl-card-name" href="' + escapeHtml(product.url) + '">' + escapeHtml(product.title) + '</a>'
+          + '<div class="cl-card-bottom"><span><span class="cl-card-price">' + escapeHtml(formatMoney(product.priceAmount, product.currencyCode)) + '</span>'
+          + (sale ? '<span class="cl-card-price-old">' + escapeHtml(formatMoney(product.compareAtAmount, product.currencyCode)) + '</span>' : '')
+          + '</span></div>'
+          + '</div>'
+          + '</div>'
+          + '</article>';
+      }).join('');
+
+      requestAnimationFrame(function() {
+        grid.querySelectorAll('[data-search-card]').forEach(function(card) { card.classList.add('in'); });
+      });
+      syncWishlistButtons();
+    }
+
+    function runSearch(query, shouldUpdateUrl) {
+      currentQuery = query || '';
+      input.value = currentQuery;
+      if (shouldUpdateUrl) updateUrl(currentQuery.trim());
+      render();
+    }
+
+    form?.addEventListener('submit', function(event) {
+      event.preventDefault();
+      runSearch(input.value, true);
+    });
+
+    input?.addEventListener('input', function() {
+      runSearch(input.value, true);
+    });
+
+    clear?.addEventListener('click', function() {
+      runSearch('', true);
+      input.focus();
+    });
+
+    root.querySelectorAll('[data-search-chip]').forEach(function(chip) {
+      chip.addEventListener('click', function() {
+        runSearch(chip.getAttribute('data-search-chip') || '', true);
+      });
+    });
+
+    root.querySelector('[data-search-reset]')?.addEventListener('click', function() {
+      runSearch('', true);
+      input.focus();
+    });
+
+    sort?.addEventListener('change', render);
+
+    root.querySelectorAll('[data-search-view]').forEach(function(button) {
+      button.addEventListener('click', function() {
+        var cols = button.getAttribute('data-search-view');
+        grid.classList.remove('view-2', 'view-3');
+        if (cols !== '4') grid.classList.add('view-' + cols);
+        root.querySelectorAll('[data-search-view]').forEach(function(viewButton) { viewButton.classList.remove('active'); });
+        button.classList.add('active');
+      });
+    });
+
+    grid?.addEventListener('click', async function(event) {
+      var wish = event.target.closest('[data-search-wish]');
+      if (wish) {
+        event.preventDefault();
+        var product = searchProducts.find(function(item) { return item.id === wish.getAttribute('data-search-wish'); });
+        if (!product) return;
+        if (wishlistApi.isWishlisted(product.id)) {
+          wishlistApi.removeWishlistItem(product.id);
+          showToast('Removed from wishlist');
+        } else {
+          wishlistApi.addWishlistItem(product.wishlistItem);
+          showToast('Saved to wishlist', true);
+        }
+        syncWishlistButtons();
+        return;
+      }
+
+      var atc = event.target.closest('[data-search-atc]');
+      if (!atc) return;
+      event.preventDefault();
+      var item = searchProducts.find(function(product) { return product.id === atc.getAttribute('data-search-atc'); });
+      if (!item) return;
+      if (!item.variantId || !item.availableForSale) {
+        window.location.href = item.url;
+        return;
+      }
+      var original = atc.textContent;
+      atc.classList.add('added');
+      atc.textContent = 'Added ✓';
+      try {
+        await cartApi.addToCart(item.variantId, 1);
+        showToast('Added to bag', true);
+      } catch {
+        showToast('Could not add to bag');
+      }
+      setTimeout(function() {
+        atc.classList.remove('added');
+        atc.textContent = original;
+      }, 1800);
+    });
+
+    window.addEventListener('rv:wishlist-changed', syncWishlistButtons);
+    var initialQuery = new URLSearchParams(window.location.search).get('q') || '';
+    runSearch(initialQuery, false);
+  })();
+</script>

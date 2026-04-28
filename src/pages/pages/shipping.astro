@@ -1,0 +1,53 @@
+---
+import LegalPage from '@/components/LegalPage.astro';
+import Layout from '@/layouts/Layout.astro';
+
+const sections = [
+  {
+    heading: 'Processing Times',
+    body: [
+      'Most in-stock orders are prepared within 1 to 3 business days. During launches, sale periods or holiday peaks, processing may take a little longer.',
+      'Bespoke, personalized and made-to-order pieces may follow a separate production timeline, which will be shared before dispatch.',
+    ],
+  },
+  {
+    heading: 'Delivery Windows',
+    body: [
+      'Estimated transit times depend on destination, courier service and customs procedures. Delivery estimates shown at checkout are guidance rather than guaranteed dates.',
+      'Once an order ships, you will receive tracking information when available so you can monitor progress directly.',
+    ],
+  },
+  {
+    heading: 'Shipping Charges',
+    body: [
+      'Shipping costs are calculated at checkout based on destination, order value and selected service level. Promotional free-delivery thresholds may apply on selected orders.',
+    ],
+  },
+  {
+    heading: 'International Orders',
+    body: [
+      'International deliveries may be subject to customs duties, local taxes or import handling fees determined by the destination country.',
+      'If those charges apply, they are typically the responsibility of the customer unless clearly stated otherwise at checkout.',
+    ],
+  },
+  {
+    heading: 'Delays and Delivery Issues',
+    body: [
+      'If a parcel is delayed, appears lost or arrives damaged, please contact us as soon as possible with your order number so we can help investigate with the courier.',
+    ],
+  },
+];
+---
+
+<Layout
+  title="Shipping Policy — RIVA VALENCIA"
+  description="Read the shipping policy for order processing, delivery windows and international shipments."
+>
+  <LegalPage
+    eyebrow="Support"
+    title="Shipping Policy"
+    intro="Everything you need to know about processing times, delivery estimates and international shipping for Riva Valencia orders."
+    updated="April 28, 2026"
+    sections={sections}
+  />
+</Layout>

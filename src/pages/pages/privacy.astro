@@ -1,0 +1,61 @@
+---
+import LegalPage from '@/components/LegalPage.astro';
+import Layout from '@/layouts/Layout.astro';
+
+const sections = [
+  {
+    heading: 'What We Collect',
+    body: [
+      'We may collect information you provide directly, such as your name, email address, shipping details, billing details and communication preferences.',
+      'We may also collect technical and browsing information such as device type, approximate location, pages visited and interactions with the site.',
+    ],
+  },
+  {
+    heading: 'How We Use Information',
+    body: [
+      'We use personal information to process orders, provide customer support, improve our storefront, detect fraud, manage accounts and communicate about products or services.',
+      'Where required, marketing communications are sent based on your preferences and can be changed or withdrawn at any time.',
+    ],
+  },
+  {
+    heading: 'Sharing and Service Providers',
+    body: [
+      'We may share information with carefully selected service providers that support payments, fulfillment, logistics, analytics, communications and website operations.',
+      'Those providers may only use information as needed to perform the agreed services and in line with applicable privacy requirements.',
+    ],
+  },
+  {
+    heading: 'Retention and Security',
+    body: [
+      'We retain information only for as long as reasonably necessary for the purposes described in this policy, including legal, accounting and security obligations.',
+      'We use organizational and technical safeguards designed to protect your information, although no online system can be guaranteed to be completely secure.',
+    ],
+  },
+  {
+    heading: 'Your Choices',
+    body: [
+      'You may request access, correction or deletion of certain personal data, subject to applicable law and operational requirements.',
+      'For cookie-related preferences and related controls, please visit our Cookie Settings and Privacy Management pages.',
+    ],
+  },
+  {
+    heading: 'Contact',
+    body: [
+      'If you have privacy-related questions or requests, please contact Riva Valencia through the contact channels listed on the website and include enough detail for us to assist you efficiently.',
+    ],
+  },
+];
+---
+
+<Layout
+  title="Privacy Policy — RIVA VALENCIA"
+  description="Read how Riva Valencia collects, uses and protects personal information."
+>
+  <LegalPage
+    eyebrow="Privacy"
+    title="Privacy Policy"
+    intro="This policy explains how Riva Valencia handles personal information collected through our website, account tools and related services."
+    updated="April 28, 2026"
+    sections={sections}
+  />
+</Layout>

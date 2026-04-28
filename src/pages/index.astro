@@ -1,0 +1,659 @@
+---
+import CookieBanner from '@/components/CookieBanner.astro';
+// Standalone welcome page — no Layout, pure HTML/CSS/JS port from Liquid
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="/favicon.ico" />
+    <title>Riva Valencia — Diseñado en España</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Cormorant+Garamond:wght@300;400;600&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet" />
+
+    <style>
+      body, html { margin: 0; padding: 0; overflow: hidden; }
+
+      .wlc-page {
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        background: #faf9f7;
+        position: relative;
+        z-index: 1;
+        overflow: hidden;
+      }
+
+      /* ── LOGO ── */
+      .wlc-logo-wrap {
+        text-align: center;
+        padding: 14px 20px 10px;
+        flex-shrink: 0;
+        border-bottom: 1px solid #e8e2d9;
+      }
+      .wlc-logo-main {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: clamp(28px, 4vw, 52px);
+        font-weight: 600;
+        letter-spacing: 0.12em;
+        color: #1a1008;
+        display: block;
+        text-decoration: none;
+      }
+      .wlc-logo-sub {
+        font-family: 'Cormorant Garamond', Georgia, serif;
+        font-size: clamp(8px, 0.9vw, 11px);
+        font-weight: 300;
+        letter-spacing: 0.35em;
+        color: #8a7660;
+        text-transform: uppercase;
+        display: block;
+        margin-top: 4px;
+      }
+      .wlc-logo-ornament {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 5px;
+      }
+      .wlc-logo-ornament span { font-size: 12px; color: #111; }
+      .wlc-logo-ornament::before,
+      .wlc-logo-ornament::after {
+        content: '';
+        display: block;
+        height: 1px;
+        width: 50px;
+        background: linear-gradient(to right, transparent, #111, transparent);
+      }
+
+      /* ── GRID ── */
+      .wlc-grid {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex: 1;
+        gap: 8px;
+        padding: 14px 20px 16px;
+        min-height: 0;
+      }
+
+      /* ── PANELS ── */
+      .wlc-panel {
+        position: relative;
+        overflow: hidden;
+        cursor: pointer;
+        width: 28%;
+        height: 88%;
+        flex-shrink: 0;
+      }
+      .wlc-panel img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        transition: transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94), filter 0.7s ease;
+      }
+      .wlc-panel-gradient {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to top, rgba(10,6,2,0.68) 0%, rgba(10,6,2,0.1) 45%, transparent 70%);
+        z-index: 2;
+      }
+      .wlc-panel-hover-overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(10,6,2,0.32);
+        z-index: 3;
+        opacity: 0;
+        transition: opacity 0.5s ease;
+      }
+      .wlc-panel:hover .wlc-panel-hover-overlay { opacity: 1; }
+      .wlc-panel:hover img { transform: scale(1.06); filter: brightness(0.85); }
+      .wlc-panel-text {
+        position: absolute;
+        bottom: 22px;
+        left: 50%;
+        transform: translateX(-50%);
+        color: #fff;
+        z-index: 4;
+        text-align: center;
+      }
+      .wlc-panel-sub {
+        display: block;
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 12px;
+        letter-spacing: 0.25em;
+        text-transform: uppercase;
+        margin-bottom: 4px;
+        font-weight: 300;
+        opacity: 1;
+        transform: translateY(6px);
+        transition: transform 0.5s ease, opacity 0.5s ease;
+      }
+      .wlc-panel:hover .wlc-panel-sub { transform: translateY(0); opacity: 1; }
+      .wlc-panel-label {
+        display: block;
+        font-family: 'Anton', sans-serif;
+        font-size: clamp(70px, 2.5vw, 80px);
+        font-weight: 400;
+      }
+      .wlc-panel-cta {
+        display: block;
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 10px;
+        letter-spacing: 0.3em;
+        text-transform: uppercase;
+        color: #c9a96e;
+        margin-top: 8px;
+        opacity: 0;
+        transform: translateY(8px);
+        transition: transform 0.5s ease 0.1s, opacity 0.5s ease 0.1s;
+      }
+      .wlc-panel-cta::after {
+        content: '';
+        display: inline-block;
+        width: 22px;
+        height: 1px;
+        background: #c9a96e;
+        vertical-align: middle;
+        margin-left: 7px;
+        transition: width 0.4s ease;
+      }
+      .wlc-panel:hover .wlc-panel-cta { opacity: 1; transform: translateY(0); }
+      .wlc-panel:hover .wlc-panel-cta::after { width: 38px; }
+      .wlc-panel-link { position: absolute; inset: 0; z-index: 5; }
+
+      /* ── POPUP ── */
+      .wlc-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(15,10,5,0.72);
+        z-index: 99999;
+        display: none;
+        align-items: flex-end;
+        justify-content: center;
+      }
+      .wlc-backdrop.wlc-visible { display: flex; }
+      .wlc-popup {
+        background: #faf9f7;
+        width: 100%;
+        padding: 48px 80px 44px;
+        font-family: 'Cormorant Garamond', Georgia, serif;
+        border-top: 1px solid #e2ddd6;
+        transform: translateY(100%);
+        transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .wlc-backdrop.wlc-visible .wlc-popup { transform: translateY(0); }
+      .wlc-popup-inner {
+        display: grid;
+        grid-template-columns: 1fr 1px 1fr;
+        margin-bottom: 32px;
+        max-width: 860px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      .wlc-popup-col { padding: 0 48px; }
+      .wlc-popup-col:first-child { padding-left: 0; }
+      .wlc-popup-col:last-child  { padding-right: 0; }
+      .wlc-popup-divider { background: #d8d2c8; width: 1px; }
+      .wlc-popup-heading {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 10px;
+        letter-spacing: 0.28em;
+        font-weight: 600;
+        color: #8a7660;
+        margin: 0 0 18px;
+        text-transform: uppercase;
+      }
+      .wlc-select-wrap {
+        border-bottom: 1px solid #c8c0b4;
+        display: flex;
+        align-items: center;
+        padding: 0 0 10px 0;
+        gap: 10px;
+        background: transparent;
+      }
+      .wlc-select {
+        border: none;
+        outline: none;
+        background: transparent;
+        font-size: 16px;
+        font-family: 'Playfair Display', serif;
+        color: #1a1008;
+        width: 100%;
+        cursor: pointer;
+        font-weight: 400;
+      }
+      .wlc-lang-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0;
+        border-top: 1px solid #e2ddd6;
+        border-left: 1px solid #e2ddd6;
+      }
+      .wlc-lang-btn {
+        background: #faf9f7;
+        border: none;
+        border-right: 1px solid #e2ddd6;
+        border-bottom: 1px solid #e2ddd6;
+        padding: 10px 20px;
+        font-size: 10px;
+        font-family: 'Cormorant Garamond', serif;
+        letter-spacing: 0.22em;
+        font-weight: 600;
+        color: #8a7660;
+        cursor: pointer;
+        text-transform: uppercase;
+        transition: background 0.25s, color 0.25s;
+      }
+      .wlc-lang-btn.active,
+      .wlc-lang-btn:hover { background: #1a1008; color: #faf9f7; }
+      .wlc-popup-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        max-width: 860px;
+        margin: 0 auto;
+      }
+      .wlc-remember {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 11px;
+        letter-spacing: 0.15em;
+        color: #8a7660;
+        cursor: pointer;
+        font-family: 'Cormorant Garamond', serif;
+        text-transform: uppercase;
+      }
+      .wlc-remember input[type="checkbox"] {
+        width: 14px;
+        height: 14px;
+        accent-color: #1a1008;
+        cursor: pointer;
+      }
+      .wlc-continue-btn {
+        background: transparent;
+        color: #1a1008;
+        border: 1px solid #1a1008;
+        padding: 14px 56px;
+        font-size: 10px;
+        font-family: 'Cormorant Garamond', serif;
+        letter-spacing: 0.28em;
+        font-weight: 600;
+        cursor: pointer;
+        text-transform: uppercase;
+        transition: background 0.25s, color 0.25s;
+      }
+      .wlc-continue-btn:hover { background: #1a1008; color: #faf9f7; }
+
+      /* ── FOOTER ── */
+      .wlc-footer {
+        flex-shrink: 0;
+        border-top: 1px solid #e8e2d9;
+        padding: 14px 32px;
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 6px;
+        background: #faf9f7;
+      }
+      .wlc-footer-links { display: flex; flex-wrap: wrap; gap: 0; align-items: center; flex: 1; }
+      .wlc-footer-links a {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 9px;
+        font-weight: 600;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: #1a1008;
+        text-decoration: none;
+        margin-right: 22px;
+        margin-bottom: 6px;
+        transition: color 0.2s;
+        white-space: nowrap;
+      }
+      .wlc-footer-links a:hover { color: #8a7660; }
+      .wlc-footer-right { display: flex; align-items: center; gap: 18px; flex-shrink: 0; padding-bottom: 6px; }
+      .wlc-footer-locale {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 9px;
+        font-weight: 600;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: #1a1008;
+        cursor: pointer;
+        transition: color 0.2s;
+      }
+      .wlc-footer-locale:hover { color: #8a7660; }
+      .wlc-footer-copy {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 9px;
+        font-weight: 600;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: #1a1008;
+        white-space: nowrap;
+      }
+
+      .rv-cookie {
+        position: fixed;
+        right: 24px;
+        bottom: 24px;
+        z-index: 100000;
+        width: min(360px, calc(100vw - 32px));
+        background: rgba(250, 250, 248, 0.98);
+        border: 1px solid #e8e4de;
+        box-shadow: 0 24px 60px rgba(26,16,8,0.16);
+        padding: 22px 22px 20px;
+        transform: translateY(24px);
+        opacity: 0;
+        pointer-events: none;
+        transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.24s ease;
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+      }
+      .rv-cookie.is-visible { transform: translateY(0); opacity: 1; pointer-events: auto; }
+      .rv-cookie-eyebrow {
+        display: block;
+        font-size: 8px;
+        letter-spacing: 0.34em;
+        text-transform: uppercase;
+        color: #8a7660;
+        font-weight: 600;
+        margin-bottom: 10px;
+      }
+      .rv-cookie-title {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 28px;
+        letter-spacing: 0.08em;
+        line-height: 0.95;
+        color: #1a1008;
+        margin: 0 0 10px;
+      }
+      .rv-cookie-copy {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 15px;
+        line-height: 1.55;
+        color: #6a5f50;
+        margin: 0;
+      }
+      .rv-cookie-actions {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        margin-top: 18px;
+      }
+      .rv-cookie-link {
+        font-size: 9px;
+        letter-spacing: 0.24em;
+        text-transform: uppercase;
+        color: #1a1008;
+        border-bottom: 1px solid #c9a96e;
+        padding-bottom: 4px;
+        font-weight: 600;
+        transition: opacity 0.2s;
+      }
+      .rv-cookie-link:hover { opacity: 0.65; }
+      .rv-cookie-accept {
+        background: #1a1008;
+        color: #fafaf8;
+        border: none;
+        padding: 12px 18px;
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 13px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+      }
+
+      @media (max-width: 768px) {
+        .wlc-panel { width: 46%; height: 62%; }
+        .wlc-popup { padding: 32px 24px 28px; }
+        .wlc-popup-inner { grid-template-columns: 1fr; max-width: 100%; margin-bottom: 24px; }
+        .wlc-popup-divider { height: 1px; width: 100%; margin: 22px 0; }
+        .wlc-popup-col { padding: 0; }
+        .wlc-popup-footer { max-width: 100%; flex-direction: column; gap: 16px; }
+        .wlc-continue-btn { width: 100%; text-align: center; }
+        .wlc-footer { flex-direction: column; padding: 14px 20px; }
+        .wlc-footer-right { flex-direction: column; align-items: flex-start; gap: 8px; }
+        .rv-cookie { right: 16px; bottom: 16px; width: min(360px, calc(100vw - 20px)); }
+        .rv-cookie-actions { flex-direction: column; align-items: stretch; }
+        .rv-cookie-link { text-align: center; }
+      }
+    </style>
+  </head>
+
+  <body>
+
+    <!-- HERO PAGE -->
+    <div class="wlc-page">
+
+      <div class="wlc-logo-wrap">
+        <a href="/" class="wlc-logo-main">Riva Valencia</a>
+        <span class="wlc-logo-sub">Diseñado en España</span>
+      </div>
+
+      <div class="wlc-grid">
+
+        <div class="wlc-panel">
+          <img src="https://cdn.shopify.com/s/files/1/0812/7738/7010/files/download_3.jpg?v=1775831468" alt="Women" loading="eager" />
+          <div class="wlc-panel-gradient"></div>
+          <div class="wlc-panel-hover-overlay"></div>
+          <div class="wlc-panel-text">
+            <span class="wlc-panel-sub" data-i18n="shop_now">Go To Fashion</span>
+            <span class="wlc-panel-label" data-i18n="women_label">WOMEN</span>
+            <span class="wlc-panel-cta">Explore Fashion</span>
+          </div>
+          <a href="/collections/womens" class="wlc-panel-link" aria-label="Shop Women"></a>
+        </div>
+
+        <div class="wlc-panel">
+          <img src="https://cdn.shopify.com/s/files/1/0812/7738/7010/files/ZARA_Espana_-_Canarias___Nueva_Coleccion_Online.jpg?v=1775831469" alt="Men" loading="eager" />
+          <div class="wlc-panel-gradient"></div>
+          <div class="wlc-panel-hover-overlay"></div>
+          <div class="wlc-panel-text">
+            <span class="wlc-panel-sub" data-i18n="shop_now">Go To Fashion</span>
+            <span class="wlc-panel-label" data-i18n="men_label">MEN</span>
+            <span class="wlc-panel-cta">Explore Fashion</span>
+          </div>
+          <a href="/collections/mens" class="wlc-panel-link" aria-label="Shop Men"></a>
+        </div>
+
+      </div>
+
+      <footer class="wlc-footer">
+        <div class="wlc-footer-links">
+          <a href="/pages/terms-purchase">Terms and Conditions of Purchase</a>
+          <a href="/pages/terms">Terms and Conditions</a>
+          <a href="/pages/privacy">Privacy Policy</a>
+          <a href="/pages/privacy-management">Privacy Management</a>
+          <a href="/pages/cookies">Cookies Policy</a>
+          <a href="/pages/cookie-settings">Cookie Settings</a>
+          <a href="/pages/sitemap">Sitemap</a>
+        </div>
+        <div class="wlc-footer-right">
+          <div class="wlc-footer-locale" id="wlcLocaleBtn">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M2 12h20M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/>
+            </svg>
+            <span id="wlcLocaleLabel">Spain | English</span>
+          </div>
+          <span class="wlc-footer-copy">© 2026 Riva Valencia</span>
+        </div>
+      </footer>
+
+    </div>
+
+    <CookieBanner />
+
+    <!-- POPUP -->
+    <div class="wlc-backdrop" id="wlcBackdrop">
+      <div class="wlc-popup" id="wlcPopup">
+        <div class="wlc-popup-inner">
+
+          <div class="wlc-popup-col">
+            <p class="wlc-popup-heading">Select Your Location</p>
+            <div class="wlc-select-wrap">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8a7660" stroke-width="1.5">
+                <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+                <line x1="3" y1="6" x2="21" y2="6"/>
+                <path d="M16 10a4 4 0 01-8 0"/>
+              </svg>
+              <select class="wlc-select" id="wlcCountry">
+                <option value="spain">Spain</option>
+                <option value="india">India</option>
+                <option value="usa">United States</option>
+                <option value="uk">United Kingdom</option>
+                <option value="uae">UAE</option>
+                <option value="australia">Australia</option>
+                <option value="canada">Canada</option>
+                <option value="france">France</option>
+                <option value="germany">Germany</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="wlc-popup-divider"></div>
+
+          <div class="wlc-popup-col">
+            <p class="wlc-popup-heading">Select Your Language</p>
+            <div class="wlc-lang-grid">
+              <button class="wlc-lang-btn active" data-lang="english">English</button>
+              <button class="wlc-lang-btn" data-lang="catalan">Català</button>
+              <button class="wlc-lang-btn" data-lang="galego">Galego</button>
+              <button class="wlc-lang-btn" data-lang="euskara">Euskara</button>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="wlc-popup-footer">
+          <label class="wlc-remember">
+            <input type="checkbox" id="wlcRemember" /> Remember my selection
+          </label>
+          <button class="wlc-continue-btn" id="wlcContinueBtn">Continue</button>
+        </div>
+      </div>
+    </div>
+
+  </body>
+</html>
+
+<script is:inline>
+(function () {
+  var translations = {
+    catalan: { women_label: 'DONA',     men_label: 'HOME',   shop_now: 'VES A LA MODA' },
+    galego:  { women_label: 'MULLER',   men_label: 'HOME',   shop_now: 'IR Á MODA'     },
+    euskara: { women_label: 'EMAKUMEA', men_label: 'GIZONA', shop_now: 'MODARA JOA'    }
+  };
+
+  var countryLabels = {
+    spain: 'Spain', india: 'India', usa: 'United States',
+    uk: 'United Kingdom', uae: 'UAE', australia: 'Australia',
+    canada: 'Canada', france: 'France', germany: 'Germany'
+  };
+  var langLabels = { english: 'English', catalan: 'Català', galego: 'Galego', euskara: 'Euskara' };
+
+  var selectedLang = 'english';
+  var backdrop = document.getElementById('wlcBackdrop');
+
+  function showPopup() {
+    backdrop.classList.add('wlc-visible');
+    setTimeout(function () {
+      document.getElementById('wlcPopup').style.transform = 'translateY(0)';
+    }, 20);
+  }
+
+  function hidePopup() {
+    backdrop.style.opacity = '0';
+    backdrop.style.transition = 'opacity 0.35s ease';
+    setTimeout(function () {
+      backdrop.classList.remove('wlc-visible');
+      backdrop.style.opacity = '';
+      backdrop.style.transition = '';
+    }, 360);
+  }
+
+  function applyTranslation(lang) {
+    var t = translations[lang];
+    if (!t) return;
+    document.querySelectorAll('[data-i18n]').forEach(function (el) {
+      var key = el.getAttribute('data-i18n');
+      if (t[key]) el.textContent = t[key];
+    });
+  }
+
+  function updateLocaleLabel() {
+    var c = document.getElementById('wlcCountry').value;
+    var el = document.getElementById('wlcLocaleLabel');
+    if (el) el.textContent = (countryLabels[c] || c) + ' | ' + (langLabels[selectedLang] || selectedLang);
+  }
+
+  /* Restore saved preference */
+  var shouldSkip = false;
+  try {
+    var raw = localStorage.getItem('wlc_sel');
+    if (raw) {
+      var d = JSON.parse(raw);
+      if (d && d.remembered === true) {
+        shouldSkip = true;
+        selectedLang = d.lang || 'english';
+        applyTranslation(selectedLang);
+        if (d.country) document.getElementById('wlcCountry').value = d.country;
+        updateLocaleLabel();
+        /* mark active lang btn */
+        document.querySelectorAll('.wlc-lang-btn').forEach(function (b) {
+          b.classList.toggle('active', b.getAttribute('data-lang') === selectedLang);
+        });
+      } else {
+        localStorage.removeItem('wlc_sel');
+      }
+    }
+  } catch (e) {
+    try { localStorage.removeItem('wlc_sel'); } catch (e2) {}
+  }
+
+  if (!shouldSkip) showPopup();
+
+  /* Language buttons */
+  document.querySelectorAll('.wlc-lang-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      document.querySelectorAll('.wlc-lang-btn').forEach(function (b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      selectedLang = btn.getAttribute('data-lang');
+    });
+  });
+
+  /* Continue */
+  document.getElementById('wlcContinueBtn').addEventListener('click', function () {
+    var country  = document.getElementById('wlcCountry').value;
+    var remember = document.getElementById('wlcRemember').checked;
+    applyTranslation(selectedLang);
+    updateLocaleLabel();
+    try {
+      if (remember) {
+        localStorage.setItem('wlc_sel', JSON.stringify({ lang: selectedLang, country: country, remembered: true }));
+      } else {
+        localStorage.removeItem('wlc_sel');
+      }
+    } catch (e) {}
+    hidePopup();
+  });
+
+  /* Re-open from footer */
+  document.getElementById('wlcLocaleBtn').addEventListener('click', showPopup);
+
+  /* Esc to close */
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') hidePopup(); });
+})();
+</script>

@@ -1,0 +1,364 @@
+---
+const heroImage = 'https://cdn.shopify.com/s/files/1/0812/7738/7010/files/Gemini_Generated_Image_n17qn0n17qn0n17q.png?v=1776004987';
+const atelierImage = 'https://cdn.shopify.com/s/files/1/0812/7738/7010/files/Gemini_Generated_Image_ohy6lqohy6lqohy6.png?v=1776001569';
+const craftImage = 'https://cdn.shopify.com/s/files/1/0812/7738/7010/files/Gemini_Generated_Image_jvsu4qjvsu4qjvsu.png?v=1776006386';
+const collectionImage = 'https://cdn.shopify.com/s/files/1/0812/7738/7010/files/Gemini_Generated_Image_qyjmyeqyjmyeqyjm.png?v=1775935488';
+
+const stats = [
+  ['500+', 'Years of tradition', "Valencia's leather craft heritage"],
+  ['12', 'Master artisans', 'Each with 15+ years experience'],
+  ['100%', 'Full-grain leather', 'Only the finest grade, always'],
+  ['1999', 'Founded in Valencia', 'Made in Spain, loved worldwide'],
+];
+
+const values = [
+  {
+    number: '01',
+    title: 'Uncompromising Materials',
+    body: "We use only full-grain, vegetable-tanned leather from Valencia's finest tanneries. We never use bonded leather, PU coatings, or split hides. If it is not the best, it does not enter our atelier.",
+  },
+  {
+    number: '02',
+    title: 'Artisan Hands Only',
+    body: 'Every cut, every stitch, every edge is done by human hands. We use saddle-stitch technique, each thread passed individually, so a broken thread never unravels an entire seam.',
+  },
+  {
+    number: '03',
+    title: 'Designed to Last Decades',
+    body: 'Our designs are intentionally timeless. Every piece is engineered to be used, repaired, and passed on. The anti-trend is the only trend we follow.',
+  },
+];
+
+const steps = [
+  {
+    title: 'Selection',
+    body: 'We hand-select each hide for grain consistency and natural character. Only the top 20% of hides we receive are accepted into our atelier.',
+    icon: 'home',
+  },
+  {
+    title: 'Cutting',
+    body: 'Each piece is hand-cut using steel-rule dies and wooden mallets, the same method used in Valencia for five centuries. No lasers.',
+    icon: 'tool',
+  },
+  {
+    title: 'Stitching',
+    body: 'Traditional two-needle saddle stitch with waxed linen thread. Each piece takes 4 to 8 hours of stitching alone by our master artisans.',
+    icon: 'heart',
+  },
+  {
+    title: 'Finishing',
+    body: 'Edges burnished by hand, hardware fitted, conditioned with natural beeswax. A final inspection before it is wrapped for you.',
+    icon: 'shield',
+  },
+];
+
+const team = [
+  ['Carlos Mendoza', 'Master Cutter', '22 years in the trade', heroImage],
+  ['Elena Soriano', 'Head Stitcher', '18 years in the trade', atelierImage],
+  ['Miguel Torres', 'Edge Finisher', '15 years in the trade', craftImage],
+];
+
+const payments = ['VISA', 'MASTERCARD', 'AMEX', 'APPLE PAY', 'GOOGLE PAY', 'PAYPAL', 'KLARNA', 'UPI', 'RAZORPAY'];
+---
+
+<section class="ab-hero">
+  <img src={heroImage} alt="Riva Valencia atelier" loading="eager" />
+  <div class="ab-hero-grad"></div>
+  <div class="ab-hero-c">
+    <span class="ab-eyebrow">Our Story · Est. 1999</span>
+    <h1 class="ab-h1">Born in Spain.<br />Made to Last.</h1>
+    <div class="ab-rule"></div>
+    <p class="ab-hero-quote">"True luxury is not about logos. It is about the enduring beauty of perfect materials, perfectly worked."</p>
+  </div>
+</section>
+
+<nav class="ab-crumb" aria-label="Breadcrumb">
+  <a href="/">Home</a>
+  <span class="ab-crumb-sep">›</span>
+  <span>Our Story</span>
+</nav>
+
+<section class="ab-split">
+  <div class="ab-split-img">
+    <img src={atelierImage} alt="Valencia atelier" loading="lazy" />
+  </div>
+  <div class="ab-split-text rv-reveal-r">
+    <span class="ab-tag">Spanish Craftsmanship</span>
+    <h2 class="ab-h2">A Love Letter<br />to Leather Craft</h2>
+    <p class="ab-p">Riva Valencia was born from a deep and abiding love of Spanish leather craft. Founded in 1999, we set out to create something the world was missing: leather goods of genuine artisan quality, made without compromise, offered without the inflated price of a heritage logo.</p>
+    <p class="ab-p">Every piece we make is cut, stitched and finished by our artisans in Valencia, a city that has been the heart of Spanish leather craftsmanship for over five centuries. We source only full-grain leather of the highest grade, vegetable-tanned using traditional methods passed down through generations.</p>
+    <a href="/collections/all" class="ab-cta">Explore the Collection →</a>
+  </div>
+</section>
+
+<section class="ab-stats" aria-label="Riva Valencia facts">
+  {stats.map(([number, label, detail], index) => (
+    <div class={`ab-stat rv-reveal d${index}`}>
+      <span class="ab-stat-n">{number}</span>
+      <span class="ab-stat-l">{label}</span>
+      <span class="ab-stat-d">{detail}</span>
+    </div>
+  ))}
+</section>
+
+<div class="rv-orn rv-reveal"><span>✦</span></div>
+
+<section class="ab-split ab-split-reverse">
+  <div class="ab-split-img">
+    <img src={craftImage} alt="Leather craft" loading="lazy" />
+  </div>
+  <div class="ab-split-text rv-reveal-l">
+    <span class="ab-tag">Our Philosophy</span>
+    <h2 class="ab-h2">No Logos.<br />Only Leather.</h2>
+    <p class="ab-p">We believe the greatest luxury is quality you can feel: a hide so supple it conforms to your hand from day one, stitching so tight it will outlast a decade of daily use, hardware so solid it never rattles or tarnishes.</p>
+    <p class="ab-p">We are craftspeople offering you something far more valuable than a logo: leather goods that become more beautiful with every scratch and every year of honest use. This is what we mean by luxury.</p>
+    <a href="/pages/bespoke" class="ab-cta">Bespoke Service →</a>
+  </div>
+</section>
+
+<section class="ab-vals">
+  <div class="ab-sec-head rv-reveal">
+    <span class="ab-sec-eyebrow">What Guides Us</span>
+    <h2 class="ab-sec-h">Our Core Values</h2>
+    <p class="ab-sec-sub">The principles we build every single piece around</p>
+  </div>
+  <div class="ab-vals-grid">
+    {values.map((value, index) => (
+      <article class={`ab-val rv-reveal d${index}`}>
+        <span class="ab-val-n">{value.number}</span>
+        <h3 class="ab-val-t">{value.title}</h3>
+        <p class="ab-val-b">{value.body}</p>
+      </article>
+    ))}
+  </div>
+</section>
+
+<section class="ab-process">
+  <div class="ab-sec-head rv-reveal">
+    <span class="ab-sec-eyebrow">From Hide to Hand</span>
+    <h2 class="ab-sec-h">How We Make It</h2>
+    <p class="ab-sec-sub">Every Riva Valencia piece takes 4 to 6 weeks to complete</p>
+  </div>
+  <div class="ab-steps">
+    {steps.map((step) => (
+      <article class="ab-step">
+        <div class="ab-step-circle">
+          {step.icon === 'home' && (
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          )}
+          {step.icon === 'tool' && (
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+          )}
+          {step.icon === 'heart' && (
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          )}
+          {step.icon === 'shield' && (
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          )}
+        </div>
+        <h3 class="ab-step-t">{step.title}</h3>
+        <p class="ab-step-b">{step.body}</p>
+      </article>
+    ))}
+  </div>
+</section>
+
+<section class="ab-team">
+  <div class="ab-sec-head rv-reveal">
+    <span class="ab-sec-eyebrow">The People Behind the Leather</span>
+    <h2 class="ab-sec-h">Meet Our Artisans</h2>
+    <p class="ab-sec-sub">Every hand that touches a Riva Valencia piece has decades of mastery</p>
+  </div>
+  <div class="ab-team-grid">
+    {team.map(([name, role, years, image], index) => (
+      <article class={`ab-team-c rv-reveal d${index}`}>
+        <img src={image} alt={name} loading="lazy" />
+        <div class="ab-team-g"></div>
+        <div class="ab-team-i">
+          <h3 class="ab-team-name">{name}</h3>
+          <span class="ab-team-role">{role}</span>
+          <span class="ab-team-yrs">{years}</span>
+        </div>
+      </article>
+    ))}
+  </div>
+</section>
+
+<section class="ab-banner rv-reveal">
+  <img src={collectionImage} alt="Riva Valencia collection" loading="lazy" />
+  <div class="ab-banner-ov"></div>
+  <div class="ab-banner-c">
+    <span class="ab-banner-ey">The Collection · Spring 2026</span>
+    <h2 class="ab-banner-h">Discover the<br />Full Collection</h2>
+    <p class="ab-banner-q">"A piece that becomes more beautiful with every use: that is the true meaning of luxury."</p>
+    <a href="/collections/all" class="ab-banner-btn">Shop All Pieces</a>
+  </div>
+</section>
+
+<section class="ab-nl rv-reveal">
+  <span class="ab-nl-tag">Stay in the know</span>
+  <h2>Join the World of Riva Valencia</h2>
+  <span class="ab-nl-sub">New arrivals, exclusive offers &amp; stories from Spain</span>
+  <form class="ab-nl-form">
+    <input class="rv-nl-input" type="email" placeholder="Your email address" aria-label="Email address" />
+    <button type="button">Subscribe</button>
+  </form>
+  <p class="ab-nl-note">By subscribing you agree to our <a href="/pages/privacy" class="rv-inline-link">Privacy Policy</a>. Unsubscribe anytime.</p>
+</section>
+
+<div class="ab-pay rv-reveal">
+  {payments.map((payment, index) => (
+    <>
+      <span>{payment}</span>
+      {index < payments.length - 1 && index % 2 === 1 && <span class="ab-pay-sep"></span>}
+    </>
+  ))}
+</div>
+
+<style>
+  .rv-announce{background:#1a1008;color:#fafaf8;text-align:center;padding:9px 20px;font-size:10px;letter-spacing:0.32em;text-transform:uppercase;overflow:hidden}
+  .rv-announce-track{display:inline-flex;gap:80px;animation:abAnnScroll 28s linear infinite;white-space:nowrap}
+  @keyframes abAnnScroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+  .ab-hero{position:relative;width:100%;height:90vh;min-height:560px;overflow:hidden;background:#1a1008}
+  .ab-hero img{width:100%;height:100%;object-fit:cover;opacity:0.72;transform:scale(1.08);animation:abZoom 2s cubic-bezier(0.16,1,0.3,1) forwards}
+  @keyframes abZoom{to{transform:scale(1.02)}}
+  .ab-hero-grad{position:absolute;inset:0;background:linear-gradient(170deg,rgba(15,10,5,0.15) 0%,rgba(15,10,5,0.85) 100%);pointer-events:none}
+  .ab-hero-c{position:absolute;bottom:0;left:0;right:0;padding:0 72px 80px;color:#fafaf8;opacity:0;animation:abIn 1.1s cubic-bezier(0.16,1,0.3,1) 0.3s forwards}
+  @keyframes abIn{to{opacity:1}}
+  .ab-eyebrow{font-size:9px;letter-spacing:0.42em;text-transform:uppercase;color:#c9a96e;display:block;margin-bottom:18px;font-weight:500}
+  .ab-h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(56px,9vw,116px);letter-spacing:0.04em;line-height:0.88;text-transform:uppercase;display:block;margin-bottom:22px;font-weight:400}
+  .ab-rule{width:48px;height:1px;background:linear-gradient(to right,#c9a96e,rgba(201,169,110,0));margin-bottom:20px}
+  .ab-hero-quote{font-family:'Playfair Display',serif;font-size:clamp(15px,1.9vw,21px);font-style:italic;opacity:0.78;line-height:1.55;max-width:520px}
+  .ab-crumb{padding:20px 48px;display:flex;align-items:center;gap:9px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#8a7660;border-bottom:1px solid #e8e4de}
+  .ab-crumb a:hover{color:#1a1008}
+  .ab-crumb-sep{opacity:0.3}
+  .ab-split{display:grid;grid-template-columns:1fr 1fr;min-height:560px;align-items:stretch}
+  .ab-split-reverse .ab-split-img{order:2}
+  .ab-split-reverse .ab-split-text{order:1}
+  .ab-split-img{overflow:hidden}
+  .ab-split-img img{width:100%;height:100%;min-height:560px;object-fit:cover;display:block;transition:transform 12s ease}
+  .ab-split:hover .ab-split-img img{transform:scale(1.04)}
+  .ab-split-text{background:#f5f2ec;padding:88px 72px;display:flex;flex-direction:column;justify-content:center}
+  .ab-tag{font-size:9px;letter-spacing:0.38em;text-transform:uppercase;color:#c9a96e;margin-bottom:18px;font-weight:500;display:block}
+  .ab-h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(34px,4.5vw,52px);letter-spacing:0.08em;color:#1a1008;margin-bottom:20px;font-weight:400;line-height:1.05}
+  .ab-p{font-size:14px;font-weight:300;line-height:1.95;color:#4a3f30;letter-spacing:0.04em;margin-bottom:18px}
+  .ab-cta{display:inline-flex;align-items:center;gap:12px;font-size:9px;letter-spacing:0.32em;text-transform:uppercase;color:#1a1008;border-bottom:1px solid #c9a96e;padding-bottom:4px;transition:gap 0.35s,letter-spacing 0.3s;align-self:flex-start;font-weight:600;margin-top:14px}
+  .ab-cta:hover{gap:18px;letter-spacing:0.38em}
+  .ab-stats{display:grid;grid-template-columns:repeat(4,1fr);background:#1a1008}
+  .ab-stat{display:flex;flex-direction:column;align-items:center;text-align:center;padding:52px 24px;border-right:1px solid rgba(250,250,248,0.07);transition:background 0.3s}
+  .ab-stat:last-child{border-right:none}
+  .ab-stat:hover{background:rgba(201,169,110,0.06)}
+  .ab-stat-n{font-family:'Bebas Neue',sans-serif;font-size:clamp(48px,5vw,64px);letter-spacing:0.06em;color:#c9a96e;line-height:1;margin-bottom:8px}
+  .ab-stat-l{font-size:10px;letter-spacing:0.24em;text-transform:uppercase;color:rgba(250,250,248,0.55);font-weight:300}
+  .ab-stat-d{font-size:12px;color:rgba(250,250,248,0.3);font-weight:300;margin-top:5px;line-height:1.6}
+  .rv-orn{display:flex;align-items:center;justify-content:center;gap:20px;padding:52px 48px;color:#c9a96e;font-size:12px}
+  .rv-orn::before,.rv-orn::after{content:'';flex:1;max-width:220px;height:1px;background:linear-gradient(to right,transparent,#c9a96e,transparent)}
+  .ab-vals{padding:96px 48px}
+  .ab-sec-head{text-align:center;margin-bottom:64px}
+  .ab-sec-eyebrow{font-size:9px;letter-spacing:0.38em;text-transform:uppercase;color:#8a7660;margin-bottom:14px;display:block;font-weight:500}
+  .ab-sec-h{font-family:'Bebas Neue',sans-serif;font-size:clamp(34px,5vw,58px);letter-spacing:0.1em;color:#1a1008;font-weight:400;margin-bottom:8px}
+  .ab-sec-sub{font-size:13px;letter-spacing:0.12em;color:#8a7660;font-weight:300}
+  .ab-vals-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px}
+  .ab-val{background:#f5f2ec;padding:52px 40px;position:relative;overflow:hidden;transition:background 0.4s}
+  .ab-val::after{content:'';position:absolute;bottom:0;left:0;width:0;height:2px;background:linear-gradient(to right,#c9a96e,transparent);transition:width 0.55s cubic-bezier(0.16,1,0.3,1)}
+  .ab-val:hover{background:#ede9e2}
+  .ab-val:hover::after{width:100%}
+  .ab-val-n{font-family:'Bebas Neue',sans-serif;font-size:76px;letter-spacing:0.04em;color:rgba(201,169,110,0.16);line-height:1;margin-bottom:-10px;display:block}
+  .ab-val-t{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:0.1em;color:#1a1008;font-weight:400;margin-bottom:14px;display:block}
+  .ab-val-b{font-size:13px;font-weight:300;line-height:1.9;color:#5a4a3a;letter-spacing:0.04em}
+  .ab-process{padding:96px 48px;background:#fafaf8;border-top:1px solid #e8e4de}
+  .ab-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:0;position:relative;margin-top:0}
+  .ab-steps::before{content:'';position:absolute;top:35px;left:12%;right:12%;height:1px;background:linear-gradient(to right,transparent,#c9a96e 15%,#c9a96e 85%,transparent);z-index:0}
+  .ab-step{display:flex;flex-direction:column;align-items:center;text-align:center;padding:0 22px;position:relative;z-index:1;opacity:0;transform:translateY(22px);transition:opacity 0.65s ease,transform 0.65s cubic-bezier(0.16,1,0.3,1)}
+  .ab-step.in{opacity:1;transform:translateY(0)}
+  .ab-step:nth-child(1){transition-delay:0s}.ab-step:nth-child(2){transition-delay:0.12s}.ab-step:nth-child(3){transition-delay:0.24s}.ab-step:nth-child(4){transition-delay:0.36s}
+  .ab-step-circle{width:70px;height:70px;border-radius:50%;background:#fafaf8;border:1.5px solid #c9a96e;display:flex;align-items:center;justify-content:center;margin-bottom:26px;color:#c9a96e;transition:background 0.35s,transform 0.45s cubic-bezier(0.34,1.56,0.64,1)}
+  .ab-step:hover .ab-step-circle{background:#1a1008;transform:scale(1.12)}
+  .ab-step-t{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:0.12em;color:#1a1008;margin-bottom:12px;font-weight:400}
+  .ab-step-b{font-size:12px;font-weight:300;line-height:1.8;color:#8a7660;letter-spacing:0.04em}
+  .ab-team{padding-top:80px}
+  .ab-team .ab-sec-head{padding:0 48px 48px;margin-bottom:0}
+  .ab-team-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px}
+  .ab-team-c{position:relative;overflow:hidden;background:#edebe6}
+  .ab-team-c img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block;transition:transform 8s cubic-bezier(0.25,0.46,0.45,0.94)}
+  .ab-team-c:hover img{transform:scale(1.06)}
+  .ab-team-g{position:absolute;inset:0;background:linear-gradient(to top,rgba(15,10,5,0.85) 0%,transparent 52%);pointer-events:none;transition:opacity 0.4s}
+  .ab-team-c:hover .ab-team-g{opacity:0.96}
+  .ab-team-i{position:absolute;bottom:0;left:0;right:0;padding:28px}
+  .ab-team-name{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.1em;color:#fafaf8;display:block;transform:translateY(4px);transition:transform 0.35s;font-weight:400}
+  .ab-team-c:hover .ab-team-name{transform:translateY(0)}
+  .ab-team-role{font-size:9px;letter-spacing:0.28em;text-transform:uppercase;color:#c9a96e;font-weight:400;display:block;margin-top:4px;opacity:0;transform:translateY(7px);transition:opacity 0.35s 0.04s,transform 0.35s 0.04s}
+  .ab-team-c:hover .ab-team-role{opacity:1;transform:translateY(0)}
+  .ab-team-yrs{font-size:11px;letter-spacing:0.12em;color:rgba(250,250,248,0.5);font-weight:300;display:block;margin-top:2px;opacity:0;transform:translateY(5px);transition:opacity 0.35s 0.08s,transform 0.35s 0.08s}
+  .ab-team-c:hover .ab-team-yrs{opacity:1;transform:translateY(0)}
+  .ab-banner{position:relative;width:100%;height:70vh;overflow:hidden;background:#1a1008;margin-top:3px}
+  .ab-banner img{width:100%;height:100%;object-fit:cover;opacity:0.7;transition:transform 12s ease}
+  .ab-banner:hover img{transform:scale(1.04)}
+  .ab-banner-ov{position:absolute;inset:0;background:rgba(15,10,5,0.42);pointer-events:none}
+  .ab-banner-c{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#fafaf8;padding:40px}
+  .ab-banner-ey{font-size:9px;letter-spacing:0.42em;text-transform:uppercase;color:#c9a96e;margin-bottom:16px;font-weight:500}
+  .ab-banner-h{font-family:'Bebas Neue',sans-serif;font-size:clamp(42px,8vw,92px);letter-spacing:0.06em;margin-bottom:22px;line-height:0.9;font-weight:400}
+  .ab-banner-q{font-family:'Playfair Display',serif;font-size:clamp(13px,1.8vw,19px);font-style:italic;opacity:0.75;max-width:540px;line-height:1.6;margin-bottom:38px}
+  .ab-banner-btn{display:inline-block;border:1px solid rgba(255,255,255,0.45);color:#fafaf8;font-size:9px;letter-spacing:0.36em;text-transform:uppercase;padding:15px 50px;transition:background 0.35s,border-color 0.3s,padding 0.3s;font-family:'Jost',sans-serif;font-weight:500}
+  .ab-banner-btn:hover{background:rgba(255,255,255,0.08);border-color:#fff;padding:15px 60px}
+  .ab-nl{background:#fafaf8;padding:88px 48px;text-align:center;border-top:1px solid #e8e4de}
+  .ab-nl-tag{font-size:9px;letter-spacing:0.36em;text-transform:uppercase;color:#8a7660;margin-bottom:14px;display:block;font-weight:500}
+  .ab-nl h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,4.5vw,52px);letter-spacing:0.1em;color:#1a1008;margin-bottom:10px;font-weight:400}
+  .ab-nl-sub{font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#8a7660;margin-bottom:36px;display:block;font-weight:300}
+  .ab-nl-form{display:flex;max-width:480px;margin:0 auto;border-bottom:1.5px solid #1a1008}
+  .ab-nl-form input{flex:1;border:none;outline:none;font-family:'Jost',sans-serif;font-size:14px;font-weight:300;background:transparent;color:#1a1008;padding:13px 4px;min-width:0}
+  .ab-nl-form input::placeholder{color:#b8b0a6}
+  .ab-nl-form button{background:none;border:none;cursor:pointer;color:#1a1008;font-size:9px;letter-spacing:0.3em;text-transform:uppercase;font-family:'Jost',sans-serif;padding:13px 16px;font-weight:600;transition:letter-spacing 0.3s}
+  .ab-nl-form button:hover{letter-spacing:0.36em}
+  .ab-nl-note{font-size:10px;color:#b8b0a6;margin-top:14px;letter-spacing:0.07em;font-weight:300}
+  .ab-pay{background:#f2eee8;border-top:1px solid #e8e4de;border-bottom:1px solid #e8e4de;padding:18px 48px;display:flex;align-items:center;justify-content:center;gap:28px;flex-wrap:wrap}
+  .ab-pay span{font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:#8a7660;font-weight:500;opacity:0.7;transition:opacity 0.2s}
+  .ab-pay span:hover{opacity:1}
+  .ab-pay-sep{width:1px;height:14px;background:#c8c0b4;flex-shrink:0}
+  @media(max-width:900px){
+    .ab-crumb,.ab-vals,.ab-process,.ab-nl,.ab-pay{padding-left:20px;padding-right:20px}
+    .ab-hero-c{padding:0 28px 48px}
+    .ab-split{grid-template-columns:1fr}
+    .ab-split-reverse .ab-split-img,.ab-split-reverse .ab-split-text{order:initial}
+    .ab-split-img img{min-height:320px;height:320px}
+    .ab-split-text{padding:44px 24px}
+    .ab-stats{grid-template-columns:1fr 1fr}
+    .ab-stat{border-right:none;border-bottom:1px solid rgba(250,250,248,0.06)}
+    .ab-stat:nth-child(odd){border-right:1px solid rgba(250,250,248,0.06)}
+    .ab-stat:last-child{border-bottom:none}
+    .ab-vals-grid{grid-template-columns:1fr}
+    .ab-steps{grid-template-columns:1fr 1fr;gap:42px 0}
+    .ab-steps::before{display:none}
+    .ab-team-grid{grid-template-columns:1fr}
+    .ab-team .ab-sec-head{padding:0 20px 48px}
+    .ab-banner-c{padding:24px}
+  }
+  @media(max-width:520px){
+    .ab-hero{min-height:520px}
+    .ab-stats{grid-template-columns:1fr}
+    .ab-stat:nth-child(odd){border-right:none}
+    .ab-steps{grid-template-columns:1fr}
+    .ab-nl-form{flex-direction:column;align-items:stretch;border-bottom:none;gap:10px}
+    .ab-nl-form input{border-bottom:1.5px solid #1a1008;text-align:center}
+  }
+</style>
+
+<script is:inline>
+  (function() {
+    var steps = document.querySelectorAll('.ab-step');
+    if (!steps.length) return;
+    if (!('IntersectionObserver' in window)) {
+      steps.forEach(function(step) { step.classList.add('in'); });
+      return;
+    }
+    var observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+    steps.forEach(function(step) { observer.observe(step); });
+  })();
+</script>

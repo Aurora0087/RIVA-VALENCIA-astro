@@ -1,0 +1,536 @@
+---
+import Layout from '@/layouts/Layout.astro';
+
+const subjectTabs = [
+  { label: 'General', value: 'General Enquiry' },
+  { label: 'Order Support', value: 'Order Support' },
+  { label: 'Bespoke', value: 'Bespoke Enquiry' },
+  { label: 'Corporate', value: 'Corporate Gifting' },
+  { label: 'Press', value: 'Press Enquiry' },
+];
+
+const channels = [
+  {
+    label: 'Email',
+    value: 'hello@rivavalencia.com',
+    note: 'We reply within 24 hours',
+    href: 'mailto:hello@rivavalencia.com',
+    icon: 'mail',
+  },
+  {
+    label: 'WhatsApp',
+    value: '+91 98765 43210',
+    note: 'Mon–Fri, 10 AM – 7 PM',
+    href: 'https://wa.me/919876543210',
+    icon: 'phone',
+  },
+  {
+    label: 'Atelier',
+    value: 'Valencia, Spain',
+    note: 'Private appointments available',
+    href: 'https://maps.google.com/?q=Valencia%2C%20Spain',
+    icon: 'pin',
+  },
+  {
+    label: 'Working Hours',
+    value: 'Monday – Friday',
+    note: '10:00 AM – 6:00 PM',
+    href: '/pages/faq',
+    icon: 'clock',
+  },
+];
+
+const faqPreview = [
+  {
+    question: 'How long does delivery take?',
+    answer:
+      'Most in-stock orders are processed within 1 to 3 business days. Transit times vary by destination, and full guidance is available in our shipping policy.',
+  },
+  {
+    question: 'What is your returns policy?',
+    answer:
+      'Eligible products can usually be returned within 30 days of delivery when unused and in their original condition. See the full return policy for details.',
+  },
+  {
+    question: 'Do you offer bespoke or custom pieces?',
+    answer:
+      'Yes. Our bespoke service allows you to personalize silhouette, leather, colour and finishing details. You can also choose the Bespoke tab in the form above.',
+  },
+  {
+    question: 'How do I care for my leather piece?',
+    answer:
+      'Store your piece in a cool, dry place, keep it away from direct heat and use appropriate leather care when needed to preserve finish and structure.',
+  },
+];
+
+const reviews = [
+  {
+    name: 'Lucia Ferraro',
+    city: 'Milan',
+    country: 'Italy',
+    text: 'The support felt personal from the first reply. They guided me to the right work bag and the piece arrived exactly as I hoped.',
+  },
+  {
+    name: 'Javier Moreno',
+    city: 'Valencia',
+    country: 'Spain',
+    text: 'Fast, elegant and very attentive. I asked about leather care and received a thoughtful answer the same day.',
+  },
+  {
+    name: 'Sofia Bellini',
+    city: 'Florence',
+    country: 'Italy',
+    text: 'My bespoke enquiry was handled beautifully. The team made the whole process feel calm, clear and very luxurious.',
+  },
+  {
+    name: 'Mateo Ruiz',
+    city: 'Barcelona',
+    country: 'Spain',
+    text: 'I contacted them about sizing and shipping before ordering. Everything was explained clearly and the delivery was seamless.',
+  },
+  {
+    name: 'Chiara Romano',
+    city: 'Rome',
+    country: 'Italy',
+    text: 'The customer care experience matches the quality of the products. Refined, warm and incredibly responsive.',
+  },
+  {
+    name: 'Alba Navarro',
+    city: 'Madrid',
+    country: 'Spain',
+    text: 'They helped me choose a gift under a tight deadline and made it feel easy. Beautiful communication and beautiful packaging.',
+  },
+];
+---
+
+<Layout
+  title="Contact — RIVA VALENCIA"
+  description="Contact Riva Valencia for product advice, order support, bespoke requests, corporate enquiries and press."
+>
+  <section class="ct-page">
+    <div class="ct-hero">
+      <img
+        src="https://cdn.shopify.com/s/files/1/0812/7738/7010/files/Gemini_Generated_Image_qyjmyeqyjmyeqyjm.png?v=1775935488"
+        alt="Contact Riva Valencia"
+        loading="eager"
+      />
+      <div class="ct-hero-grad"></div>
+      <div class="ct-hero-c">
+        <span class="ct-hero-eyebrow">We Are Here For You</span>
+        <h1 class="ct-hero-h1">Get in Touch</h1>
+      </div>
+    </div>
+
+    <div class="ct-crumb">
+      <a href="/">Home</a>
+      <span class="ct-crumb-sep">›</span>
+      <span>Contact</span>
+    </div>
+
+    <div class="ct-wrap">
+      <aside class="ct-info rv-reveal rv-reveal-l">
+        <div class="ct-info-top">
+          <span class="ct-tag">We Would Love to Hear From You</span>
+          <h2 class="ct-h2">Contact Riva Valencia</h2>
+          <p class="ct-body">
+            Whether you need help with an order, product guidance, bespoke advice or a corporate request,
+            our team is ready to assist with care and clarity.
+          </p>
+        </div>
+
+        <div class="ct-channels">
+          {channels.map((channel) => (
+            <a
+              class="ct-channel"
+              href={channel.href}
+              target={channel.href.startsWith('http') ? '_blank' : undefined}
+              rel={channel.href.startsWith('http') ? 'noreferrer' : undefined}
+            >
+              <div class="ct-channel-icon">
+                {channel.icon === 'mail' && (
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                    <polyline points="22,6 12,13 2,6"/>
+                  </svg>
+                )}
+                {channel.icon === 'phone' && (
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
+                    <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.63A2 2 0 012 .18h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7a2 2 0 011.72 2.02z"/>
+                  </svg>
+                )}
+                {channel.icon === 'pin' && (
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
+                    <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0118 0z"/>
+                    <circle cx="12" cy="10" r="3"/>
+                  </svg>
+                )}
+                {channel.icon === 'clock' && (
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                  </svg>
+                )}
+              </div>
+              <div>
+                <span class="ct-channel-label">{channel.label}</span>
+                <span class="ct-channel-value">{channel.value}</span>
+                <span class="ct-channel-note">{channel.note}</span>
+              </div>
+            </a>
+          ))}
+        </div>
+
+        <div class="ct-socials">
+          <a href="https://www.instagram.com/" target="_blank" rel="noreferrer" class="ct-soc" aria-label="Instagram">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <rect x="2" y="2" width="20" height="20" rx="5"/>
+              <path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/>
+              <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+            </svg>
+          </a>
+          <a href="https://www.facebook.com/" target="_blank" rel="noreferrer" class="ct-soc" aria-label="Facebook">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/>
+            </svg>
+          </a>
+        </div>
+      </aside>
+
+      <section class="ct-form-wrap rv-reveal rv-reveal-r">
+        <div class="ct-form-head">
+          <span class="ct-form-eyebrow">Send a Message</span>
+          <h2 class="ct-form-h">How Can We Help?</h2>
+        </div>
+
+        <div class="ct-subject-tabs" id="ctTabs">
+          {subjectTabs.map((tab, index) => (
+            <button
+              type="button"
+              class:list={['ct-tab', index === 0 && 'active']}
+              data-subject-value={tab.value}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        <form class="ct-form" id="ctForm" novalidate>
+          <div class="ct-field-row">
+            <div class="ct-field">
+              <input class="ct-field-input" type="text" id="ctFirst" name="first_name" />
+              <label class="ct-field-label" for="ctFirst">First Name</label>
+              <div class="ct-field-bar"></div>
+            </div>
+            <div class="ct-field">
+              <input class="ct-field-input" type="text" id="ctLast" name="last_name" />
+              <label class="ct-field-label" for="ctLast">Last Name</label>
+              <div class="ct-field-bar"></div>
+            </div>
+          </div>
+
+          <div class="ct-field">
+            <input class="ct-field-input" type="email" id="ctEmail" name="email" required />
+            <label class="ct-field-label" for="ctEmail">Email Address</label>
+            <div class="ct-field-bar"></div>
+          </div>
+
+          <div class="ct-field">
+            <input class="ct-field-input" type="tel" id="ctPhone" name="phone" />
+            <label class="ct-field-label" for="ctPhone">Phone (optional)</label>
+            <div class="ct-field-bar"></div>
+          </div>
+
+          <input type="hidden" id="ctSubjectHidden" name="subject" value="General Enquiry" />
+
+          <div class="ct-field">
+            <textarea class="ct-field-textarea" id="ctMsg" name="message" rows="4" required></textarea>
+            <label class="ct-field-label" for="ctMsg">Your Message</label>
+            <div class="ct-field-bar"></div>
+          </div>
+
+          <button type="submit" class="ct-submit" id="ctSubmitBtn">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="22" y1="2" x2="11" y2="13"/>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+            </svg>
+            Send Message
+          </button>
+          <p class="ct-form-note" id="ctFormNote">
+            Submitting opens your email app with your message pre-filled.
+          </p>
+        </form>
+      </section>
+    </div>
+
+    <div class="rv-orn rv-reveal"><span>✦</span></div>
+
+    <section class="ct-reviews rv-reveal">
+      <div class="ct-reviews-head">
+        <span class="ct-reviews-eyebrow">Client Notes</span>
+        <h2 class="ct-reviews-h">What Clients Say</h2>
+      </div>
+      <div class="swiper ct-reviews-swiper" id="ctReviewsSwiper">
+        <div class="swiper-wrapper">
+          {reviews.map((review) => (
+            <div class="swiper-slide">
+              <article class="ct-review-card">
+                <div class="ct-review-stars">★★★★★</div>
+                <p class="ct-review-text">“{review.text}”</p>
+                <div class="ct-review-meta">
+                  <span class="ct-review-name">{review.name}</span>
+                  <span class="ct-review-place">{review.city}, {review.country}</span>
+                </div>
+              </article>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section class="ct-faq rv-reveal">
+      <h2 class="ct-faq-h">Frequently Asked</h2>
+      <p class="ct-faq-sub">Quick answers to our most common questions</p>
+
+      {faqPreview.map((item) => (
+        <div class="ct-acc-item">
+          <button type="button" class="ct-acc-btn">
+            {item.question}
+            <span class="ct-acc-icon"></span>
+          </button>
+          <div class="ct-acc-content">
+            <div class="ct-acc-inner">{item.answer}</div>
+          </div>
+        </div>
+      ))}
+
+      <a href="/pages/faq" class="ct-faq-all">View All FAQs →</a>
+    </section>
+  </section>
+
+  <style>
+    .ct-page{background:#fafaf8;color:#1a1008}
+    .ct-hero{position:relative;height:44vh;min-height:320px;overflow:hidden;background:#1a1008}
+    .ct-hero img{width:100%;height:100%;object-fit:cover;opacity:0.6;transform:scale(1.06);animation:ctZ 2s cubic-bezier(0.16,1,0.3,1) forwards}
+    @keyframes ctZ{to{transform:scale(1.01)}}
+    .ct-hero-grad{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(15,10,5,0.1) 0%,rgba(15,10,5,0.75) 100%);pointer-events:none}
+    .ct-hero-c{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#fafaf8;padding:40px;opacity:0;animation:ctIn 1s cubic-bezier(0.16,1,0.3,1) 0.3s forwards}
+    @keyframes ctIn{to{opacity:1}}
+    .ct-hero-eyebrow{font-size:9px;letter-spacing:0.42em;text-transform:uppercase;color:#c9a96e;margin-bottom:16px;font-weight:500}
+    .ct-hero-h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(48px,8vw,96px);letter-spacing:0.05em;line-height:0.9;font-weight:400}
+    .ct-crumb{padding:20px 48px;display:flex;align-items:center;gap:9px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#8a7660;border-bottom:1px solid #e8e4de}
+    .ct-crumb a:hover{color:#1a1008}
+    .ct-crumb-sep{opacity:0.3}
+    .ct-wrap{display:grid;grid-template-columns:1fr 1.15fr;min-height:600px;align-items:stretch}
+    .ct-info{padding:72px 56px;background:#f5f2ec;display:flex;flex-direction:column;justify-content:space-between}
+    .ct-tag{font-size:9px;letter-spacing:0.38em;text-transform:uppercase;color:#c9a96e;margin-bottom:16px;font-weight:500;display:block}
+    .ct-h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,4.5vw,54px);letter-spacing:0.08em;color:#1a1008;margin-bottom:16px;font-weight:400;line-height:1.05}
+    .ct-body{font-size:14px;font-weight:300;line-height:1.9;color:#4a3f30;letter-spacing:0.04em;margin-bottom:44px}
+    .ct-channels{display:flex;flex-direction:column;gap:0}
+    .ct-channel{display:flex;align-items:flex-start;gap:18px;padding:20px 0;border-bottom:1px solid #e8e4de;transition:padding-left 0.3s}
+    .ct-channel:first-child{border-top:1px solid #e8e4de}
+    .ct-channel:hover{padding-left:6px}
+    .ct-channel-icon{width:40px;height:40px;background:#fafaf8;border:1px solid #e8e4de;display:flex;align-items:center;justify-content:center;color:#c9a96e;flex-shrink:0;transition:background 0.25s}
+    .ct-channel:hover .ct-channel-icon{background:#1a1008;color:#c9a96e}
+    .ct-channel-label{font-size:9px;letter-spacing:0.24em;text-transform:uppercase;color:#8a7660;font-weight:500;display:block;margin-bottom:4px}
+    .ct-channel-value{font-size:14px;color:#1a1008;font-weight:400;letter-spacing:0.04em;display:block}
+    .ct-channel-note{font-size:11px;color:#8a7660;font-weight:300;margin-top:2px;display:block}
+    .ct-socials{display:flex;gap:10px;margin-top:36px}
+    .ct-soc{width:40px;height:40px;border:1px solid #e8e4de;display:flex;align-items:center;justify-content:center;color:#1a1008;transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1)}
+    .ct-soc:hover{border-color:#1a1008;background:#1a1008;color:#fafaf8;transform:scale(1.1)}
+    .ct-form-wrap{padding:72px 64px;border-left:1px solid #e8e4de;display:flex;flex-direction:column;justify-content:center}
+    .ct-form-head{margin-bottom:44px}
+    .ct-form-eyebrow{font-size:9px;letter-spacing:0.38em;text-transform:uppercase;color:#c9a96e;margin-bottom:12px;font-weight:500;display:block}
+    .ct-form-h{font-family:'Bebas Neue',sans-serif;font-size:clamp(30px,3.5vw,44px);letter-spacing:0.08em;color:#1a1008;font-weight:400;line-height:1}
+    .ct-subject-tabs{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:36px}
+    .ct-tab{border:1px solid #e8e4de;background:none;cursor:pointer;font-family:'Jost',sans-serif;font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:#1a1008;padding:8px 16px;transition:all 0.25s;font-weight:400}
+    .ct-tab:hover{border-color:#1a1008}
+    .ct-tab.active{background:#1a1008;color:#fafaf8;border-color:#1a1008}
+    .ct-field{position:relative;margin-bottom:30px}
+    .ct-field-input,.ct-field-textarea{width:100%;background:transparent;border:none;border-bottom:1px solid #d4cfc8;outline:none;font-family:'Jost',sans-serif;font-size:14px;font-weight:300;color:#1a1008;letter-spacing:0.06em;padding:18px 0 10px;transition:border-color 0.35s;resize:none}
+    .ct-field-textarea{min-height:100px;line-height:1.7}
+    .ct-field-input:focus,.ct-field-textarea:focus{border-color:#1a1008}
+    .ct-field-label{position:absolute;left:0;top:18px;font-size:12px;letter-spacing:0.14em;text-transform:uppercase;color:#b8b0a6;font-weight:400;pointer-events:none;transform-origin:left top;transition:transform 0.3s cubic-bezier(0.16,1,0.3,1),color 0.3s}
+    .ct-field-input:focus ~ .ct-field-label,.ct-field-input.has-val ~ .ct-field-label,.ct-field-textarea:focus ~ .ct-field-label,.ct-field-textarea.has-val ~ .ct-field-label{transform:translateY(-22px) scale(0.78);color:#8a7660;letter-spacing:0.22em}
+    .ct-field-bar{position:absolute;bottom:0;left:0;width:0;height:1.5px;background:linear-gradient(to right,#c9a96e,#1a1008);transition:width 0.5s cubic-bezier(0.16,1,0.3,1)}
+    .ct-field-input:focus ~ .ct-field-bar,.ct-field-textarea:focus ~ .ct-field-bar{width:100%}
+    .ct-field-row{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+    .ct-submit{width:100%;background:#1a1008;color:#fafaf8;border:none;cursor:pointer;font-family:'Jost',sans-serif;font-size:10px;letter-spacing:0.36em;text-transform:uppercase;padding:19px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:10px;position:relative;overflow:hidden;transition:letter-spacing 0.4s,background 0.3s;margin-top:4px}
+    .ct-submit::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(201,169,110,0.12),transparent);opacity:0;transition:opacity 0.4s}
+    .ct-submit:hover::before{opacity:1}
+    .ct-submit:hover{letter-spacing:0.42em;background:#2e1f0f}
+    .ct-submit::after{content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.06),transparent);transition:left 0.7s}
+    .ct-submit:hover::after{left:150%}
+    .ct-submit.sent{background:#3d5c35}
+    .ct-form-note{font-size:10px;color:#b8b0a6;margin-top:14px;letter-spacing:0.07em;font-weight:300;text-align:center}
+    .ct-form-note.is-success{color:#4a6741}
+    .ct-form-note.is-error{color:#8b3a2a}
+    .rv-orn{display:flex;align-items:center;justify-content:center;gap:20px;padding:52px 48px;color:#c9a96e;font-size:12px}
+    .rv-orn::before,.rv-orn::after{content:'';flex:1;max-width:220px;height:1px;background:linear-gradient(to right,transparent,#c9a96e,transparent)}
+    .ct-reviews{padding:0 0 72px}
+    .ct-reviews-head{text-align:center;padding:0 48px 28px}
+    .ct-reviews-eyebrow{display:block;font-size:9px;letter-spacing:0.34em;text-transform:uppercase;color:#8a7660;font-weight:500;margin-bottom:12px}
+    .ct-reviews-h{font-family:'Bebas Neue',sans-serif;font-size:clamp(30px,4vw,52px);letter-spacing:0.1em;color:#1a1008;font-weight:400}
+    .ct-reviews-swiper{padding:0 48px}
+    .ct-reviews-swiper .swiper-slide{height:auto;width:340px}
+    .ct-review-card{
+      height:100%;
+      background:#fff;
+      border:1px solid #e8e4de;
+      padding:28px 26px 24px;
+      box-shadow:0 12px 32px rgba(26,16,8,0.04);
+    }
+    .ct-review-stars{font-size:14px;letter-spacing:0.28em;color:#c9a96e;margin-bottom:18px}
+    .ct-review-text{font-size:13px;line-height:1.85;color:#5a4a3a;letter-spacing:0.03em;margin-bottom:22px}
+    .ct-review-meta{display:flex;flex-direction:column;gap:4px}
+    .ct-review-name{font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:#1a1008;font-weight:600}
+    .ct-review-place{font-size:11px;color:#8a7660;letter-spacing:0.08em}
+    .ct-faq{padding:0 48px 80px}
+    .ct-faq-h{font-family:'Bebas Neue',sans-serif;font-size:clamp(30px,4vw,50px);letter-spacing:0.1em;color:#1a1008;font-weight:400;margin-bottom:8px}
+    .ct-faq-sub{font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#8a7660;font-weight:300;margin-bottom:36px}
+    .ct-acc-item{border-bottom:1px solid #e8e4de}
+    .ct-acc-item:first-of-type{border-top:1px solid #e8e4de}
+    .ct-acc-btn{width:100%;background:none;border:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;padding:18px 0;font-family:'Jost',sans-serif;font-size:14px;font-weight:400;color:#1a1008;letter-spacing:0.04em;text-align:left;transition:color 0.2s}
+    .ct-acc-btn:hover{color:#8a7660}
+    .ct-acc-icon{width:14px;height:14px;position:relative;flex-shrink:0}
+    .ct-acc-icon::before,.ct-acc-icon::after{content:'';position:absolute;background:#1a1008;transition:transform 0.35s,opacity 0.3s}
+    .ct-acc-icon::before{width:14px;height:1px;top:50%;left:0;transform:translateY(-50%)}
+    .ct-acc-icon::after{width:1px;height:14px;left:50%;top:0;transform:translateX(-50%)}
+    .ct-acc-btn.open .ct-acc-icon::after{opacity:0;transform:translateX(-50%) rotate(90deg)}
+    .ct-acc-content{max-height:0;overflow:hidden;transition:max-height 0.45s cubic-bezier(0.16,1,0.3,1)}
+    .ct-acc-content.open{max-height:300px}
+    .ct-acc-inner{padding:4px 0 20px;font-size:13px;font-weight:300;line-height:1.9;color:#5a4a3a;letter-spacing:0.04em}
+    .ct-faq-all{display:inline-flex;align-items:center;gap:10px;font-size:9px;letter-spacing:0.3em;text-transform:uppercase;color:#1a1008;border-bottom:1px solid #c9a96e;padding-bottom:3px;transition:gap 0.35s,letter-spacing 0.3s;margin-top:32px;font-weight:600}
+    .ct-faq-all:hover{gap:16px;letter-spacing:0.36em}
+    @media(max-width:900px){
+      .ct-crumb,.ct-faq,.ct-reviews-head,.ct-reviews-swiper{padding-left:20px;padding-right:20px}
+      .ct-wrap{grid-template-columns:1fr}
+      .ct-info{padding:44px 24px}
+      .ct-form-wrap{padding:44px 24px;border-left:none;border-top:1px solid #e8e4de}
+      .ct-field-row{grid-template-columns:1fr}
+    }
+    @media(max-width:520px){
+      .ct-subject-tabs{gap:5px}
+    }
+  </style>
+
+  <script is:inline>
+    (function() {
+      var form = document.getElementById('ctForm');
+      var note = document.getElementById('ctFormNote');
+      var subjectHidden = document.getElementById('ctSubjectHidden');
+
+      document.querySelectorAll('.ct-field-input,.ct-field-textarea').forEach(function(inp) {
+        function check() {
+          inp.classList.toggle('has-val', inp.value.length > 0);
+        }
+        inp.addEventListener('input', check);
+        inp.addEventListener('blur', check);
+        check();
+      });
+
+      document.querySelectorAll('#ctTabs .ct-tab').forEach(function(button) {
+        button.addEventListener('click', function() {
+          document.querySelectorAll('#ctTabs .ct-tab').forEach(function(tab) {
+            tab.classList.remove('active');
+          });
+          button.classList.add('active');
+          if (subjectHidden) subjectHidden.value = button.getAttribute('data-subject-value') || button.textContent.trim();
+        });
+      });
+
+      document.querySelectorAll('.ct-acc-btn').forEach(function(button) {
+        button.addEventListener('click', function() {
+          var content = button.nextElementSibling;
+          var isOpen = button.classList.contains('open');
+          document.querySelectorAll('.ct-acc-btn.open').forEach(function(otherBtn) {
+            otherBtn.classList.remove('open');
+          });
+          document.querySelectorAll('.ct-acc-content.open').forEach(function(otherContent) {
+            otherContent.classList.remove('open');
+          });
+          if (!isOpen) {
+            button.classList.add('open');
+            if (content) content.classList.add('open');
+          }
+        });
+      });
+
+      if (!form) return;
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        if (!form.reportValidity()) {
+          if (note) {
+            note.textContent = 'Please complete the required fields before sending.';
+            note.classList.remove('is-success');
+            note.classList.add('is-error');
+          }
+          return;
+        }
+
+        var formData = new FormData(form);
+        var first = String(formData.get('first_name') || '').trim();
+        var last = String(formData.get('last_name') || '').trim();
+        var email = String(formData.get('email') || '').trim();
+        var phone = String(formData.get('phone') || '').trim();
+        var subject = String(formData.get('subject') || 'General Enquiry').trim();
+        var message = String(formData.get('message') || '').trim();
+        var fullName = [first, last].filter(Boolean).join(' ').trim() || 'Not provided';
+
+        var mailBody = [
+          'Subject: ' + subject,
+          '',
+          'Name: ' + fullName,
+          'Email: ' + email,
+          'Phone: ' + (phone || 'Not provided'),
+          '',
+          'Message:',
+          message
+        ].join('\n');
+
+        var mailto = 'mailto:hello@rivavalencia.com?subject='
+          + encodeURIComponent('Riva Valencia — ' + subject)
+          + '&body=' + encodeURIComponent(mailBody);
+
+        var submitBtn = document.getElementById('ctSubmitBtn');
+        if (submitBtn) submitBtn.classList.add('sent');
+        if (note) {
+          note.textContent = 'Your email app should open now with your enquiry ready to send.';
+          note.classList.remove('is-error');
+          note.classList.add('is-success');
+        }
+        window.location.href = mailto;
+      });
+
+      function initReviewsSwiper() {
+        var reviewsEl = document.getElementById('ctReviewsSwiper');
+        if (!reviewsEl || !window.Swiper) return;
+        if (reviewsEl.swiper) {
+          reviewsEl.swiper.update();
+          return;
+        }
+        new window.Swiper(reviewsEl, {
+          loop: true,
+          slidesPerView: 1.08,
+          spaceBetween: 14,
+          speed: 900,
+          allowTouchMove: true,
+          autoplay: {
+            delay: 2600,
+            disableOnInteraction: false,
+            pauseOnMouseEnter: true,
+            reverseDirection: true,
+          },
+          breakpoints: {
+            640: { slidesPerView: 1.6, spaceBetween: 16 },
+            900: { slidesPerView: 2.35, spaceBetween: 18 },
+            1200: { slidesPerView: 3.2, spaceBetween: 20 },
+          },
+        });
+      }
+
+      if (document.readyState === 'complete') initReviewsSwiper();
+      document.addEventListener('DOMContentLoaded', initReviewsSwiper);
+      window.addEventListener('load', initReviewsSwiper);
+    })();
+  </script>
+</Layout>

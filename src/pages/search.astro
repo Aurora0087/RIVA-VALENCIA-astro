@@ -1,0 +1,14 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import SearchPage from '@/components/SearchPage.astro';
+import { getAllProducts } from '@/lib/shopify';
+
+const { products, status } = await getAllProducts(80);
+---
+
+<Layout
+  title="Search — RIVA VALENCIA"
+  description="Search the Riva Valencia leather collection for bags, wallets, belts, accessories and limited pieces."
+>
+  <SearchPage products={products} status={status} />
+</Layout>

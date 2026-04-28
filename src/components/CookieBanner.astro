@@ -1,0 +1,70 @@
+<div class="rv-cookie" id="rvCookieBanner" hidden>
+  <p class="rv-cookie-eyebrow">Cookies</p>
+  <h2 class="rv-cookie-title">A smoother visit, tailored for you.</h2>
+  <p class="rv-cookie-copy">
+    We use cookies to keep the site secure, remember your preferences and improve your experience.
+  </p>
+  <div class="rv-cookie-actions">
+    <a href="/pages/cookie-settings" class="rv-cookie-link">Cookie Settings</a>
+    <button type="button" class="rv-cookie-accept" id="rvCookieAccept">Accept</button>
+  </div>
+</div>
+
+<script is:inline>
+  (function() {
+    var storageKey = 'rv_cookie_consent_v1';
+
+    function mountCookieBanner() {
+      var banner = document.getElementById('rvCookieBanner');
+      var acceptBtn = document.getElementById('rvCookieAccept');
+      if (!banner || !acceptBtn) return;
+
+      function showBanner() {
+        banner.hidden = false;
+        requestAnimationFrame(function() {
+          banner.classList.add('is-visible');
+        });
+      }
+
+      function hideBanner() {
+        banner.classList.remove('is-visible');
+        window.setTimeout(function() {
+          if (!banner.classList.contains('is-visible')) banner.hidden = true;
+        }, 260);
+      }
+
+      function acceptCookies() {
+        try {
+          localStorage.setItem(storageKey, 'accepted');
+        } catch (_) {}
+        hideBanner();
+      }
+
+      acceptBtn.addEventListener('click', acceptCookies);
+
+      window.RivaCookieBanner = {
+        show: function() {
+          try {
+            localStorage.removeItem(storageKey);
+          } catch (_) {}
+          showBanner();
+        },
+        hide: hideBanner,
+        accept: acceptCookies,
+      };
+
+      var consent = null;
+      try {
+        consent = localStorage.getItem(storageKey);
+      } catch (_) {}
+
+      if (!consent) showBanner();
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', mountCookieBanner, { once: true });
+    } else {
+      mountCookieBanner();
+    }
+  })();
+</script>

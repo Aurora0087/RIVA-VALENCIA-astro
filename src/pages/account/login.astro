@@ -1,0 +1,55 @@
+---
+import '@/styles/global.css';
+import CookieBanner from '@/components/CookieBanner.astro';
+import { LoginPage } from '@/components/LoginPage';
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="description" content="Sign in to your Riva Valencia account to view orders, manage your wishlist and more." />
+    <title>Sign In — RIVA VALENCIA</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Cormorant+Garamond:wght@300;400;600&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@200;300;400;500;600;700&display=swap" rel="stylesheet" />
+  </head>
+  <body class="lg-standalone-body">
+    <div class="wlc-page lg-wlc-page">
+      <div class="wlc-logo-wrap">
+        <a href="/" class="wlc-logo-main">Riva Valencia</a>
+        <span class="wlc-logo-sub">Diseñado en España</span>
+      </div>
+
+      <LoginPage client:load />
+
+      <footer class="wlc-footer">
+        <div class="wlc-footer-links">
+          <a href="/pages/terms-purchase">Terms and Conditions of Purchase</a>
+          <a href="/pages/terms">Terms and Conditions</a>
+          <a href="/pages/privacy">Privacy Policy</a>
+          <a href="/pages/privacy-management">Privacy Management</a>
+          <a href="/pages/cookies">Cookies Policy</a>
+          <a href="/pages/cookie-settings">Cookie Settings</a>
+          <a href="/pages/sitemap">Sitemap</a>
+        </div>
+        <div class="wlc-footer-right">
+          <a href="/" class="wlc-footer-locale">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M2 12h20M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/>
+            </svg>
+            <span>Spain | English</span>
+          </a>
+          <span class="wlc-footer-copy">© 2026 Riva Valencia</span>
+        </div>
+      </footer>
+    </div>
+    <CookieBanner />
+  </body>
+</html>

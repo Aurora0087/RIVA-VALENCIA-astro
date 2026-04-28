@@ -1,0 +1,114 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import { AllProductsPage } from '@/components/AllProductsPage';
+import {
+  getAllCollections,
+  getCollectionByHandle,
+  type ShopifyConnectionStatus,
+} from '@/lib/shopify';
+
+export async function getStaticPaths() {
+  const reservedHandles = new Set([
+    'all',
+    'ss26',
+    'mens',
+    'womens',
+    'limited-edition',
+    'mens-collection',
+    'womens-collections',
+  ]);
+  const navCollectionHandles = [
+    'ss26',
+    'new-in',
+    'new-man-products',
+    'new-woman-products',
+    'shoulder-bags',
+    'handbags',
+    'sling-bags-cloths',
+    'laptop-portfolio-bags',
+    'back-packs',
+    'woman-wallet',
+    'woman-belt',
+    'briefcases',
+    'sling-bags',
+    'man-wallets',
+    'man-belt',
+    'work-essentials',
+    'techpack',
+    'gloves',
+    'belts',
+    'mobile-case',
+    'watch-strap',
+    'keychain',
+    'woman-jackets',
+    'man-jackets',
+    'gifts',
+    'woman-gifts',
+    'man-gifts',
+    'sale',
+    'man-sale',
+    'woman-sale',
+    'travel-items',
+    'accessories',
+    'jackets',
+  ];
+  const collections = await getAllCollections();
+  const handles = new Set([
+    ...navCollectionHandles,
+    ...collections.map((collection) => collection.handle),
+  ]);
+
+  return Array.from(handles)
+    .filter((handle) => handle && !reservedHandles.has(handle))
+    .map((handle) => ({
+      params: { collectionId: handle },
+      props: { collectionId: handle },
+    }));
+}
+
+interface Props {
+  collectionId: string;
+}
+
+const { collectionId } = Astro.props;
+const { collection, status } = await getCollectionByHandle(collectionId);
+const products = collection?.products.edges.map((edge) => edge.node) ?? [];
+
+function titleFromHandle(handle: string) {
+  return handle
+    .split('-')
+    .filter(Boolean)
+    .map((part) => (part.length <= 3 ? part.toUpperCase() : part.charAt(0).toUpperCase() + part.slice(1)))
+    .join(' ');
+}
+
+const title = collection?.title ?? titleFromHandle(collectionId);
+const description =
+  collection?.description?.trim() ||
+  `Browse the ${title} collection from Riva Valencia.`;
+
+const pageStatus: ShopifyConnectionStatus = collection
+  ? status
+  : status.ok
+    ? {
+        ok: false,
+        reason: 'api_error',
+        message: `The collection "${collectionId}" is not available yet.`,
+      }
+    : status;
+---
+
+<Layout
+  title={`${title} — RIVA VALENCIA`}
+  description={description}
+>
+  <AllProductsPage
+    products={products}
+    status={pageStatus}
+    title={title}
+    breadcrumbLabel={title}
+    kicker="Riva Valencia Collection"
+    metaItems={['Crafted in Spain', 'Full-Grain Leather']}
+    client:load
+  />
+</Layout>

@@ -1,0 +1,73 @@
+---
+import Layout from '@/layouts/Layout.astro';
+
+const faqGroups = [
+  {
+    title: 'Orders',
+    items: [
+      ['Can I change or cancel an order after placing it?', 'If your order has not yet moved into processing or dispatch, we may be able to help. Contact us as soon as possible with your order number.'],
+      ['Will I receive order confirmation and tracking?', 'Yes. We send an order confirmation first, followed by shipment and tracking details when the parcel is dispatched.'],
+    ],
+  },
+  {
+    title: 'Shipping',
+    items: [
+      ['Do you ship internationally?', 'Yes. International availability depends on destination and courier service coverage. Duties and local taxes may apply depending on country rules.'],
+      ['How long does delivery take?', 'Processing and transit times vary by product and location. See the shipping policy for a fuller overview.'],
+    ],
+  },
+  {
+    title: 'Returns and Care',
+    items: [
+      ['What is your return window?', 'Eligible products can usually be returned within 30 days of delivery when unused and in original condition.'],
+      ['How should I care for leather goods?', 'Store pieces in a cool, dry place, avoid prolonged moisture and direct heat, and condition the leather appropriately when needed.'],
+    ],
+  },
+  {
+    title: 'Sizing and Product Advice',
+    items: [
+      ['How do I choose the right bag size?', 'Use the size guide and check product dimensions against what you plan to carry daily, especially for tablets, laptops and notebooks.'],
+      ['How do I choose the correct belt size?', 'Measure from the buckle pin to the hole you use most on a belt you already own, then compare with the product sizing information.'],
+    ],
+  },
+];
+---
+
+<Layout
+  title="FAQ — RIVA VALENCIA"
+  description="Find answers to common questions about ordering, shipping, returns and sizing."
+>
+  <section class="lp-shell">
+    <div class="lp-hero rv-reveal">
+      <span class="lp-eyebrow">Support</span>
+      <h1 class="lp-title">FAQ</h1>
+      <p class="lp-intro">Answers to the questions we hear most about orders, delivery, returns, sizing and aftercare.</p>
+      <p class="lp-updated">Last updated: April 28, 2026</p>
+    </div>
+
+    <div class="faq-groups">
+      {faqGroups.map((group, groupIndex) => (
+        <section class:list={['faq-group', 'rv-reveal', groupIndex % 2 === 0 ? 'rv-reveal-l' : 'rv-reveal-r']}>
+          <h2>{group.title}</h2>
+          <div class="faq-list">
+            {group.items.map(([question, answer]) => (
+              <details class="faq-item">
+                <summary>{question}</summary>
+                <p>{answer}</p>
+              </details>
+            ))}
+          </div>
+        </section>
+      ))}
+    </div>
+
+    <section class="lp-extra rv-reveal">
+      <h2>Still Need Help?</h2>
+      <ul>
+        <li><a href="/pages/size-guide">Open Size Guide</a></li>
+        <li><a href="/pages/shipping">View Shipping Policy</a></li>
+        <li><a href="/pages/returns">View Return Policy</a></li>
+      </ul>
+    </section>
+  </section>
+</Layout>
