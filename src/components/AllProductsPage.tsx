@@ -147,7 +147,7 @@ export function AllProductsPage({
   title = 'All Products',
   kicker = 'Riva Valencia Collection',
   breadcrumbLabel = 'All Products',
-  metaItems = ['Crafted in Spain', 'Full-Grain Leather'],
+  metaItems = ['Designed In Spain', 'Full-Grain Leather'],
   embedded = false,
   categoryTabs = [...DEFAULT_CATEGORY_TABS],
 }: Props) {

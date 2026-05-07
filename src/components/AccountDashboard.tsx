@@ -61,61 +61,78 @@ export function AccountDashboard() {
 
   return (
     <div className="ac-page">
-      {/* Header */}
-      <div className="ac-head">
-        <div className="ac-head-copy">
-          <span className="ac-kicker">My Account</span>
-          <h1 className="ac-title">Welcome, {customer.firstName || 'there'}</h1>
-          <p className="ac-subtitle">Your Riva Valencia account, orders, profile details and saved addresses in one quiet place.</p>
-        </div>
-        <button
-          type="button"
-          className="ac-logout"
-          onClick={handleLogout}
-          disabled={loggingOut}
-        >
-          {loggingOut ? 'Signing out…' : 'Sign Out'}
-        </button>
-      </div>
+      <div className="ac-hero">
+        <div className="ac-shell">
+          <div className="ac-head">
+            <div className="ac-head-copy">
+              <span className="ac-kicker">My Account</span>
+              <h1 className="ac-title">Welcome, {customer.firstName || 'there'}</h1>
+              <p className="ac-subtitle">
+                Your Riva Valencia account, orders, profile details and saved addresses in one calm,
+                beautifully organised place.
+              </p>
+            </div>
+            <button
+              type="button"
+              className="ac-logout"
+              onClick={handleLogout}
+              disabled={loggingOut}
+            >
+              {loggingOut ? 'Signing out…' : 'Sign Out'}
+            </button>
+          </div>
 
-      <div className="ac-overview">
-        <div className="ac-client-card">
-          <div className="ac-client-avatar">{initials}</div>
-          <div>
-            <span className="ac-client-label">Signed in as</span>
-            <p className="ac-client-name">{fullName}</p>
-            <p className="ac-client-email">{customer.email}</p>
+          <div className="ac-overview">
+            <div className="ac-client-card">
+              <div className="ac-client-avatar">{initials}</div>
+              <div>
+                <span className="ac-client-label">Signed in as</span>
+                <p className="ac-client-name">{fullName}</p>
+                <p className="ac-client-email">{customer.email}</p>
+                <p className="ac-client-note">Quiet access to your orders, details and delivery preferences.</p>
+              </div>
+            </div>
+
+            <div className="ac-metric">
+              <span className="ac-metric-label">Orders</span>
+              <span className="ac-metric-value">{orders.length}</span>
+              <span className="ac-metric-note">Across your client account</span>
+            </div>
+
+            <div className="ac-metric">
+              <span className="ac-metric-label">Address</span>
+              <span className="ac-metric-value">{customer.defaultAddress ? 'Saved' : 'Add'}</span>
+              <span className="ac-metric-note">Default delivery details</span>
+            </div>
+
+            <div className="ac-metric">
+              <span className="ac-metric-label">Latest Order</span>
+              <span className="ac-metric-value">{lastOrder ? `#${lastOrder.orderNumber}` : 'New'}</span>
+              <span className="ac-metric-note">
+                {lastOrder ? 'Most recent purchase' : 'Your next piece will appear here'}
+              </span>
+            </div>
           </div>
         </div>
-        <div className="ac-metric">
-          <span className="ac-metric-value">{orders.length}</span>
-          <span className="ac-metric-label">Orders</span>
-        </div>
-        <div className="ac-metric">
-          <span className="ac-metric-value">{customer.defaultAddress ? 'Saved' : 'Add'}</span>
-          <span className="ac-metric-label">Address</span>
-        </div>
-        <div className="ac-metric">
-          <span className="ac-metric-value">{lastOrder ? `#${lastOrder.orderNumber}` : 'New'}</span>
-          <span className="ac-metric-label">Latest Order</span>
-        </div>
       </div>
 
-      {/* Nav tabs */}
-      <div className="ac-tabs">
-        {(['orders', 'profile', 'addresses'] as Section[]).map((s) => (
-          <button
-            key={s}
-            type="button"
-            className={cn('ac-tab', section === s && 'active')}
-            onClick={() => setSection(s)}
-          >
-            {s === 'orders' ? 'Order History' : s === 'profile' ? 'Profile' : 'Addresses'}
-          </button>
-        ))}
-      </div>
+      <div className="ac-shell">
+        <div className="ac-tabs-wrap">
+          <div className="ac-tabs">
+            {(['orders', 'profile', 'addresses'] as Section[]).map((s) => (
+              <button
+                key={s}
+                type="button"
+                className={cn('ac-tab', section === s && 'active')}
+                onClick={() => setSection(s)}
+              >
+                {s === 'orders' ? 'Order History' : s === 'profile' ? 'Profile' : 'Addresses'}
+              </button>
+            ))}
+          </div>
+        </div>
 
-      <div className="ac-body">
+        <div className="ac-body">
         {/* ── ORDERS ── */}
         {section === 'orders' && (
           <div className="ac-section">
@@ -231,14 +248,30 @@ export function AccountDashboard() {
             </p>
           </div>
         )}
-      </div>
+        </div>
 
-      {/* Quick links */}
-      <div className="ac-quick">
-        <a href="/collections/all" className="ac-quick-link">Shop All →</a>
-        <a href="/wishlist" className="ac-quick-link">My Wishlist →</a>
-        <a href="/pages/contact" className="ac-quick-link">Contact Us →</a>
-        <a href="/cart" className="ac-quick-link">View Cart →</a>
+        <div className="ac-quick">
+          <a href="/collections/all" className="ac-quick-link">
+            <span className="ac-quick-kicker">Collection</span>
+            <span className="ac-quick-title">Shop All →</span>
+            <span className="ac-quick-copy">Explore the full Riva Valencia collection.</span>
+          </a>
+          <a href="/wishlist" className="ac-quick-link">
+            <span className="ac-quick-kicker">Saved</span>
+            <span className="ac-quick-title">My Wishlist →</span>
+            <span className="ac-quick-copy">Return to the pieces you have been considering.</span>
+          </a>
+          <a href="/pages/contact" className="ac-quick-link">
+            <span className="ac-quick-kicker">Support</span>
+            <span className="ac-quick-title">Contact Us →</span>
+            <span className="ac-quick-copy">Speak with our team about delivery, care or gifting.</span>
+          </a>
+          <a href="/cart" className="ac-quick-link">
+            <span className="ac-quick-kicker">Basket</span>
+            <span className="ac-quick-title">View Cart →</span>
+            <span className="ac-quick-copy">Pick up where you left off and continue to checkout.</span>
+          </a>
+        </div>
       </div>
     </div>
   );
@@ -280,12 +313,12 @@ function OrderCard({ order }: { order: CustomerOrder }) {
             {order.fulfillmentStatus.replace(/_/g, ' ')}
           </span>
           <svg
+            className={cn('ac-order-chevron', open && 'open')}
             width="14" height="14"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
             strokeWidth="1.5"
-            style={{ transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.3s', flexShrink: 0 }}
           >
             <polyline points="6 9 12 15 18 9" />
           </svg>

@@ -32,6 +32,8 @@ export interface CustomerAddress {
   address1: string | null;
   city: string | null;
   country: string | null;
+  countryCode?: string | null;
+  provinceCode?: string | null;
   zip: string | null;
 }
 
@@ -347,7 +349,17 @@ export async function getCustomer(accessToken: string): Promise<Customer | null>
       `query GetCustomer($token: String!) {
         customer(customerAccessToken: $token) {
           id firstName lastName email phone
-          defaultAddress { id firstName lastName address1 city country zip }
+          defaultAddress {
+            id
+            firstName
+            lastName
+            address1
+            city
+            country
+            countryCode: countryCodeV2
+            provinceCode
+            zip
+          }
           orders(first: 10, sortKey: PROCESSED_AT, reverse: true) {
             edges {
               node {
@@ -433,7 +445,17 @@ async function getCustomerAccountCustomer(accessToken: string): Promise<Customer
           lastName
           emailAddress { emailAddress }
           phoneNumber { phoneNumber }
-          defaultAddress { id firstName lastName address1 city country zip }
+          defaultAddress {
+            id
+            firstName
+            lastName
+            address1
+            city
+            country
+            countryCode: countryCodeV2
+            provinceCode
+            zip
+          }
           orders(first: 10, sortKey: PROCESSED_AT, reverse: true) {
             edges {
               node {

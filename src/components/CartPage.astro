@@ -1,5 +1,6 @@
 ---
 import { formatPrice, type ShopifyProduct } from '@/lib/shopify';
+import { CartRelatedProducts } from '@/components/CartRelatedProducts';
 
 interface Props {
   suggestions: ShopifyProduct[];
@@ -85,8 +86,12 @@ const suggestionPayload = suggestions.map((product) => {
           <span class="rv-cart-summary-val green" data-cart-discount>₹0</span>
         </div>
         <div class="rv-cart-summary-row">
-          <span class="rv-cart-summary-label">Delivery</span>
-          <span class="rv-cart-summary-val" data-cart-delivery>Calculated at checkout</span>
+          <span class="rv-cart-summary-label">Shipping</span>
+          <span class="rv-cart-summary-val" data-cart-shipping>₹0</span>
+        </div>
+        <div class="rv-cart-summary-row">
+          <span class="rv-cart-summary-label">Estimated taxes</span>
+          <span class="rv-cart-summary-val" data-cart-tax>₹0</span>
         </div>
         <div class="rv-cart-summary-row rv-cart-summary-row-note" data-free-shipping-row hidden>
           <span data-free-shipping-message></span>
@@ -97,7 +102,7 @@ const suggestionPayload = suggestions.map((product) => {
         <span class="rv-cart-total-label">Total</span>
         <span class="rv-cart-total-price" data-cart-total>₹0</span>
       </div>
-      <span class="rv-cart-total-tax">Inclusive of all taxes (GST)</span>
+      <span class="rv-cart-total-tax">Shipping and estimated taxes are based on your current cart and may change after you choose your delivery address at checkout.</span>
 
       <div class="rv-cart-promo">
         <span class="rv-cart-promo-label">Promo Code</span>
@@ -116,14 +121,6 @@ const suggestionPayload = suggestions.map((product) => {
         </svg>
         Proceed to Checkout — <span data-checkout-total>₹0</span>
       </a>
-
-      <button type="button" class="rv-cart-paypal" data-paypal-button>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-          <path d="M6.5 10.5h6a4 4 0 000-8H5l-2 14h4l.5-3.5"></path>
-          <path d="M11.5 10.5h5a4 4 0 010 8H12l-1.5-8"></path>
-        </svg>
-        Pay with PayPal
-      </button>
 
       <div class="rv-cart-pay-logos">
         <span class="rv-cart-pay-logo">UPI</span>
@@ -152,15 +149,7 @@ const suggestionPayload = suggestions.map((product) => {
   </div>
 </div>
 
-<div class="rv-cart-related" data-related-wrap hidden>
-  <div class="rv-sh rv-reveal">
-    <h2>Complete the Look</h2>
-    <p>Pieces that pair beautifully with your selection</p>
-  </div>
-  <div class="rv-hscroll">
-    <div class="rv-htrack" data-related-track></div>
-  </div>
-</div>
+<CartRelatedProducts products={suggestions} client:load />
 
 <div class="rv-payment rv-reveal">
   <span class="rv-payment-logo">VISA</span>
@@ -168,13 +157,6 @@ const suggestionPayload = suggestions.map((product) => {
   <span class="rv-payment-sep"></span>
   <span class="rv-payment-logo">AMEX</span>
   <span class="rv-payment-sep"></span>
-  <span class="rv-payment-logo">APPLE PAY</span>
-  <span class="rv-payment-logo">GOOGLE PAY</span>
-  <span class="rv-payment-sep"></span>
-  <span class="rv-payment-logo">PAYPAL</span>
-  <span class="rv-payment-logo">KLARNA</span>
-  <span class="rv-payment-sep"></span>
-  <span class="rv-payment-logo">UPI</span>
   <span class="rv-payment-logo">RAZORPAY</span>
 </div>
 
@@ -216,7 +198,9 @@ const suggestionPayload = suggestions.map((product) => {
   .rv-qty{display:flex;align-items:center;border:1px solid #e8e4de}
   .rv-qty-btn{width:38px;height:38px;background:none;border:none;cursor:pointer;font-size:16px;color:#1a1008;display:flex;align-items:center;justify-content:center;transition:background 0.2s;font-family:'Jost',sans-serif;font-weight:300}
   .rv-qty-btn:hover{background:#f5f2ec}
-  .rv-qty-val{width:44px;text-align:center;font-size:13px;letter-spacing:0.1em;color:#1a1008;border:none;border-left:1px solid #e8e4de;border-right:1px solid #e8e4de;height:38px;background:none;font-family:'Jost',sans-serif;font-weight:400}
+  .rv-qty-val{width:44px;height:38px;padding:0;text-align:center;font-size:13px;line-height:38px;letter-spacing:0.1em;color:#1a1008;border:none;border-left:1px solid #e8e4de;border-right:1px solid #e8e4de;background:none;font-family:'Jost',sans-serif;font-weight:400;appearance:textfield;-moz-appearance:textfield}
+  .rv-qty-val::-webkit-outer-spin-button,
+  .rv-qty-val::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
   .rv-cart-remove{background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:5px;font-family:'Jost',sans-serif;font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:#b8b0a6;padding:0;transition:color 0.2s}
   .rv-cart-remove:hover{color:#8b3a2a}
   .rv-cart-item.removing{opacity:0!important;transform:translateX(-40px)!important;pointer-events:none;transition:opacity 0.4s ease,transform 0.4s cubic-bezier(0.16,1,0.3,1)!important}
@@ -256,8 +240,6 @@ const suggestionPayload = suggestions.map((product) => {
   .rv-cart-checkout:hover{letter-spacing:0.42em;background:#2e1f0f}
   .rv-cart-checkout::after{content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.07),transparent);transition:left 0.7s}
   .rv-cart-checkout:hover::after{left:140%}
-  .rv-cart-paypal{width:100%;background:transparent;border:1px solid #e8e4de;cursor:pointer;font-family:'Jost',sans-serif;font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:#1a1008;padding:16px;display:flex;align-items:center;justify-content:center;gap:8px;transition:border-color 0.3s,background 0.3s}
-  .rv-cart-paypal:hover{border-color:#1a1008;background:#f5f2ec}
   .rv-cart-pay-logos{display:flex;align-items:center;justify-content:center;gap:14px;padding-top:16px;flex-wrap:wrap}
   .rv-cart-pay-logo{font-size:8px;letter-spacing:0.18em;text-transform:uppercase;color:#b8b0a6;font-weight:500}
   .rv-cart-pay-sep{width:1px;height:10px;background:#e8e4de}
@@ -280,24 +262,7 @@ const suggestionPayload = suggestions.map((product) => {
   .rv-cart-empty-sub{font-size:12px;letter-spacing:0.14em;text-transform:uppercase;color:#8a7660;margin-bottom:40px;display:block;font-weight:300}
   .rv-cart-empty-btn{display:inline-flex;align-items:center;gap:12px;background:#1a1008;color:#fafaf8;font-family:'Jost',sans-serif;font-size:9px;letter-spacing:0.32em;text-transform:uppercase;padding:18px 48px;font-weight:600;transition:letter-spacing 0.35s,background 0.3s}
   .rv-cart-empty-btn:hover{background:#2e1f0f;letter-spacing:0.38em}
-  .rv-cart-related{border-top:1px solid #e8e4de}
-  .rv-hscroll{padding:0 48px 80px}
-  .rv-htrack{display:flex;gap:20px;overflow-x:auto;scrollbar-width:none;padding-bottom:8px;cursor:grab;-webkit-overflow-scrolling:touch}
-  .rv-htrack::-webkit-scrollbar{display:none}
-  .rv-hcard{flex-shrink:0;width:240px}
-  .rv-pc{display:block;color:#1a1008;perspective:1000px;transform-style:preserve-3d}
-  .rv-pc-inner{transition:transform 0.5s cubic-bezier(0.34,1.56,0.64,1);transform-style:preserve-3d}
-  .rv-pc:hover .rv-pc-inner{transform:translateY(-8px) rotateX(2deg)}
-  .rv-pc-wrap{overflow:hidden;position:relative;background:#edebe6;box-shadow:0 0 0 rgba(26,16,8,0);transition:box-shadow 0.5s}
-  .rv-pc:hover .rv-pc-wrap{box-shadow:0 20px 48px rgba(26,16,8,0.14)}
-  .rv-pc img,.rv-pc-ph{width:100%;aspect-ratio:3/4;object-fit:cover;display:block;transition:transform 8s cubic-bezier(0.25,0.46,0.45,0.94)}
-  .rv-pc:hover img{transform:scale(1.05)}
-  .rv-pc-badge{position:absolute;top:12px;left:0;background:#1a1008;color:#fafaf8;font-size:8px;letter-spacing:0.2em;text-transform:uppercase;padding:4px 12px;font-weight:500}
-  .rv-pc-badge.new{background:#3d5c35}
-  .rv-pc-info{padding:16px 2px 8px}
-  .rv-pc-col{font-size:9px;letter-spacing:0.24em;text-transform:uppercase;color:#8a7660;display:block;margin-bottom:4px;font-weight:400}
-  .rv-pc-name{font-size:13px;font-weight:400;color:#1a1008;display:block;margin-bottom:6px;line-height:1.3;letter-spacing:0.02em}
-  .rv-pc-price{font-size:12px;color:#5a4a3a;letter-spacing:0.06em;font-weight:400}
+  .rv-cart-related{border-top:1px solid #e8e4de;padding-bottom:72px}
   .rv-sh{text-align:center;padding:64px 20px 40px}
   .rv-sh h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(34px,5.5vw,60px);letter-spacing:0.1em;color:#1a1008;font-weight:400;margin-bottom:10px}
   .rv-sh p{font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#8a7660;font-weight:400}
@@ -312,8 +277,6 @@ const suggestionPayload = suggestions.map((product) => {
     .rv-cart-header{flex-direction:column;align-items:flex-start;gap:12px}
     .rv-cart-header-right{align-items:flex-start}
     .rv-cart-item{grid-template-columns:96px 1fr;gap:16px;padding:24px 0}
-    .rv-hscroll{padding:0 20px 60px}
-    .rv-hcard{width:200px}
     .rv-sh{padding:52px 20px 36px}
     .rv-payment{padding:18px 20px;gap:18px}
   }
@@ -330,7 +293,6 @@ const suggestionPayload = suggestions.map((product) => {
 >
   (async () => {
   const cartApi = window.RivaCart || await window.RivaCartReady;
-  const FREE_SHIPPING_THRESHOLD = 5000;
   const cartRoot = document.querySelector('[data-cart-root]');
 
   if (cartRoot) {
@@ -347,22 +309,21 @@ const suggestionPayload = suggestions.map((product) => {
     const checkoutTotalEl = cartRoot.querySelector('[data-checkout-total]');
     const discountRow = cartRoot.querySelector('[data-discount-row]');
     const discountEl = cartRoot.querySelector('[data-cart-discount]');
-    const deliveryEl = cartRoot.querySelector('[data-cart-delivery]');
+    const shippingEl = cartRoot.querySelector('[data-cart-shipping]');
+    const taxEl = cartRoot.querySelector('[data-cart-tax]');
     const freeShippingRow = cartRoot.querySelector('[data-free-shipping-row]');
     const freeShippingMessage = cartRoot.querySelector('[data-free-shipping-message]');
     const checkoutLink = cartRoot.querySelector('[data-checkout-link]');
-    const paypalButton = cartRoot.querySelector('[data-paypal-button]');
     const promoInput = cartRoot.querySelector('[data-promo-input]');
     const promoApply = cartRoot.querySelector('[data-promo-apply]');
     const promoMessage = cartRoot.querySelector('[data-promo-message]');
     const upsellWrap = cartRoot.querySelector('[data-upsell-wrap]');
     const upsellItems = cartRoot.querySelector('[data-upsell-items]');
-    const relatedWrap = document.querySelector('[data-related-wrap]');
-    const relatedTrack = document.querySelector('[data-related-track]');
 
     let cartState = null;
     let currentDiscountCode = '';
     let noteTimer = null;
+    let defaultAddressPromise = null;
 
     const formatMoney = (amount, currency = 'INR') => new Intl.NumberFormat('en-IN', {
       style: 'currency',
@@ -371,6 +332,133 @@ const suggestionPayload = suggestions.map((product) => {
     }).format(Number(amount) || 0);
 
     const getCartLines = (cart) => cart?.lines?.edges?.map((edge) => edge.node) || [];
+    const getDeliveryGroups = (cart) => cart?.deliveryGroups?.edges?.map((edge) => edge.node) || [];
+    const CURRENCY_COUNTRY_MAP = {
+      INR: 'IN',
+      USD: 'US',
+      EUR: 'ES',
+      GBP: 'GB',
+      AED: 'AE',
+    };
+
+    const getDetectedCountryCode = (cart) => {
+      const currencyCountryCode = CURRENCY_COUNTRY_MAP[cart?.cost?.totalAmount?.currencyCode || ''];
+      if (currencyCountryCode) return currencyCountryCode;
+
+      const locales = [
+        ...(Array.isArray(navigator.languages) ? navigator.languages : []),
+        navigator.language,
+      ].filter(Boolean);
+
+      for (const locale of locales) {
+        try {
+          const region = new Intl.Locale(locale).region;
+          if (region && region.length === 2) return region.toUpperCase();
+        } catch {
+        }
+
+        const match = String(locale).match(/[-_]([A-Za-z]{2})\b/);
+        if (match?.[1]) return match[1].toUpperCase();
+      }
+
+      return null;
+    };
+
+    const getSignedInDefaultAddress = async () => {
+      if (defaultAddressPromise !== null) return defaultAddressPromise;
+
+      defaultAddressPromise = (async () => {
+        try {
+          const customerApi = window.RivaCustomer || await window.RivaCustomerReady;
+          if (typeof customerApi?.getDefaultAddress !== 'function') return null;
+          return await customerApi.getDefaultAddress();
+        } catch {
+          return null;
+        }
+      })();
+
+      return defaultAddressPromise;
+    };
+
+    const getPricingAddressPreference = async (cart) => {
+      const defaultAddress = await getSignedInDefaultAddress();
+      const detectedCountryCode = getDetectedCountryCode(cart);
+      const countryCode = String(defaultAddress?.countryCode || detectedCountryCode || '').trim().toUpperCase();
+      if (!countryCode) return null;
+
+      const deliveryAddress = { countryCode };
+      const hasDetailedAddress = Boolean(
+        defaultAddress?.address1 ||
+        defaultAddress?.city ||
+        defaultAddress?.zip ||
+        defaultAddress?.provinceCode
+      );
+
+      if (defaultAddress?.firstName) deliveryAddress.firstName = defaultAddress.firstName;
+      if (defaultAddress?.lastName) deliveryAddress.lastName = defaultAddress.lastName;
+      if (defaultAddress?.address1) deliveryAddress.address1 = defaultAddress.address1;
+      if (defaultAddress?.city) deliveryAddress.city = defaultAddress.city;
+      if (defaultAddress?.provinceCode) deliveryAddress.provinceCode = defaultAddress.provinceCode;
+      if (defaultAddress?.zip) deliveryAddress.zip = defaultAddress.zip;
+
+      return {
+        countryCode,
+        deliveryAddressPreferences: [
+          {
+            deliveryAddress,
+            deliveryAddressValidationStrategy: hasDetailedAddress ? 'STRICT' : 'COUNTRY_CODE_ONLY',
+            oneTimeUse: true,
+          },
+        ],
+      };
+    };
+
+    const ensureCartPricing = async (cart) => {
+      let nextCart = cart;
+      if (!nextCart) return nextCart;
+
+      const pricingAddressPreference = await getPricingAddressPreference(nextCart);
+      const preferredCountryCode = pricingAddressPreference?.countryCode || null;
+      const buyerCountryCode = nextCart.buyerIdentity?.countryCode || null;
+      const deliveryGroups = getDeliveryGroups(nextCart);
+      const hasAnyDeliveryOptions = deliveryGroups.some((group) => group.deliveryOptions?.length > 0);
+      const hasSelectedDeliveryOption = deliveryGroups.some((group) => group.selectedDeliveryOption);
+      const pricingLooksUnresolved =
+        Number(nextCart.cost.totalAmount.amount || 0) <= Number(nextCart.cost.subtotalAmount.amount || 0) &&
+        Math.max(Number(nextCart.cost.totalTaxAmount?.amount || 0), 0) === 0 &&
+        !hasSelectedDeliveryOption;
+      const shouldRefreshBuyerIdentity =
+        pricingAddressPreference &&
+        (
+          !buyerCountryCode ||
+          buyerCountryCode !== preferredCountryCode ||
+          !hasAnyDeliveryOptions ||
+          pricingLooksUnresolved
+        );
+
+      if (shouldRefreshBuyerIdentity && typeof cartApi.updateCartBuyerIdentity === 'function') {
+        try {
+          nextCart = await cartApi.updateCartBuyerIdentity(pricingAddressPreference);
+        } catch {
+        }
+      }
+
+      const selectedDeliveryOptions = getDeliveryGroups(nextCart)
+        .filter((group) => !group.selectedDeliveryOption && group.deliveryOptions?.length)
+        .map((group) => ({
+          deliveryGroupId: group.id,
+          deliveryOptionHandle: group.deliveryOptions[0].handle,
+        }));
+
+      if (selectedDeliveryOptions.length && typeof cartApi.updateCartSelectedDeliveryOptions === 'function') {
+        try {
+          nextCart = await cartApi.updateCartSelectedDeliveryOptions(selectedDeliveryOptions);
+        } catch {
+        }
+      }
+
+      return nextCart;
+    };
 
     const getCartDiscount = (cart) => getCartLines(cart).reduce((total, line) => {
       const compareAt = Number(line.cost.compareAtAmountPerQuantity?.amount || 0);
@@ -387,21 +475,6 @@ const suggestionPayload = suggestions.map((product) => {
         if (!badge) {
           badge = document.createElement('span');
           badge.className = 'rv-cart-nav-badge';
-          badge.style.position = 'absolute';
-          badge.style.top = '2px';
-          badge.style.right = '2px';
-          badge.style.width = '14px';
-          badge.style.height = '14px';
-          badge.style.background = '#c9a96e';
-          badge.style.borderRadius = '50%';
-          badge.style.fontSize = '8px';
-          badge.style.display = 'flex';
-          badge.style.alignItems = 'center';
-          badge.style.justifyContent = 'center';
-          badge.style.color = '#1a1008';
-          badge.style.fontWeight = '700';
-          badge.style.letterSpacing = '0';
-          cartLink.style.position = 'relative';
           cartLink.appendChild(badge);
         }
         badge.textContent = String(count);
@@ -501,15 +574,12 @@ const suggestionPayload = suggestions.map((product) => {
       if (!cart.totalQuantity) {
         if (upsellWrap) upsellWrap.hidden = true;
         if (upsellItems) upsellItems.innerHTML = '';
-        if (relatedWrap) relatedWrap.hidden = true;
-        if (relatedTrack) relatedTrack.innerHTML = '';
         return;
       }
 
       const cartHandles = new Set(getCartLines(cart).map((item) => item.merchandise.product.handle));
       const filtered = suggestionData.filter((product) => !cartHandles.has(product.handle));
       const upsells = filtered.slice(0, 2);
-      const related = filtered.slice(0, 8);
 
       if (upsellWrap && upsellItems) {
         if (upsells.length) {
@@ -529,65 +599,43 @@ const suggestionPayload = suggestions.map((product) => {
           upsellItems.innerHTML = '';
         }
       }
-
-      if (relatedWrap && relatedTrack) {
-        if (related.length) {
-          relatedWrap.hidden = false;
-          relatedTrack.innerHTML = related.map((product, index) => {
-            const tags = (product.tags || []).map((tag) => String(tag).toLowerCase());
-            let badge = '';
-            if (tags.includes('new') || tags.includes('new-in')) badge = `<span class="rv-pc-badge new">New In</span>`;
-            else if (tags.includes('bestseller')) badge = `<span class="rv-pc-badge">Best Seller</span>`;
-            return `
-              <div class="rv-hcard rv-reveal ${index % 3 === 1 ? 'rv-reveal-delay1' : index % 3 === 2 ? 'rv-reveal-delay2' : ''}">
-                <a class="rv-pc" href="/products/${escapeHtml(product.handle)}">
-                  <div class="rv-pc-inner">
-                    <div class="rv-pc-wrap">
-                      ${product.imageUrl ? `<img src="${escapeHtml(product.imageUrl)}" alt="${escapeHtml(product.imageAlt)}" loading="lazy">` : `<div class="rv-pc-ph"></div>`}
-                      ${badge}
-                    </div>
-                    <div class="rv-pc-info">
-                      <span class="rv-pc-col">${escapeHtml(product.productType || product.vendor || 'Leather Goods')}</span>
-                      <span class="rv-pc-name">${escapeHtml(product.title)}</span>
-                      <span class="rv-pc-price">${escapeHtml(product.priceLabel)}</span>
-                    </div>
-                  </div>
-                </a>
-              </div>
-            `;
-          }).join('');
-          observeReveals(relatedWrap.querySelectorAll('.rv-reveal'));
-        } else {
-          relatedWrap.hidden = true;
-          relatedTrack.innerHTML = '';
-        }
-      }
     };
 
     const updateSummary = (cart) => {
       const currency = cart.cost.totalAmount.currencyCode || 'INR';
       const discountAmount = getCartDiscount(cart);
+      const subtotalAmount = Number(cart.cost.subtotalAmount.amount || 0);
       const totalAmount = Number(cart.cost.totalAmount.amount || 0);
+      const taxAmount = Math.max(Number(cart.cost.totalTaxAmount?.amount || 0), 0);
+      const deliveryGroups = getDeliveryGroups(cart);
+      const selectedShippingAmount = deliveryGroups.reduce((sum, group) => {
+        return sum + Number(group.selectedDeliveryOption?.estimatedCost.amount || 0);
+      }, 0);
+      const shippingAmount = selectedShippingAmount > 0
+        ? selectedShippingAmount
+        : Math.max(totalAmount - subtotalAmount - taxAmount, 0);
+      const resolvedTotalAmount = Math.max(totalAmount, subtotalAmount + shippingAmount + taxAmount);
       cartCountEls.forEach((el) => {
         el.textContent = `${cart.totalQuantity} ${cart.totalQuantity === 1 ? 'piece' : 'pieces'} selected`;
       });
       if (subtotalEl) subtotalEl.textContent = formatMoney(cart.cost.subtotalAmount.amount, currency);
-      if (totalEl) totalEl.textContent = formatMoney(totalAmount, currency);
-      if (checkoutTotalEl) checkoutTotalEl.textContent = formatMoney(totalAmount, currency);
+      if (totalEl) totalEl.textContent = formatMoney(resolvedTotalAmount, currency);
+      if (checkoutTotalEl) checkoutTotalEl.textContent = formatMoney(resolvedTotalAmount, currency);
       if (discountRow && discountEl) {
         const hasDiscount = discountAmount > 0;
         discountRow.hidden = !hasDiscount;
         discountEl.textContent = hasDiscount ? `− ${formatMoney(discountAmount, currency)}` : '';
       }
-      if (deliveryEl) {
-        const free = totalAmount >= FREE_SHIPPING_THRESHOLD;
-        deliveryEl.textContent = free ? 'Free' : 'Calculated at checkout';
-        deliveryEl.classList.toggle('green', free);
+      if (shippingEl) {
+        shippingEl.textContent = formatMoney(shippingAmount, currency);
+        shippingEl.classList.toggle('green', shippingAmount === 0);
+      }
+      if (taxEl) {
+        taxEl.textContent = formatMoney(taxAmount, currency);
       }
       if (freeShippingRow && freeShippingMessage) {
-        const needed = FREE_SHIPPING_THRESHOLD - totalAmount;
-        freeShippingRow.hidden = needed <= 0;
-        freeShippingMessage.textContent = needed > 0 ? `Add ${formatMoney(needed, currency)} more for free delivery` : '';
+        freeShippingRow.hidden = true;
+        freeShippingMessage.textContent = '';
       }
       if (noteTextarea && document.activeElement !== noteTextarea) {
         noteTextarea.value = cart.note || '';
@@ -604,7 +652,6 @@ const suggestionPayload = suggestions.map((product) => {
       const isEmpty = cart.totalQuantity === 0;
       if (emptyState) emptyState.hidden = !isEmpty;
       if (grid) grid.hidden = isEmpty;
-      if (relatedWrap) relatedWrap.hidden = isEmpty;
     };
 
     const renderCart = (cart) => {
@@ -620,7 +667,8 @@ const suggestionPayload = suggestions.map((product) => {
       try {
         const cart = await cartApi.getCart();
         if (!cart) throw new Error('Cart request failed');
-        renderCart(cart);
+        const pricedCart = await ensureCartPricing(cart);
+        renderCart(pricedCart);
       } catch {
         if (itemsWrap) itemsWrap.innerHTML = '<div class="rv-cart-loading">We could not load your bag right now.</div>';
         cartCountEls.forEach((el) => { el.textContent = 'Bag unavailable'; });
@@ -634,7 +682,8 @@ const suggestionPayload = suggestions.map((product) => {
       const cart = quantity === 0
         ? await cartApi.removeCartLine(lineId)
         : await cartApi.updateCartLine(lineId, quantity);
-      renderCart(cart);
+      const pricedCart = await ensureCartPricing(cart);
+      renderCart(pricedCart);
     };
 
     const addUpsell = async (handle, button) => {
@@ -647,7 +696,8 @@ const suggestionPayload = suggestions.map((product) => {
       button.disabled = true;
       const cart = await cartApi.getCart();
       if (!cart) return;
-      renderCart(cart);
+      const pricedCart = await ensureCartPricing(cart);
+      renderCart(pricedCart);
     };
 
     const applyPromo = () => {
@@ -764,28 +814,6 @@ const suggestionPayload = suggestions.map((product) => {
         event.preventDefault();
         applyPromo();
       }
-    });
-
-    paypalButton?.addEventListener('click', () => {
-      window.location.href = checkoutLink?.href || '/checkout';
-    });
-
-    document.querySelectorAll('.rv-htrack').forEach((track) => {
-      let isDown = false;
-      let startX = 0;
-      let scrollLeft = 0;
-      track.addEventListener('mousedown', (event) => {
-        isDown = true;
-        startX = event.pageX - track.offsetLeft;
-        scrollLeft = track.scrollLeft;
-      });
-      track.addEventListener('mouseleave', () => { isDown = false; });
-      track.addEventListener('mouseup', () => { isDown = false; });
-      track.addEventListener('mousemove', (event) => {
-        if (!isDown) return;
-        event.preventDefault();
-        track.scrollLeft = scrollLeft - (event.pageX - track.offsetLeft - startX) * 1.6;
-      });
     });
 
     loadCart();

@@ -1,7 +1,6 @@
 ---
 import Layout from '@/layouts/Layout.astro';
 import { ProductGrid } from '@/components/ProductGrid';
-import { formatPrice } from '@/lib/format';
 import {
   getAllProducts,
   getCollectionByHandle,
@@ -67,7 +66,7 @@ const statementCopy = collection?.description?.trim() ||
 
 <Layout
   title={`${collectionTitle} — RIVA VALENCIA`}
-  description="Discover the Riva Valencia limited-edition collection: numbered leather pieces, handcrafted in Spain, with secure cart, wishlist, and live product actions."
+  description="Discover the Riva Valencia limited-edition collection: numbered leather pieces, handDesigned In Spain, with secure cart, wishlist, and live product actions."
 >
   <section class="le-hero">
     <img class="le-hero-bg" src={heroImage} alt={heroAlt ?? collectionTitle} />
@@ -80,7 +79,7 @@ const statementCopy = collection?.description?.trim() ||
         Limited
         <span>Edition</span>
       </span>
-      <div class="le-hero-sub">A collector collection of rare leather pieces, handcrafted in Spain.</div>
+      <div class="le-hero-sub">A collector collection of rare leather pieces, handDesigned In Spain.</div>
       <div class="le-hero-meta">
         <a href="#le-collection" class="le-hero-cta">Explore the Collection</a>
         <div class="le-hero-pieces">
@@ -250,43 +249,13 @@ const statementCopy = collection?.description?.trim() ||
 
   {atelierProducts.length > 0 && (
     <>
-      <div class="rv-orn rv-reveal"><span>✦</span></div>
       <div class="rv-sh rv-reveal">
         <h2>From the Atelier</h2>
         <p>Permanent collection favourites</p>
       </div>
 
-      <div class="rv-hscroll">
-        <div class="rv-htrack" id="rvLeTrack">
-          {atelierProducts.map((product) => {
-            const image = firstImage(product);
-            return (
-              <div class="rv-hcard">
-                <a class="rv-pc" href={`/products/${product.handle}`}>
-                  <div class="rv-pc-inner">
-                    <div class="rv-pc-wrap">
-                      {image ? (
-                        <img src={image.url} alt={image.altText ?? product.title} loading="lazy" />
-                      ) : (
-                        <div class="rv-pc-ph"><span>{product.productType || 'Leather Goods'}</span></div>
-                      )}
-                    </div>
-                    <div class="rv-pc-info">
-                      <span class="rv-pc-col">{product.vendor || product.productType || 'Leather Goods'}</span>
-                      <span class="rv-pc-name">{product.title}</span>
-                      <span class="rv-pc-price">
-                        {formatPrice(
-                          product.priceRange.minVariantPrice.amount,
-                          product.priceRange.minVariantPrice.currencyCode
-                        )}
-                      </span>
-                    </div>
-                  </div>
-                </a>
-              </div>
-            );
-          })}
-        </div>
+      <div class="le-atelier-grid">
+        <ProductGrid products={atelierProducts} client:load />
       </div>
     </>
   )}
@@ -335,7 +304,7 @@ const statementCopy = collection?.description?.trim() ||
   </div>
 
   <div class="rv-payment rv-reveal">
-    {['VISA', 'MASTERCARD', 'AMEX', 'APPLE PAY', 'GOOGLE PAY', 'UPI', 'RAZORPAY'].map((item, index, items) => (
+    {['VISA', 'MASTERCARD', 'AMEX','RAZORPAY'].map((item, index, items) => (
       <>
         <span class="rv-payment-logo">{item}</span>
         {index < items.length - 1 && index % 2 === 1 && <span class="rv-payment-sep"></span>}

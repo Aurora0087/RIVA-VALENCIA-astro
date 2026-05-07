@@ -58,7 +58,7 @@ const team = [
   ['Miguel Torres', 'Edge Finisher', '15 years in the trade', craftImage],
 ];
 
-const payments = ['VISA', 'MASTERCARD', 'AMEX', 'APPLE PAY', 'GOOGLE PAY', 'PAYPAL', 'KLARNA', 'UPI', 'RAZORPAY'];
+const payments = ['VISA', 'MASTERCARD', 'AMEX', 'RAZORPAY'];
 ---
 
 <section class="ab-hero">
@@ -101,7 +101,6 @@ const payments = ['VISA', 'MASTERCARD', 'AMEX', 'APPLE PAY', 'GOOGLE PAY', 'PAYP
   ))}
 </section>
 
-<div class="rv-orn rv-reveal"><span>✦</span></div>
 
 <section class="ab-split ab-split-reverse">
   <div class="ab-split-img">
@@ -199,11 +198,11 @@ const payments = ['VISA', 'MASTERCARD', 'AMEX', 'APPLE PAY', 'GOOGLE PAY', 'PAYP
   <span class="ab-nl-tag">Stay in the know</span>
   <h2>Join the World of Riva Valencia</h2>
   <span class="ab-nl-sub">New arrivals, exclusive offers &amp; stories from Spain</span>
-  <form class="ab-nl-form">
-    <input class="rv-nl-input" type="email" placeholder="Your email address" aria-label="Email address" />
-    <button type="button">Subscribe</button>
+  <form class="ab-nl-form" data-newsletter-form data-newsletter-source="about-page">
+    <input class="rv-nl-input" type="email" name="email" placeholder="Your email address" aria-label="Email address" required />
+    <button type="submit">Subscribe</button>
   </form>
-  <p class="ab-nl-note">By subscribing you agree to our <a href="/pages/privacy" class="rv-inline-link">Privacy Policy</a>. Unsubscribe anytime.</p>
+  <p class="ab-nl-note" data-newsletter-message aria-live="polite">By subscribing you agree to our <a href="/pages/privacy" class="rv-inline-link">Privacy Policy</a>. Unsubscribe anytime.</p>
 </section>
 
 <div class="ab-pay rv-reveal">

@@ -1,20 +1,13 @@
 ---
-import { formatPrice, isOnSale, type ShopifyProduct } from '@/lib/shopify';
-import { wishlistItemFromProduct } from '@/lib/wishlist';
+import { ProductGrid } from '@/components/ProductGrid';
+import type { ShopifyProduct } from '@/lib/shopify';
 
 interface Props {
   suggestions: ShopifyProduct[];
 }
 
 const { suggestions = [] } = Astro.props;
-const suggestionItems = suggestions.slice(0, 8).map((product) => ({
-  product,
-  item: wishlistItemFromProduct(product),
-  image: product.images.edges[0]?.node,
-  price: product.priceRange.minVariantPrice,
-  compareAt: product.compareAtPriceRange.minVariantPrice,
-  onSale: isOnSale(product),
-}));
+const suggestionProducts = suggestions.slice(0, 8);
 ---
 
 <div class="rv-wishlist" data-wishlist-root>
@@ -92,7 +85,7 @@ const suggestionItems = suggestions.slice(0, 8).map((product) => ({
       <div class="rv-wl-empty-orn"><span>♡</span></div>
       <span class="rv-wl-empty-title">Your Wishlist is Empty</span>
       <span class="rv-wl-empty-sub">Save pieces you love and come back to them anytime</span>
-      <a href="/collections/all" class="rv-wl-empty-btn">Discover the Collection →</a>
+      <a href="/collections/all" class="rv-wl-empty-btn">Discover the Products →</a>
     </div>
 
     <div class="cl-grid-wrap rv-wl-grid-wrap">
@@ -100,45 +93,14 @@ const suggestionItems = suggestions.slice(0, 8).map((product) => ({
     </div>
   </section>
 
-  {suggestionItems.length > 0 && (
+  {suggestionProducts.length > 0 && (
     <>
-      <div class="rv-orn rv-reveal"><span>✦</span></div>
       <section class="rv-sh rv-reveal">
         <h2>You May Also Love</h2>
         <p>Pieces that pair perfectly</p>
       </section>
-      <section class="rv-hscroll" aria-label="Suggested products">
-        <div class="rv-htrack" data-wl-suggest-track>
-          {suggestionItems.map(({ product, item, image, price, compareAt, onSale }) => (
-            <article class="rv-hcard">
-              <div class="rv-pc">
-                <div class="rv-pc-inner">
-                  <div class="rv-pc-wrap">
-                    <a href={`/products/${product.handle}`} aria-label={product.title}>
-                      {image ? (
-                        <img src={image.url} alt={image.altText ?? product.title} loading="lazy" />
-                      ) : (
-                        <div class="rv-pc-img-ph"></div>
-                      )}
-                    </a>
-                    {onSale && <span class="rv-pc-badge">Sale</span>}
-                    <button class="rv-pc-wish" type="button" data-wl-suggestion={JSON.stringify(item)} aria-label={`Save ${product.title}`}>
-                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" /></svg>
-                    </button>
-                  </div>
-                  <div class="rv-pc-info">
-                    <span class="rv-pc-col">{product.productType || product.vendor || 'Leather Goods'}</span>
-                    <a class="rv-pc-name" href={`/products/${product.handle}`}>{product.title}</a>
-                    <span class="rv-pc-price">
-                      {formatPrice(price.amount, price.currencyCode)}
-                      {onSale && <span class="rv-pc-price-old">{formatPrice(compareAt.amount, compareAt.currencyCode)}</span>}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </article>
-          ))}
-        </div>
+      <section class="rv-wl-related" aria-label="Suggested products">
+        <ProductGrid products={suggestionProducts} client:load />
       </section>
     </>
   )}
@@ -227,31 +189,11 @@ const suggestionItems = suggestions.slice(0, 8).map((product) => ({
   .rv-sh{text-align:center;padding:72px 20px 48px}
   .rv-sh h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(34px,5.5vw,64px);letter-spacing:0.1em;color:#1a1008;font-weight:400;margin-bottom:10px}
   .rv-sh p{font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#8a7660;font-weight:400}
-  .rv-hscroll{padding:0 48px 80px}
-  .rv-htrack{display:flex;gap:20px;overflow-x:auto;scrollbar-width:none;padding-bottom:8px;cursor:grab;-webkit-overflow-scrolling:touch}
-  .rv-htrack::-webkit-scrollbar{display:none}
-  .rv-htrack:active{cursor:grabbing}
-  .rv-hcard{flex-shrink:0;width:240px}
-  .rv-pc{display:block;color:#1a1008;perspective:1000px;transform-style:preserve-3d}
-  .rv-pc-inner{transition:transform 0.5s cubic-bezier(0.34,1.56,0.64,1);transform-style:preserve-3d}
-  .rv-pc:hover .rv-pc-inner{transform:translateY(-8px) rotateX(2deg)}
-  .rv-pc-wrap{overflow:hidden;position:relative;background:#edebe6;box-shadow:0 0 0 rgba(26,16,8,0);transition:box-shadow 0.5s}
-  .rv-pc:hover .rv-pc-wrap{box-shadow:0 20px 48px rgba(26,16,8,0.14)}
-  .rv-pc img,.rv-pc-img-ph{width:100%;aspect-ratio:3/4;object-fit:cover;display:block;transition:transform 8s cubic-bezier(0.25,0.46,0.45,0.94);background:#edebe6}
-  .rv-pc:hover img{transform:scale(1.05)}
-  .rv-pc-badge{position:absolute;top:12px;left:0;background:#8b3a2a;color:#fafaf8;font-size:8px;letter-spacing:0.2em;text-transform:uppercase;padding:4px 12px;font-weight:500}
-  .rv-pc-wish{position:absolute;top:12px;right:12px;width:34px;height:34px;border:none;background:rgba(250,250,248,0.92);display:flex;align-items:center;justify-content:center;color:#1a1008;cursor:pointer;transition:transform 0.3s}
-  .rv-pc-wish:hover,.rv-pc-wish.wished{transform:scale(1.1);color:#8b3a2a}
-  .rv-pc-wish.wished svg{fill:#8b3a2a;stroke:#8b3a2a}
-  .rv-pc-info{padding:16px 2px 8px}
-  .rv-pc-col{font-size:9px;letter-spacing:0.24em;text-transform:uppercase;color:#8a7660;display:block;margin-bottom:5px;font-weight:400}
-  .rv-pc-name{font-size:14px;font-weight:400;color:#1a1008;display:block;margin-bottom:6px;line-height:1.3;letter-spacing:0.02em}
-  .rv-pc-price{font-size:13px;color:#5a4a3a;letter-spacing:0.06em;font-weight:400}
-  .rv-pc-price-old{font-size:11px;color:#b8b0a6;text-decoration:line-through;margin-left:7px}
+  .rv-wl-related{padding:0 48px 80px}
+  .rv-wl-related :global(.cl-grid-wrap){padding:0}
   @media(max-width:960px){
     .rv-wl-page{padding:40px 20px 80px}
-    .rv-hscroll{padding:0 20px 64px}
-    .rv-hcard{width:200px}
+    .rv-wl-related{padding:0 20px 64px}
     .rv-orn{padding:40px 20px}
     .rv-sh{padding:52px 20px 36px}
   }
@@ -323,7 +265,6 @@ const suggestionItems = suggestions.slice(0, 8).map((product) => ({
       if (!items.length) {
         grid.innerHTML = '';
         empty?.classList.add('show');
-        syncSuggestionButtons();
         return;
       }
 
@@ -373,7 +314,6 @@ const suggestionItems = suggestions.slice(0, 8).map((product) => ({
       requestAnimationFrame(function() {
         grid.querySelectorAll('[data-wl-card]').forEach(function(card) { card.classList.add('in'); });
       });
-      syncSuggestionButtons();
     }
 
     function makeShareUrl() {
@@ -408,18 +348,6 @@ const suggestionItems = suggestions.slice(0, 8).map((product) => ({
     function closeShareModal() {
       modal?.classList.remove('open');
       document.body.style.overflow = '';
-    }
-
-    function syncSuggestionButtons() {
-      root.querySelectorAll('[data-wl-suggestion]').forEach(function(button) {
-        try {
-          var item = JSON.parse(button.getAttribute('data-wl-suggestion') || '{}');
-          var wished = wishlistApi.isWishlisted(item.id);
-          button.classList.toggle('wished', wished);
-          var icon = button.querySelector('svg');
-          if (icon) icon.setAttribute('fill', wished ? '#8b3a2a' : 'none');
-        } catch {}
-      });
     }
 
     grid?.addEventListener('click', async function(event) {
@@ -538,43 +466,6 @@ const suggestionItems = suggestions.slice(0, 8).map((product) => ({
         closeShareModal();
       });
     });
-
-    root.querySelectorAll('[data-wl-suggestion]').forEach(function(button) {
-      button.addEventListener('click', function() {
-        try {
-          var item = JSON.parse(button.getAttribute('data-wl-suggestion') || '{}');
-          if (wishlistApi.isWishlisted(item.id)) {
-            wishlistApi.removeWishlistItem(item.id);
-            showToast('Removed from wishlist');
-          } else {
-            wishlistApi.addWishlistItem(item);
-            showToast('Saved to wishlist', true);
-          }
-          render();
-        } catch {
-          showToast('Could not update wishlist');
-        }
-      });
-    });
-
-    var track = root.querySelector('[data-wl-suggest-track]');
-    if (track) {
-      var down = false;
-      var startX = 0;
-      var scrollLeft = 0;
-      track.addEventListener('mousedown', function(event) {
-        down = true;
-        startX = event.pageX - track.offsetLeft;
-        scrollLeft = track.scrollLeft;
-      });
-      track.addEventListener('mouseleave', function() { down = false; });
-      track.addEventListener('mouseup', function() { down = false; });
-      track.addEventListener('mousemove', function(event) {
-        if (!down) return;
-        event.preventDefault();
-        track.scrollLeft = scrollLeft - (event.pageX - track.offsetLeft - startX) * 1.6;
-      });
-    }
 
     document.addEventListener('keydown', function(event) {
       if (event.key === 'Escape') closeShareModal();

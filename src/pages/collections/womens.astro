@@ -1,8 +1,7 @@
 ---
 import Layout from '@/layouts/Layout.astro';
-import { getCollectionByHandle, getAllCollections, formatPrice, isOnSale } from '@/lib/shopify';
+import { getCollectionByHandle, getAllCollections } from '@/lib/shopify';
 import { ProductGrid } from '@/components/ProductGrid';
-import { AllProductsPage } from '@/components/AllProductsPage';
 
 const COLLECTION_HANDLE = 'womens-collections';
 const { collection, status } = await getCollectionByHandle(COLLECTION_HANDLE);
@@ -22,17 +21,6 @@ const REVIEWS = [
   { text: 'I ordered a handbag for daily wear and the proportions are perfect. It feels timeless and very easy to style.', author: 'Lucia Navarro — Seville, Spain', stars: 5 },
   { text: 'The finish is stunning and the leather feels rich without being heavy. I would absolutely order again.', author: 'Giulia Moretti — Turin, Italy', stars: 5 },
 ];
-
-const WOMEN_CATEGORY_TABS = [
-  { key: 'all', label: 'All' },
-  { key: 'shoulder-bags', label: 'Shoulder Bags' },
-  { key: 'handbags', label: 'Handbags' },
-  { key: 'sling-bags', label: 'Sling Bags' },
-  { key: 'laptop-bags', label: 'Laptop Bags' },
-  { key: 'backpacks', label: 'Backpacks' },
-  { key: 'wallets', label: 'Wallet' },
-  { key: 'belts', label: 'Belt' },
-] as const;
 
 const AS_SEEN_ON = [
   {
@@ -71,25 +59,9 @@ const AS_SEEN_ON = [
       <span class="rv-hero-eyebrow">Spring / Summer 2026</span>
       <span class="rv-hero-h1">Women's<br>Leather</span>
       <span class="rv-hero-sub">Crafted in the heart of Spain</span>
-      <span class="rv-hero-btn">Discover the Collection →</span>
+      <span class="rv-hero-btn">Discover the Products →</span>
     </div>
   </a>
-
-  <div class="rv-sh rv-reveal">
-    <h2>Shop the Full Collection</h2>
-    <p>Filter, sort and explore every piece in the women&apos;s collection</p>
-  </div>
-  <AllProductsPage
-    products={products}
-    status={status}
-    title={collection?.title ?? "Women's Collection"}
-    breadcrumbLabel={collection?.title ?? "Women's Collection"}
-    kicker="Women's Collection"
-    metaItems={['Crafted in Spain', 'Full-Grain Leather']}
-    categoryTabs={[...WOMEN_CATEGORY_TABS]}
-    embedded
-    client:load
-  />
 
   <!-- ── NEW ARRIVALS ── -->
   <div class="rv-sh rv-reveal">
@@ -97,7 +69,7 @@ const AS_SEEN_ON = [
     <p>The finest Spanish leather, crafted for the modern woman</p>
   </div>
   <div class="rv-g2">
-    <a class="rv-ec rv-reveal rv-reveal-l" href="/collections/womens?cat=shoulder-bags">
+    <a class="rv-ec rv-reveal rv-reveal-l" href="/collections/woman-shoulder-bags">
       <img
         src="https://cdn.shopify.com/s/files/1/0812/7738/7010/files/Gemini_Generated_Image_ohy6lqohy6lqohy6.png?v=1776001569"
         alt="Shoulder Bags — New In"
@@ -110,7 +82,7 @@ const AS_SEEN_ON = [
         <span class="rv-ec-cta">Shop Now →</span>
       </div>
     </a>
-    <a class="rv-ec rv-reveal rv-reveal-r" href="/collections/womens?cat=handbags">
+    <a class="rv-ec rv-reveal rv-reveal-r" href="/collections/woman-hand-bags">
       <img
         src="https://cdn.shopify.com/s/files/1/0812/7738/7010/files/Gemini_Generated_Image_n17qn0n17qn0n17q.png?v=1776004987"
         alt="Handbags — New In"
@@ -154,10 +126,12 @@ const AS_SEEN_ON = [
     </div>
   )}
 
-  {bestSellers.length > 0
-    ? <ProductGrid products={bestSellers} client:load />
-    : <ProductGrid products={products} client:load />
-  }
+  <div class="rv-best-sellers-slider">
+    {bestSellers.length > 0
+      ? <ProductGrid products={bestSellers} mode="carousel" client:load />
+      : <ProductGrid products={products} mode="carousel" client:load />
+    }
+  </div>
 
   <!-- ── VIDEO ── -->
   <div class="rv-vid">
@@ -180,7 +154,7 @@ const AS_SEEN_ON = [
     <p>Every category, every occasion</p>
   </div>
   <div class="rv-feat">
-    <a class="rv-ec rv-reveal rv-reveal-l" href="/collections/womens?cat=handbags" style="height:100%">
+    <a class="rv-ec rv-reveal rv-reveal-l" href="/collections/woman-hand-bags" style="height:100%">
       <img
         src="https://cdn.shopify.com/s/files/1/0812/7738/7010/files/Gemini_Generated_Image_ohy6lqohy6lqohy6.png?v=1776001569"
         alt="Handbags Collection"
@@ -195,7 +169,7 @@ const AS_SEEN_ON = [
       </div>
     </a>
     <div class="rv-feat-r">
-      <a class="rv-ec rv-reveal rv-reveal-r" href="/collections/womens?cat=backpacks">
+      <a class="rv-ec rv-reveal rv-reveal-r" href="/collections/woman-backpacks">
         <img
           src="https://cdn.shopify.com/s/files/1/0812/7738/7010/files/4a8acfb5a7916c96b74de5368e47df1c.jpg?v=1775999513"
           alt="Backpacks"
@@ -209,17 +183,17 @@ const AS_SEEN_ON = [
           <span class="rv-ec-cta">Explore →</span>
         </div>
       </a>
-      <a class="rv-ec rv-reveal rv-reveal-r rv-reveal-delay2" href="/collections/womens?cat=wallets">
+      <a class="rv-ec rv-reveal rv-reveal-r rv-reveal-delay2" href="/collections/woman-wallet">
         <img
           src="https://cdn.shopify.com/s/files/1/0812/7738/7010/files/Gemini_Generated_Image_2qiani2qiani2qia.png?v=1775996042"
-          alt="Wallets & Belts"
+          alt="Wallets"
           style="aspect-ratio:unset;height:100%;min-height:280px"
           loading="lazy"
         />
         <div class="rv-ec-grad"></div>
         <div class="rv-ec-body">
           <span class="rv-ec-tag">Small Leather Goods</span>
-          <span class="rv-ec-title">Wallets & Belts</span>
+          <span class="rv-ec-title">Wallets</span>
           <span class="rv-ec-cta">Explore →</span>
         </div>
       </a>
@@ -252,10 +226,16 @@ const AS_SEEN_ON = [
     <div class="rv-fbanner-ov"></div>
     <div class="rv-fbanner-c">
       <span class="rv-fbanner-tag">Limited Edition · 2026</span>
-      <span class="rv-fbanner-h2">The Bespoke<br>Collection</span>
+      <span class="rv-fbanner-h2">The Executive<br>Collection</span>
       <span class="rv-fbanner-cta">Explore Now</span>
     </div>
   </a>
+
+  <div class="rv-sh rv-reveal">
+    <h2>Shop the Full Products</h2>
+    <p>Swipe through every piece in the women&apos;s collection</p>
+  </div>
+  <ProductGrid products={products} mode="carousel" client:load />
 
   <!-- ── TRUST BAR ── -->
   <div class="rv-trust">
@@ -304,7 +284,7 @@ const AS_SEEN_ON = [
 
   <!-- ── PAYMENT LOGOS ── -->
   <div class="rv-payment rv-reveal">
-    {['VISA','MASTERCARD','AMEX','APPLE PAY','GOOGLE PAY','PAYPAL','KLARNA','UPI'].map((p, i, arr) => (
+    {['VISA','MASTERCARD','AMEX','UPI'].map((p, i, arr) => (
       <>
         <span class="rv-payment-logo">{p}</span>
         {i < arr.length - 1 && i % 2 === 1 && <span class="rv-payment-sep"></span>}
@@ -341,11 +321,11 @@ const AS_SEEN_ON = [
     <span class="rv-nl-tag rv-reveal">Exclusive Access</span>
     <h2 class="rv-reveal">Stay in the Know</h2>
     <span class="rv-nl-sub rv-reveal">New arrivals, private sales and stories from our artisans</span>
-    <form class="rv-nl-form" onsubmit="return false">
-      <input type="email" class="rv-nl-input" placeholder="Your email address" />
+    <form class="rv-nl-form" data-newsletter-form data-newsletter-source="womens-collection">
+      <input type="email" class="rv-nl-input" name="email" placeholder="Your email address" required />
       <button type="submit" class="rv-nl-btn">Subscribe</button>
     </form>
-    <p class="rv-nl-note">No spam. Unsubscribe anytime. Read our <a href="/pages/privacy" class="rv-inline-link">Privacy Policy</a>.</p>
+    <p class="rv-nl-note" data-newsletter-message aria-live="polite">No spam. Unsubscribe anytime. Read our <a href="/pages/privacy" class="rv-inline-link">Privacy Policy</a>.</p>
   </div>
 
 </Layout>

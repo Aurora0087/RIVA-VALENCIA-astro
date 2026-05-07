@@ -1,4 +1,5 @@
 ---
+import { ProductGrid } from '@/components/ProductGrid';
 import { formatPrice, type ShopifyConnectionStatus, type ShopifyProduct, type ShopifyVariant } from '@/lib/shopify';
 
 interface Props {
@@ -8,45 +9,6 @@ interface Props {
 }
 
 const { product, recommendedProducts, status } = Astro.props;
-
-const reviewEntries = [
-  {
-    title: 'A lifelong investment',
-    text: 'The leather is so supple and rich. It gets more beautiful with every use and still feels immaculate after months of wear.',
-    author: 'Priya S., Mumbai',
-    date: 'March 2026',
-  },
-  {
-    title: 'Beyond expectations',
-    text: 'The craftsmanship is extraordinary and the packaging felt as refined as the bag itself. It arrived ready to gift.',
-    author: 'Ananya R., Delhi',
-    date: 'February 2026',
-  },
-  {
-    title: 'Still perfect after 2 years',
-    text: 'No loud branding, just beautiful leather and clean construction. It looks even better now than the day I bought it.',
-    author: 'Meera K., Bangalore',
-    date: 'January 2026',
-  },
-  {
-    title: 'Elegant and practical',
-    text: 'I can carry my laptop, daily essentials and still keep the silhouette sleek. It feels thoughtful rather than oversized.',
-    author: 'Sara D., Pune',
-    date: 'December 2025',
-  },
-  {
-    title: 'The stitching is flawless',
-    text: 'Every seam, edge and hardware detail feels considered. It has the kind of finish you usually only find at much higher prices.',
-    author: 'Nikita T., Hyderabad',
-    date: 'November 2025',
-  },
-  {
-    title: 'My new daily companion',
-    text: 'I bought it for work and ended up using it every weekend too. It works with everything and the leather smells incredible.',
-    author: 'Rhea B., Chennai',
-    date: 'October 2025',
-  },
-];
 
 function getProductBadge(currentProduct: ShopifyProduct) {
   const tags = currentProduct.tags.map((tag) => tag.toLowerCase());
@@ -93,6 +55,16 @@ function getVariantOptionValue(variant: ShopifyVariant | null, optionName: strin
   return variant?.selectedOptions?.find((option) => option.name === optionName)?.value ?? '';
 }
 
+function getVariantLabel(variant: ShopifyVariant | null) {
+  if (!variant) return '';
+  const title = (variant.title ?? '').trim();
+  if (title && title.toLowerCase() !== 'default title') return title;
+  return (variant.selectedOptions ?? [])
+    .map((option) => option.value)
+    .filter(Boolean)
+    .join(' · ');
+}
+
 const imageNodes = product?.images.edges.map(({ node }) => node) ?? [];
 const productVariants = product?.variants.edges.map(({ node }) => node) ?? [];
 const primaryVariant = productVariants.find((variant) => variant.availableForSale) ?? productVariants[0] ?? null;
@@ -102,6 +74,7 @@ const configurableOption = product?.options?.find((option) => option.values.leng
 const colorOptionNames = new Set(['color', 'colour']);
 const optionIsColor = configurableOption ? colorOptionNames.has(configurableOption.name.toLowerCase()) : false;
 const selectedOptionValue = configurableOption ? getVariantOptionValue(primaryVariant, configurableOption.name) || configurableOption.values[0] : '';
+const primaryVariantLabel = getVariantLabel(primaryVariant);
 const mainImages = imageNodes.filter((_, index) => index % 2 === 0);
 const sideImages = imageNodes.filter((_, index) => index % 2 === 1);
 const detailImages = sideImages.length > 0 ? sideImages : imageNodes.slice(1);
@@ -133,6 +106,8 @@ const wishlistBasePayload = product ? {
   currencyCode: product.priceRange.minVariantPrice.currencyCode,
   tags: product.tags,
 } : null;
+const medusaUrl = import.meta.env.PUBLIC_MEDUSA_BACKEND_URL || 'http://localhost:9000';
+const medusaPublishableKey = import.meta.env.PUBLIC_MEDUSA_PUBLISHABLE_KEY || '';
 ---
 
 {!product ? (
@@ -146,9 +121,9 @@ const wishlistBasePayload = product ? {
     <div class="rv-ann">
       <div class="rv-ann-track">
         <span>
-          Free delivery on orders above ₹5,000 &nbsp;·&nbsp; Handcrafted in Spain &nbsp;·&nbsp;
+          Free delivery on orders above ₹5,000 &nbsp;·&nbsp; HandDesigned In Spain &nbsp;·&nbsp;
           Easy 30-day returns &nbsp;·&nbsp; Secure payment &nbsp;·&nbsp; New arrivals Spring 2026 &nbsp;·&nbsp;
-          Free delivery on orders above ₹5,000 &nbsp;·&nbsp; Handcrafted in Spain &nbsp;·&nbsp;
+          Free delivery on orders above ₹5,000 &nbsp;·&nbsp; HandDesigned In Spain &nbsp;·&nbsp;
           Easy 30-day returns &nbsp;·&nbsp; Secure payment &nbsp;·&nbsp; New arrivals Spring 2026
         </span>
       </div>
@@ -389,103 +364,125 @@ const wishlistBasePayload = product ? {
       </div>
     </div>
 
-    <div class="pd-rev" id="pdRevs">
-      <div class="pd-rev-head rv-reveal">
-        <div>
-          <span class="pd-rev-eyebrow">Verified Reviews</span>
-          <span class="pd-rev-title">What Our Clients Say</span>
-          <div class="pd-rev-avg">
-            <span class="pd-rev-stars">★★★★★</span>
-            <span class="pd-rev-num">4.9</span>
-            <span class="pd-rev-sub">142 reviews</span>
-          </div>
-          <button type="button" class="pd-rev-write" data-review-toggle>Write a Review →</button>
-        </div>
-        <div class="pd-rev-bars">
-          <div class="pd-rev-bar"><span class="pd-rev-bar-lbl">5 ★</span><div class="pd-rev-bar-track"><div class="pd-rev-bar-fill" data-width="88%"></div></div><span class="pd-rev-bar-cnt">125</span></div>
-          <div class="pd-rev-bar"><span class="pd-rev-bar-lbl">4 ★</span><div class="pd-rev-bar-track"><div class="pd-rev-bar-fill" data-width="8%"></div></div><span class="pd-rev-bar-cnt">11</span></div>
-          <div class="pd-rev-bar"><span class="pd-rev-bar-lbl">3 ★</span><div class="pd-rev-bar-track"><div class="pd-rev-bar-fill" data-width="3%"></div></div><span class="pd-rev-bar-cnt">4</span></div>
-          <div class="pd-rev-bar"><span class="pd-rev-bar-lbl">2 ★</span><div class="pd-rev-bar-track"><div class="pd-rev-bar-fill" data-width="1%"></div></div><span class="pd-rev-bar-cnt">1</span></div>
-          <div class="pd-rev-bar"><span class="pd-rev-bar-lbl">1 ★</span><div class="pd-rev-bar-track"><div class="pd-rev-bar-fill" data-width="0%"></div></div><span class="pd-rev-bar-cnt">0</span></div>
-        </div>
-      </div>
-
-      <div class="pd-rev-form-wrap" data-review-panel hidden>
-        <form class="pd-rev-form" data-review-form>
-          <input class="pd-rev-input" type="text" name="name" placeholder="Your name" required />
-          <select class="pd-rev-input" name="rating" required>
-            <option value="5">5 stars</option>
-            <option value="4">4 stars</option>
-            <option value="3">3 stars</option>
-            <option value="2">2 stars</option>
-            <option value="1">1 star</option>
-          </select>
-          <input class="pd-rev-input" type="text" name="title" placeholder="Review title" required />
-          <textarea class="pd-rev-input pd-rev-textarea" name="message" placeholder="Share your experience" required></textarea>
-          <button type="submit" class="pd-rev-submit">Submit Review</button>
-          <span class="pd-rev-submit-msg" data-review-message aria-live="polite"></span>
-        </form>
-      </div>
-
-      <div class="pd-rev-grid" data-review-grid>
-        {reviewEntries.map((review, index) => (
-          <article class:list={['pd-rev-card', 'rv-reveal', index === 1 && 'd1', index === 2 && 'd2']} data-extra-review={index > 2 ? 'true' : 'false'} hidden={index > 2}>
-            <div class="pd-rev-stars-sm">★★★★★</div>
-            <div class="pd-rev-card-title">"{review.title}"</div>
-            <p class="pd-rev-card-text">{review.text}</p>
-            <div class="pd-rev-card-author">— {review.author}</div>
-            <div class="pd-rev-card-date">{review.date}</div>
-            <div class="pd-rev-verified">
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                <polyline points="20 6 9 17 4 12" />
-              </svg>
-              Verified Purchase
-            </div>
-          </article>
-        ))}
-      </div>
-
-      <div class="pd-rev-more rv-reveal">
-        <button type="button" class="pd-rev-more-btn" data-review-more>Load More Reviews →</button>
-      </div>
-    </div>
-
     {relatedProducts.length > 0 && (
       <>
-        <div class="rv-orn rv-reveal"><span>✦</span></div>
         <div class="rv-sh rv-reveal" id="pdRecommended">
           <h2>You May Also Love</h2>
-          <p>Recommended from our Shopify catalogue</p>
+          <p>Recommended from our catalogue</p>
         </div>
-        <div class="rv-hscroll">
-          <div class="rv-htrack">
-            {relatedProducts.map((item) => {
-              const image = item.images.edges[0]?.node;
-              const price = item.priceRange.minVariantPrice;
-              return (
-                <div class="rv-hcard">
-                  <a class="rv-pc" href={`/products/${item.handle}`}>
-                    <div class="rv-pc-img">
-                      {image ? (
-                        <img src={image.url} alt={image.altText ?? item.title} loading="lazy" />
-                      ) : (
-                        <div class="rv-pc-ph"></div>
-                      )}
-                      {getProductBadge(item).label === 'Best Seller' && <span class="rv-pc-badge">Best Seller</span>}
-                    </div>
-                    <div class="rv-pc-info">
-                      <span class="rv-pc-cat">{item.productType || item.vendor || 'Leather Goods'}</span>
-                      <span class="rv-pc-name">{item.title}</span>
-                      <span class="rv-pc-price">{formatPrice(price.amount, price.currencyCode)}</span>
-                    </div>
-                  </a>
-                </div>
-              );
-            })}
-          </div>
+        <div class="pd-related-grid">
+          <ProductGrid products={relatedProducts} mode="carousel" client:load />
         </div>
       </>
     )}
+
+    <div class="pd-rev" id="pdRevs">
+      <div class="pd-rev-shell">
+        <div class="pd-rev-head rv-reveal">
+          <div class="pd-rev-head-copy">
+            <span class="pd-rev-eyebrow">Verified Reviews</span>
+            <span class="pd-rev-title">What Our Clients Say</span>
+            <p class="pd-rev-head-note">
+              A closer look at how this piece feels, carries and wears in daily life.
+            </p>
+          </div>
+          <button type="button" class="pd-rev-write" data-review-toggle>Write a Review →</button>
+        </div>
+
+        <div class="pd-rev-overview rv-reveal">
+          <div class="pd-rev-score-card">
+            <span class="pd-rev-score-kicker">Average rating</span>
+            <div class="pd-rev-score">
+              <span class="pd-rev-num">0.0</span>
+              <div class="pd-rev-score-meta">
+                <span class="pd-rev-stars">☆☆☆☆☆</span>
+                <span class="pd-rev-sub">No reviews yet</span>
+              </div>
+            </div>
+            <p class="pd-rev-score-note">
+              Every review is checked before it appears so the feedback stays thoughtful, clear and useful.
+            </p>
+          </div>
+
+          <div class="pd-rev-bars-card">
+            <span class="pd-rev-bars-kicker">Rating breakdown</span>
+            <div class="pd-rev-bars">
+              <div class="pd-rev-bar"><span class="pd-rev-bar-lbl">5 ★</span><div class="pd-rev-bar-track"><div class="pd-rev-bar-fill" data-width="0%"></div></div><span class="pd-rev-bar-cnt">0</span></div>
+              <div class="pd-rev-bar"><span class="pd-rev-bar-lbl">4 ★</span><div class="pd-rev-bar-track"><div class="pd-rev-bar-fill" data-width="0%"></div></div><span class="pd-rev-bar-cnt">0</span></div>
+              <div class="pd-rev-bar"><span class="pd-rev-bar-lbl">3 ★</span><div class="pd-rev-bar-track"><div class="pd-rev-bar-fill" data-width="0%"></div></div><span class="pd-rev-bar-cnt">0</span></div>
+              <div class="pd-rev-bar"><span class="pd-rev-bar-lbl">2 ★</span><div class="pd-rev-bar-track"><div class="pd-rev-bar-fill" data-width="0%"></div></div><span class="pd-rev-bar-cnt">0</span></div>
+              <div class="pd-rev-bar"><span class="pd-rev-bar-lbl">1 ★</span><div class="pd-rev-bar-track"><div class="pd-rev-bar-fill" data-width="0%"></div></div><span class="pd-rev-bar-cnt">0</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pd-rev-form-wrap" data-review-panel hidden>
+          <div class="pd-rev-form-intro">
+            <span class="pd-rev-form-kicker">Write a review</span>
+            <h3>Tell us how it feels in real life.</h3>
+            <p>
+              Your notes help other clients understand the leather, structure, finish and daily use of this piece.
+            </p>
+          </div>
+          <form class="pd-rev-form" data-review-form>
+            <input class="pd-rev-input" type="text" name="name" placeholder="Your name" required />
+            <input class="pd-rev-input" type="email" name="email" placeholder="Email address" required />
+            <fieldset class="pd-rev-rating" aria-label="Choose your rating">
+              <legend class="pd-rev-rating-label">Your rating</legend>
+              <div class="pd-rev-rating-stars">
+                <input class="pd-rev-rating-input" type="radio" id="pd-rating-5" name="rating" value="5" checked />
+                <label class="pd-rev-rating-star" for="pd-rating-5" aria-label="5 stars">
+                  <span aria-hidden="true">★</span>
+                </label>
+                <input class="pd-rev-rating-input" type="radio" id="pd-rating-4" name="rating" value="4" />
+                <label class="pd-rev-rating-star" for="pd-rating-4" aria-label="4 stars">
+                  <span aria-hidden="true">★</span>
+                </label>
+                <input class="pd-rev-rating-input" type="radio" id="pd-rating-3" name="rating" value="3" />
+                <label class="pd-rev-rating-star" for="pd-rating-3" aria-label="3 stars">
+                  <span aria-hidden="true">★</span>
+                </label>
+                <input class="pd-rev-rating-input" type="radio" id="pd-rating-2" name="rating" value="2" />
+                <label class="pd-rev-rating-star" for="pd-rating-2" aria-label="2 stars">
+                  <span aria-hidden="true">★</span>
+                </label>
+                <input class="pd-rev-rating-input" type="radio" id="pd-rating-1" name="rating" value="1" />
+                <label class="pd-rev-rating-star" for="pd-rating-1" aria-label="1 star">
+                  <span aria-hidden="true">★</span>
+                </label>
+              </div>
+              <span class="pd-rev-rating-value" data-review-rating-value>5 stars — Excellent</span>
+              <span class="pd-rev-rating-help">Tap the stars to rate your experience.</span>
+            </fieldset>
+            <input class="pd-rev-input pd-rev-input-wide" type="text" name="title" placeholder="Review title" required />
+            <textarea class="pd-rev-input pd-rev-textarea" name="message" placeholder="Share your experience" required></textarea>
+            <button type="submit" class="pd-rev-submit">Submit Review</button>
+            <span class="pd-rev-submit-msg" data-review-message aria-live="polite"></span>
+          </form>
+        </div>
+
+        <div class="pd-rev-grid" data-review-grid>
+          <article class="pd-rev-card pd-rev-card-empty rv-reveal">
+            <div class="pd-rev-card-top">
+              <div class="pd-rev-stars-sm">☆☆☆☆☆</div>
+            </div>
+            <span class="pd-rev-card-kicker">Review title</span>
+            <div class="pd-rev-card-title">Be the first to review</div>
+            <p class="pd-rev-card-text">Approved customer reviews for this product will appear here once they have been moderated by our team.</p>
+            <div class="pd-rev-card-foot">
+              <div class="pd-rev-card-author-block">
+                <span class="pd-rev-card-author">Share Your Experience</span>
+                <span class="pd-rev-card-date">Awaiting first review</span>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <div class="pd-rev-more rv-reveal">
+          <button type="button" class="pd-rev-more-btn" data-review-more hidden>Load More Reviews →</button>
+        </div>
+      </div>
+    </div>
 
     <div class="rv-trust">
       <div class="rv-ti rv-reveal">
@@ -533,15 +530,14 @@ const wishlistBasePayload = product ? {
 
     <div class="rv-pay rv-reveal">
       <span>VISA</span><span>MASTERCARD</span><span class="rv-pay-sep"></span><span>AMEX</span>
-      <span class="rv-pay-sep"></span><span>APPLE PAY</span><span>GOOGLE PAY</span><span class="rv-pay-sep"></span>
-      <span>PAYPAL</span><span>KLARNA</span><span class="rv-pay-sep"></span><span>UPI</span><span>RAZORPAY</span>
+      <span class="rv-pay-sep"></span><span>RAZORPAY</span>
     </div>
 
     <div class="rv-nl rv-reveal">
       <span class="rv-nl-tag">Stay in the know</span>
       <h2>Join the World of Riva Valencia</h2>
       <span class="rv-nl-sub">New arrivals, exclusive offers &amp; stories from Spain</span>
-      <form class="rv-nl-form" data-newsletter-form>
+      <form class="rv-nl-form" data-newsletter-form data-newsletter-source="product-page">
         <input class="rv-nl-input" type="email" name="email" placeholder="Your email address" required />
         <button type="submit">Subscribe</button>
       </form>
@@ -567,6 +563,37 @@ const wishlistBasePayload = product ? {
         </svg>
       </button>
       <span class="pd-lb-count" data-lightbox-count>1 / {galleryImages.length}</span>
+    </div>
+
+    <div class="pd-sticky-atc-bar" data-pd-sticky-bar aria-hidden="true">
+      <div class="pd-sticky-atc-shell">
+        <div class="pd-sticky-atc-copy">
+          {imageNodes[0]?.url ? (
+            <img
+              class="pd-sticky-atc-img"
+              src={imageNodes[0].url}
+              alt={imageNodes[0].altText ?? product.title}
+              loading="lazy"
+            />
+          ) : (
+            <div class="pd-sticky-atc-img pd-sticky-atc-ph" aria-hidden="true"></div>
+          )}
+          <div class="pd-sticky-atc-text">
+            <span class="pd-sticky-atc-name">{product.title}</span>
+            <span class="pd-sticky-atc-variant" data-pd-sticky-variant hidden={!primaryVariantLabel}>
+              {primaryVariantLabel}
+            </span>
+          </div>
+        </div>
+        <button
+          type="button"
+          class:list={['pd-atc', 'pd-sticky-atc-btn', !primaryVariant?.availableForSale && 'is-disabled']}
+          data-pd-sticky-add
+          disabled={!primaryVariant?.availableForSale}
+        >
+          {primaryVariant?.availableForSale ? 'Add to Basket' : 'Sold Out'}
+        </button>
+      </div>
     </div>
   </div>
 )}
@@ -628,6 +655,16 @@ const wishlistBasePayload = product ? {
   .pd-atc.done{background:#3d5c35;border-color:#3d5c35;color:#fff}
   .pd-atc.is-disabled,.pd-atc:disabled{opacity:0.28;cursor:not-allowed}
   .pd-form-msg{font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#3d5c35;min-height:14px}
+  .pd-sticky-atc-bar{position:fixed;left:22px;right:22px;bottom:18px;z-index:850;pointer-events:none;opacity:0;transform:translateY(calc(100% + 26px));transition:transform 0.48s cubic-bezier(0.16,1,0.3,1),opacity 0.28s ease}
+  .pd-sticky-atc-bar.is-visible{opacity:1;transform:translateY(0);pointer-events:auto}
+  .pd-sticky-atc-shell{max-width:980px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:20px;padding:12px 14px 12px 12px;background:rgba(250,248,245,0.96);border:1px solid rgba(201,169,110,0.28);box-shadow:0 18px 42px rgba(26,16,8,0.14);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+  .pd-sticky-atc-copy{display:flex;align-items:center;gap:14px;min-width:0}
+  .pd-sticky-atc-img{width:54px;height:68px;object-fit:cover;background:#f5f4f2;flex-shrink:0}
+  .pd-sticky-atc-ph{border:1px solid #ebe4d9}
+  .pd-sticky-atc-text{display:flex;flex-direction:column;gap:5px;min-width:0}
+  .pd-sticky-atc-name{font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#1a1008;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+  .pd-sticky-atc-variant{font-size:10px;letter-spacing:0.08em;color:#8a7660;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+  .pd-sticky-atc-btn{width:auto;min-width:220px;padding:15px 24px;flex-shrink:0}
   .pd-delivery-note{font-size:11px;color:#555;font-weight:300;letter-spacing:0.05em;line-height:1.7;display:block;border-top:1px solid #ebebeb;border-bottom:1px solid #ebebeb;padding:13px 0;margin:16px 0 4px}
   .pd-body-copy{font-size:12px;font-weight:300;line-height:1.9;color:#555;letter-spacing:0.03em;margin:18px 0 4px}
   .pd-acc{margin-top:2px}
@@ -659,53 +696,80 @@ const wishlistBasePayload = product ? {
   .rv-sh{text-align:center;padding:48px 20px 28px}
   .rv-sh h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,4vw,48px);letter-spacing:0.12em;color:#1a1008;font-weight:400;margin-bottom:6px}
   .rv-sh p{font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:#aaa;font-weight:300}
-  .rv-hscroll{padding:0 48px 68px}
-  .rv-htrack{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;padding-bottom:6px;cursor:grab;-webkit-overflow-scrolling:touch}
-  .rv-htrack::-webkit-scrollbar{display:none}
-  .rv-hcard{flex-shrink:0;width:256px}
-  .rv-pc{display:block;color:#1a1008}
-  .rv-pc-img{overflow:hidden;position:relative;background:#f5f4f2}
-  .rv-pc-img img,.rv-pc-ph{width:100%;aspect-ratio:3/4;object-fit:cover;display:block;transition:transform 8s cubic-bezier(0.25,0.46,0.45,0.94)}
-  .rv-pc:hover .rv-pc-img img{transform:scale(1.05)}
-  .rv-pc-badge{position:absolute;top:0;left:0;background:#1a1008;color:#fff;font-size:8px;letter-spacing:0.2em;text-transform:uppercase;padding:4px 12px;font-weight:600}
-  .rv-pc-info{padding:10px 0 6px}
-  .rv-pc-cat{font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:#aaa;display:block;margin-bottom:4px;font-weight:300}
-  .rv-pc-name{font-size:12px;font-weight:400;color:#1a1008;display:block;margin-bottom:5px;letter-spacing:0.03em;line-height:1.4}
-  .rv-pc-price{font-size:12px;color:#555;letter-spacing:0.06em;font-weight:300}
-  .pd-rev{background:#0f0a05;padding:72px 48px}
-  .pd-rev-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:44px;flex-wrap:wrap;gap:24px}
-  .pd-rev-eyebrow{font-size:8px;letter-spacing:0.4em;text-transform:uppercase;color:#c9a96e;margin-bottom:8px;display:block;font-weight:500}
-  .pd-rev-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(26px,3.5vw,44px);letter-spacing:0.1em;color:#fafaf8;font-weight:400;display:block;margin-bottom:10px}
-  .pd-rev-avg{display:flex;align-items:center;gap:10px}
-  .pd-rev-stars{font-size:14px;color:#c9a96e;letter-spacing:2px}
-  .pd-rev-num{font-family:'Bebas Neue',sans-serif;font-size:30px;color:#fafaf8;line-height:1}
-  .pd-rev-sub{font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:#8a7660;font-weight:300}
-  .pd-rev-write{display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(201,169,110,0.28);color:#c9a96e;font-size:9px;letter-spacing:0.24em;text-transform:uppercase;padding:10px 20px;font-family:'Jost',sans-serif;cursor:pointer;background:none;transition:all 0.3s;margin-top:12px;text-decoration:none}
-  .pd-rev-write:hover,.pd-rev-more-btn:hover,.pd-rev-submit:hover{border-color:#c9a96e}
-  .pd-rev-bars{min-width:170px}
-  .pd-rev-bar{display:flex;align-items:center;gap:10px;margin-bottom:8px}
-  .pd-rev-bar-lbl{font-size:10px;color:#8a7660;width:28px;text-align:right;flex-shrink:0}
-  .pd-rev-bar-track{flex:1;height:2px;background:rgba(255,255,255,0.07);position:relative;overflow:hidden}
-  .pd-rev-bar-fill{position:absolute;left:0;top:0;height:100%;background:#c9a96e;width:0;transition:width 1.4s cubic-bezier(0.16,1,0.3,1)}
-  .pd-rev-bar-cnt{font-size:10px;color:#5a5048;font-weight:300;flex-shrink:0;width:20px}
-  .pd-rev-form-wrap{margin-bottom:24px}
-  .pd-rev-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-  .pd-rev-input{background:rgba(255,255,255,0.03);border:1px solid rgba(201,169,110,0.12);color:#fafaf8;padding:12px 14px;font-family:'Jost',sans-serif;font-size:12px}
-  .pd-rev-input::placeholder{color:#8a7660}
-  .pd-rev-textarea{grid-column:1 / -1;min-height:120px;resize:vertical}
-  .pd-rev-submit{justify-self:start;border:1px solid rgba(201,169,110,0.22);color:#c9a96e;font-size:9px;letter-spacing:0.24em;text-transform:uppercase;padding:12px 24px;font-family:'Jost',sans-serif;cursor:pointer;background:none;transition:all 0.3s}
-  .pd-rev-submit-msg{grid-column:1 / -1;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:#c9a96e;min-height:14px}
-  .pd-rev-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:32px}
-  .pd-rev-card{border:1px solid rgba(201,169,110,0.1);padding:24px 20px;transition:border-color 0.3s,transform 0.4s cubic-bezier(0.34,1.56,0.64,1)}
-  .pd-rev-card:hover{border-color:rgba(201,169,110,0.28);transform:translateY(-4px)}
-  .pd-rev-stars-sm{color:#c9a96e;font-size:10px;margin-bottom:10px}
-  .pd-rev-card-title{font-size:11px;font-weight:600;letter-spacing:0.06em;color:#fafaf8;margin-bottom:7px}
-  .pd-rev-card-text{font-size:12px;font-weight:300;line-height:1.85;color:#c8c4be;margin-bottom:12px}
-  .pd-rev-card-author{font-size:9px;letter-spacing:0.16em;text-transform:uppercase;color:#8a7660;font-weight:500}
-  .pd-rev-card-date{font-size:9px;color:#5a5048;margin-top:3px}
-  .pd-rev-verified{display:flex;align-items:center;gap:4px;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:#3d5c35;margin-top:6px}
-  .pd-rev-more{text-align:center}
-  .pd-rev-more-btn{display:inline-flex;align-items:center;gap:7px;border:1px solid rgba(201,169,110,0.22);color:#c9a96e;font-size:9px;letter-spacing:0.24em;text-transform:uppercase;padding:12px 30px;font-family:'Jost',sans-serif;cursor:pointer;background:none;transition:all 0.3s}
+  .pd-related-grid :global(.cl-carousel-wrap){padding-top:24px;padding-bottom:68px}
+  .pd-rev{position:relative;background:linear-gradient(180deg,#fbf8f2 0%,#f5ede1 100%);padding:92px 64px 84px;border-top:1px solid #ede4d7;overflow:hidden}
+  .pd-rev::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at top left,rgba(201,169,110,0.12),transparent 34%),radial-gradient(circle at bottom right,rgba(255,255,255,0.68),transparent 30%);pointer-events:none}
+  .pd-rev-shell{position:relative;z-index:1;max-width:1320px;margin:0 auto}
+  .pd-rev-head{display:flex;align-items:flex-end;justify-content:space-between;gap:32px;margin-bottom:34px}
+  .pd-rev-head-copy{max-width:760px}
+  .pd-rev-eyebrow{font-size:8px;letter-spacing:0.5em;text-transform:uppercase;color:#c9a96e;margin-bottom:12px;display:block;font-weight:600}
+  .pd-rev-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,5vw,72px);letter-spacing:0.12em;color:#2f2418;font-weight:400;display:block;line-height:0.95}
+  .pd-rev-head-note{margin-top:18px;max-width:560px;font-family:'Cormorant Garamond',serif;font-size:clamp(18px,2vw,24px);line-height:1.45;color:#6d5540;font-style:italic}
+  .pd-rev-write{display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(201,169,110,0.42);color:#5f4a35;font-size:9px;letter-spacing:0.3em;text-transform:uppercase;padding:14px 18px;font-family:'Jost',sans-serif;cursor:pointer;background:rgba(255,255,255,0.72);transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1),border-color 0.25s,background 0.25s;flex-shrink:0;text-decoration:none}
+  .pd-rev-write:hover{transform:translateY(-2px);background:#fff;border-color:#1a1008}
+  .pd-rev-overview{display:grid;grid-template-columns:minmax(280px,360px) minmax(0,1fr);gap:20px;align-items:stretch;margin-bottom:28px}
+  .pd-rev-score-card,.pd-rev-bars-card,.pd-rev-form-wrap,.pd-rev-card{background:rgba(255,252,247,0.86);border:1px solid rgba(201,169,110,0.18);box-shadow:0 22px 54px rgba(84,58,28,0.08);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+  .pd-rev-score-card{padding:28px 30px;background:linear-gradient(180deg,rgba(255,255,255,0.92) 0%,rgba(252,246,238,0.92) 100%)}
+  .pd-rev-score-kicker,.pd-rev-bars-kicker,.pd-rev-form-kicker,.pd-rev-card-kicker{font-size:8px;letter-spacing:0.34em;text-transform:uppercase;color:#9b7b52;font-weight:600;display:block}
+  .pd-rev-score{display:flex;align-items:flex-end;gap:16px;margin:20px 0 14px}
+  .pd-rev-num{font-family:'Cormorant Garamond',serif;font-size:84px;color:#2f2418;line-height:0.8;font-weight:400}
+  .pd-rev-score-meta{display:flex;flex-direction:column;gap:8px;padding-bottom:6px}
+  .pd-rev-stars{font-size:15px;color:#c9a96e;letter-spacing:3px;display:block}
+  .pd-rev-sub{font-size:9px;letter-spacing:0.24em;text-transform:uppercase;color:#8d6a45;font-weight:500}
+  .pd-rev-score-note{font-size:12px;line-height:1.8;color:#765f49}
+  .pd-rev-bars-card{padding:28px 30px}
+  .pd-rev-bars{display:flex;flex-direction:column;gap:14px;margin-top:18px}
+  .pd-rev-bar{display:grid;grid-template-columns:28px minmax(0,1fr) 24px;align-items:center;gap:14px}
+  .pd-rev-bar-lbl{font-size:9px;color:#9b7750;text-align:right;letter-spacing:0.08em}
+  .pd-rev-bar-track{height:8px;background:#efe3d1;position:relative;overflow:hidden;border-radius:999px}
+  .pd-rev-bar-fill{position:absolute;left:0;top:0;height:100%;background:linear-gradient(90deg,#d6b98a,#b98943);width:0;transition:width 1.4s cubic-bezier(0.16,1,0.3,1);border-radius:999px}
+  .pd-rev-bar-cnt{font-size:10px;color:#8d6a45;font-weight:500;min-width:18px}
+  .pd-rev-form-wrap{display:grid;grid-template-columns:minmax(240px,300px) minmax(0,1fr);gap:26px;padding:28px 30px;margin-bottom:34px}
+  .pd-rev-form-intro h3{font-family:'Cormorant Garamond',serif;font-size:clamp(28px,3vw,40px);line-height:1.05;color:#2f2418;margin:14px 0 12px;font-style:italic;font-weight:500}
+  .pd-rev-form-intro p{font-size:13px;line-height:1.9;color:#715943;max-width:240px}
+  .pd-rev-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+  .pd-rev-input{background:#fffaf4;border:1px solid #e5d7c5;color:#2f2418;padding:14px 16px;font-family:'Jost',sans-serif;font-size:13px;outline:none;transition:border-color 0.2s,background 0.2s,box-shadow 0.2s;width:100%}
+  .pd-rev-input:focus{border-color:#c9a96e;background:#fff;box-shadow:0 0 0 4px rgba(201,169,110,0.12)}
+  .pd-rev-input::placeholder{color:#b5a898;font-weight:300}
+  .pd-rev-input-wide{grid-column:1 / -1}
+  .pd-rev-rating{grid-column:1 / -1;border:1px solid #e5d7c5;background:#fffaf4;padding:18px 18px 16px;display:flex;flex-direction:column;gap:12px}
+  .pd-rev-rating-label{font-size:9px;letter-spacing:0.28em;text-transform:uppercase;color:#9b7750;font-weight:500}
+  .pd-rev-rating-stars{display:flex;flex-direction:row-reverse;justify-content:flex-end;gap:8px}
+  .pd-rev-rating-input{position:absolute;opacity:0;pointer-events:none}
+  .pd-rev-rating-star{cursor:pointer;color:rgba(201,169,110,0.22);font-size:28px;line-height:1;transition:transform 0.2s ease,color 0.2s ease}
+  .pd-rev-rating-star span{display:block}
+  .pd-rev-rating-star:hover{transform:translateY(-1px) scale(1.04)}
+  .pd-rev-rating-star:hover,
+  .pd-rev-rating-star:hover ~ .pd-rev-rating-star,
+  .pd-rev-rating-input:checked + .pd-rev-rating-star,
+  .pd-rev-rating-input:checked + .pd-rev-rating-star ~ .pd-rev-rating-star{color:#c9a96e}
+  .pd-rev-rating-input:focus-visible + .pd-rev-rating-star{outline:1px solid rgba(201,169,110,0.55);outline-offset:6px}
+  .pd-rev-rating-value{font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#2f2418;font-weight:600}
+  .pd-rev-rating-help{font-size:10px;letter-spacing:0.08em;color:#8a7660;font-weight:300}
+  .pd-rev-textarea{grid-column:1 / -1;min-height:140px;resize:vertical}
+  .pd-rev-submit{justify-self:start;border:1px solid #2f2418;color:#2f2418;font-size:9px;letter-spacing:0.3em;text-transform:uppercase;padding:15px 28px;font-family:'Jost',sans-serif;cursor:pointer;background:transparent;transition:all 0.35s}
+  .pd-rev-submit:hover{background:#2f2418;color:#fffdf9}
+  .pd-rev-submit-msg{grid-column:1 / -1;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:#8a7660;min-height:14px;align-self:center}
+  .pd-rev-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin-bottom:34px;align-items:stretch}
+  .pd-rev-grid.is-single{grid-template-columns:minmax(320px,560px);justify-content:flex-start}
+  .pd-rev-card{position:relative;display:flex;flex-direction:column;justify-content:flex-start;min-height:360px;padding:28px;overflow:hidden;transition:transform 0.28s ease,box-shadow 0.28s ease,background 0.28s ease}
+  .pd-rev-card::before{content:'“';position:absolute;right:18px;top:16px;font-family:'Cormorant Garamond',serif;font-size:96px;line-height:0.7;color:rgba(201,169,110,0.14);font-weight:600;pointer-events:none}
+  .pd-rev-card:hover{background:#fffdf9;transform:translateY(-5px);box-shadow:0 28px 52px rgba(84,58,28,0.12)}
+  .pd-rev-card-empty{grid-column:1 / -1;min-height:280px;background:rgba(255,252,247,0.72)}
+  .pd-rev-card-empty:hover{transform:none}
+  .pd-rev-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:18px;position:relative;z-index:1}
+  .pd-rev-stars-sm{color:#c9a96e;font-size:11px;letter-spacing:0.3em;display:block}
+  .pd-rev-card-kicker{margin-bottom:12px}
+  .pd-rev-card-title{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:500;letter-spacing:0.01em;line-height:1.15;color:#2d2014;margin-bottom:14px;font-style:italic;position:relative;z-index:1}
+  .pd-rev-card-text{font-size:14px;font-weight:300;line-height:1.9;color:#5a4535;margin-bottom:auto;position:relative;z-index:1}
+  .pd-rev-card-foot{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-top:20px;margin-top:26px;border-top:1px solid #eadfce;position:relative;z-index:1}
+  .pd-rev-card-author-block{display:flex;flex-direction:column;gap:6px}
+  .pd-rev-card-author{font-size:9px;letter-spacing:0.28em;text-transform:uppercase;color:#6a5135;font-weight:600}
+  .pd-rev-card-date{font-size:9px;color:#9b7750;letter-spacing:0.2em;text-transform:uppercase;font-weight:400}
+  .pd-rev-verified{display:inline-flex;align-items:center;gap:5px;font-size:8px;letter-spacing:0.16em;text-transform:uppercase;color:#6c5633;background:#fbf4e7;border:1px solid rgba(184,138,66,0.22);padding:6px 10px;white-space:nowrap}
+  .pd-rev-more{text-align:center;padding-top:2px}
+  .pd-rev-more-btn{display:inline-flex;align-items:center;gap:8px;border:1px solid #2f2418;color:#2f2418;font-size:9px;letter-spacing:0.28em;text-transform:uppercase;padding:14px 32px;font-family:'Jost',sans-serif;cursor:pointer;background:rgba(255,255,255,0.64);transition:all 0.35s}
+  .pd-rev-more-btn:hover{background:#2f2418;color:#fffdf9}
   .rv-trust{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid #e8e4de;background:#fff}
   .rv-ti{display:flex;flex-direction:column;align-items:center;text-align:center;padding:40px 20px;border-right:1px solid #e8e4de;transition:background 0.3s}
   .rv-ti:last-child{border-right:none}
@@ -736,25 +800,50 @@ const wishlistBasePayload = product ? {
     .pd-layout{grid-template-columns:1fr}
     .pd-info{position:relative;top:0;height:auto;max-height:none;padding:28px 24px 44px}
     .pd-img-side{position:relative;top:0}
+    .pd-rev-overview,.pd-rev-form-wrap{grid-template-columns:1fr}
+    .pd-rev-form-intro p{max-width:none}
+    .pd-rev-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
   }
   @media(max-width:768px){
-    .pd-crumb,.rv-hscroll,.pd-rev,.rv-nl,.rv-pay{padding-left:20px;padding-right:20px}
+    .pd-crumb,.pd-rev,.rv-nl,.rv-pay{padding-left:20px;padding-right:20px}
+    .pd-rev{padding-top:56px;padding-bottom:52px}
     .pd-img-grid{grid-template-columns:1fr 0.5fr}
-    .pd-rev-grid{grid-template-columns:1fr}
-    .pd-rev-head{flex-direction:column}
+    .pd-sticky-atc-bar{left:12px;right:12px;bottom:12px}
+    .pd-sticky-atc-shell{gap:12px;padding:10px}
+    .pd-sticky-atc-img{width:44px;height:56px}
+    .pd-sticky-atc-name{font-size:10px;letter-spacing:0.16em}
+    .pd-sticky-atc-variant{font-size:9px}
+    .pd-sticky-atc-btn{min-width:0;padding:14px 16px;font-size:9px;letter-spacing:0.22em}
+    .pd-rev-head{flex-direction:column;align-items:flex-start}
+    .pd-rev-title{font-size:clamp(34px,12vw,56px)}
+    .pd-rev-head-note{font-size:20px;max-width:none}
+    .pd-rev-overview{gap:14px}
+    .pd-rev-score-card,.pd-rev-bars-card,.pd-rev-form-wrap{padding:22px}
+    .pd-rev-score{margin-top:16px}
+    .pd-rev-num{font-size:58px}
+    .pd-rev-bar{grid-template-columns:28px minmax(0,1fr) 20px;gap:10px}
+    .pd-rev-form-wrap{gap:18px}
     .pd-rev-form{grid-template-columns:1fr}
+    .pd-rev-grid,.pd-rev-grid.is-single{grid-template-columns:1fr;gap:12px}
+    .pd-rev-card{padding:24px 22px 22px;min-height:auto}
+    .pd-rev-card-title{font-size:22px}
+    .pd-rev-card-text{font-size:14px}
     .rv-trust{grid-template-columns:1fr 1fr}
     .rv-ti{border-right:none;border-bottom:1px solid #e8e4de}
     .rv-ti:nth-child(odd){border-right:1px solid #e8e4de}
     .rv-ti:last-child{border-bottom:none}
-    .rv-hcard{width:180px}
     .rv-orn,.rv-sh{padding-left:20px;padding-right:20px}
+    .pd-related-grid :global(.cl-carousel-wrap){padding-bottom:56px}
   }
   @media(max-width:520px){
     .rv-trust{grid-template-columns:1fr}
     .rv-ti:nth-child(odd){border-right:none}
     .pd-img-grid{grid-template-columns:1fr}
     .pd-img-side{display:grid;grid-template-columns:1fr 1fr}
+    .pd-sticky-atc-shell{align-items:stretch}
+    .pd-sticky-atc-copy{gap:10px;min-width:0;flex:1}
+    .pd-sticky-atc-text{justify-content:center}
+    .pd-sticky-atc-btn{padding-left:14px;padding-right:14px}
   }
 </style>
 
@@ -767,14 +856,19 @@ const wishlistBasePayload = product ? {
     imageData: imagePayload,
     productTitle: product?.title ?? '',
     wishlistBase: wishlistBasePayload,
+    medusaUrl,
+    medusaPublishableKey,
   }}
 >
   (async () => {
   const cartApi = window.RivaCart || await window.RivaCartReady;
   const wishlistApi = window.RivaWishlist || await window.RivaWishlistReady;
+  const customerApi = window.RivaCustomer || await window.RivaCustomerReady;
   const root = document.querySelector('[data-pd-root]');
 
   if (root) {
+    const medusaBaseUrl = String(medusaUrl || '').replace(/\/+$/, '');
+    const medusaPublishableKeyValue = String(medusaPublishableKey || '').trim();
     const optionButtons = Array.from(root.querySelectorAll('[data-option-value]'));
     const priceEl = root.querySelector('[data-pd-price]');
     const compareEl = root.querySelector('[data-pd-compare]');
@@ -782,16 +876,22 @@ const wishlistBasePayload = product ? {
     const optionValueEl = root.querySelector('[data-option-label-value]');
     const variantInput = root.querySelector('[data-variant-id]');
     const addButton = root.querySelector('[data-pd-add]');
+    const infoPanel = root.querySelector('.pd-info');
+    const stickyBar = root.querySelector('[data-pd-sticky-bar]');
+    const stickyAddButton = root.querySelector('[data-pd-sticky-add]');
+    const stickyVariantEl = root.querySelector('[data-pd-sticky-variant]');
     const cartMessage = root.querySelector('[data-cart-message]');
     const wishlistButtons = Array.from(root.querySelectorAll('[data-wishlist-toggle]'));
     const reviewPanel = root.querySelector('[data-review-panel]');
     const reviewToggle = root.querySelector('[data-review-toggle]');
     const reviewForm = root.querySelector('[data-review-form]');
+    const ratingInputs = Array.from(root.querySelectorAll('[name="rating"]'));
+    const reviewRatingValue = root.querySelector('[data-review-rating-value]');
     const reviewGrid = root.querySelector('[data-review-grid]');
     const reviewMessage = root.querySelector('[data-review-message]');
     const reviewMoreButton = root.querySelector('[data-review-more]');
-    const newsletterForm = root.querySelector('[data-newsletter-form]');
-    const newsletterMessage = root.querySelector('[data-newsletter-message]');
+    const reviewNameInput = reviewForm?.querySelector('[name="name"]');
+    const reviewEmailInput = reviewForm?.querySelector('[name="email"]');
     const recommendedSection = root.querySelector('#pdRecommended');
     const accordionButtons = Array.from(root.querySelectorAll('[data-accordion-trigger]'));
     const lightbox = root.querySelector('[data-lightbox]');
@@ -805,11 +905,24 @@ const wishlistBasePayload = product ? {
     let wished = false;
     let currentVariant = variantData.find((variant) => variant.id === initialVariantId) || variantData[0] || null;
     let lightboxIndex = 0;
+    let addResetTimer = 0;
+    let isAddingToCart = false;
+    let stickyScrollFrame = 0;
 
     const formatMoney = (amount, currency) => new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency,
     }).format(Number(amount));
+
+    const addButtons = [addButton, stickyAddButton].filter(Boolean);
+
+    const medusaHeaders = (headers = {}) => {
+      const nextHeaders = { ...headers };
+      if (medusaPublishableKeyValue) {
+        nextHeaders['x-publishable-api-key'] = medusaPublishableKeyValue;
+      }
+      return nextHeaders;
+    };
 
     const syncWishlist = () => {
       wishlistButtons.forEach((button) => {
@@ -840,6 +953,46 @@ const wishlistBasePayload = product ? {
       addedAt: Date.now(),
     });
 
+    const getVariantDisplayLabel = (variant) => {
+      if (!variant) return '';
+      const title = String(variant.title || '').trim();
+      if (title && title.toLowerCase() !== 'default title') return title;
+      return (variant.selectedOptions || [])
+        .map((option) => option.value)
+        .filter(Boolean)
+        .join(' · ');
+    };
+
+    const syncStickyBarVisibility = (visible) => {
+      if (!stickyBar) return;
+      stickyBar.classList.toggle('is-visible', visible);
+      stickyBar.setAttribute('aria-hidden', String(!visible));
+    };
+
+    const evaluateStickyBar = () => {
+      stickyScrollFrame = 0;
+      if (!addButton || !stickyBar) return;
+      const rect = addButton.getBoundingClientRect();
+      const topBoundary = 88;
+      syncStickyBarVisibility(rect.bottom <= topBoundary);
+    };
+
+    const queueStickyBarCheck = () => {
+      if (stickyScrollFrame) return;
+      stickyScrollFrame = window.requestAnimationFrame(evaluateStickyBar);
+    };
+
+    const applyAddButtonState = (label, options = {}) => {
+      const isDisabled = Boolean(options.disabled);
+      const isDone = Boolean(options.done);
+      addButtons.forEach((button) => {
+        button.disabled = isDisabled;
+        button.textContent = label;
+        button.classList.toggle('is-disabled', isDisabled);
+        button.classList.toggle('done', isDone);
+      });
+    };
+
     const updateVariantUi = () => {
       if (!currentVariant) return;
 
@@ -855,11 +1008,14 @@ const wishlistBasePayload = product ? {
         compareEl.hidden = !hasCompare;
       }
       if (refEl) refEl.textContent = `Ref. ${currentVariant.sku || currentVariant.id.split('/').pop()}`;
-      if (addButton) {
-        addButton.disabled = !currentVariant.availableForSale;
-        addButton.classList.toggle('is-disabled', !currentVariant.availableForSale);
-        addButton.textContent = currentVariant.availableForSale ? 'Add to Basket' : 'Sold Out';
+      if (stickyVariantEl) {
+        const variantLabel = getVariantDisplayLabel(currentVariant);
+        stickyVariantEl.textContent = variantLabel;
+        stickyVariantEl.hidden = !variantLabel;
       }
+      if (!isAddingToCart) applyAddButtonState(currentVariant.availableForSale ? 'Add to Basket' : 'Sold Out', {
+        disabled: !currentVariant.availableForSale,
+      });
 
       optionButtons.forEach((button) => {
         const isActive = button.getAttribute('data-option-value') === optionValueEl?.textContent;
@@ -872,6 +1028,16 @@ const wishlistBasePayload = product ? {
       return variantData.find((variant) => variant.selectedOptions.some((option) => option.name === optionName && option.value === value && variant.availableForSale))
         || variantData.find((variant) => variant.selectedOptions.some((option) => option.name === optionName && option.value === value))
         || null;
+    };
+
+    const getCustomerDisplayName = (customer) => {
+      const firstName = String(customer?.firstName || '').trim();
+      const lastName = String(customer?.lastName || '').trim();
+      const fullName = `${firstName} ${lastName}`.trim();
+      if (fullName) return fullName;
+      const email = String(customer?.email || '').trim();
+      if (email) return email.split('@')[0];
+      return '';
     };
 
     const openLightbox = (index) => {
@@ -890,6 +1056,20 @@ const wishlistBasePayload = product ? {
       document.body.style.overflow = '';
     };
 
+    const getReviewRatingCopy = (rating) => {
+      if (rating >= 5) return '5 stars — Excellent';
+      if (rating >= 4) return '4 stars — Very good';
+      if (rating >= 3) return '3 stars — Good';
+      if (rating >= 2) return '2 stars — Fair';
+      return '1 star — Needs improvement';
+    };
+
+    const syncReviewRatingValue = () => {
+      if (!reviewRatingValue) return;
+      const selectedRating = Number(ratingInputs.find((input) => input.checked)?.value || 5);
+      reviewRatingValue.textContent = getReviewRatingCopy(selectedRating);
+    };
+
     optionButtons.forEach((button) => {
       button.addEventListener('click', () => {
         const value = button.getAttribute('data-option-value');
@@ -901,26 +1081,36 @@ const wishlistBasePayload = product ? {
       });
     });
 
-    if (addButton) {
-      addButton.addEventListener('click', async () => {
-        if (!currentVariant?.availableForSale) return;
-        addButton.classList.add('done');
-        addButton.textContent = 'Added ✓';
+    const handleAddToCart = async () => {
+      if (!currentVariant?.availableForSale || isAddingToCart) return;
+      isAddingToCart = true;
+      window.clearTimeout(addResetTimer);
+      applyAddButtonState('Adding…', { disabled: true });
+      if (cartMessage) cartMessage.textContent = 'Adding to basket';
+
+      try {
+        await cartApi.addToCart(currentVariant.id, 1);
+        applyAddButtonState('Added ✓', { disabled: false, done: true });
         if (cartMessage) cartMessage.textContent = 'Added to basket';
-
-        try {
-          await cartApi.addToCart(currentVariant.id, 1);
-        } catch {
-          if (cartMessage) cartMessage.textContent = 'Could not add item right now';
-        }
-
-        window.setTimeout(() => {
-          addButton.classList.remove('done');
-          addButton.textContent = currentVariant?.availableForSale ? 'Add to Basket' : 'Sold Out';
+      } catch {
+        applyAddButtonState(currentVariant?.availableForSale ? 'Add to Basket' : 'Sold Out', {
+          disabled: !currentVariant?.availableForSale,
+        });
+        if (cartMessage) cartMessage.textContent = 'Could not add item right now';
+      } finally {
+        isAddingToCart = false;
+        addResetTimer = window.setTimeout(() => {
+          applyAddButtonState(currentVariant?.availableForSale ? 'Add to Basket' : 'Sold Out', {
+            disabled: !currentVariant?.availableForSale,
+          });
           if (cartMessage) cartMessage.textContent = '';
         }, 1800);
-      });
-    }
+      }
+    };
+
+    addButtons.forEach((button) => {
+      button.addEventListener('click', handleAddToCart);
+    });
 
     wishlistButtons.forEach((button) => {
       button.addEventListener('click', (event) => {
@@ -992,38 +1182,64 @@ const wishlistBasePayload = product ? {
       }
     });
 
-    reviewForm?.addEventListener('submit', (event) => {
+    ratingInputs.forEach((input) => {
+      input.addEventListener('change', syncReviewRatingValue);
+    });
+    syncReviewRatingValue();
+
+    reviewForm?.addEventListener('submit', async (event) => {
       event.preventDefault();
-      if (!reviewGrid) return;
       const formData = new FormData(reviewForm);
       const name = String(formData.get('name') || '').trim();
+      const email = String(formData.get('email') || '').trim();
       const rating = Number(formData.get('rating') || 5);
       const title = String(formData.get('title') || '').trim();
       const message = String(formData.get('message') || '').trim();
 
-      if (!name || !title || !message) return;
+      if (!name || !email || !title || !message) return;
+      if (!medusaBaseUrl || !medusaPublishableKeyValue) {
+        if (reviewMessage) reviewMessage.textContent = 'Reviews are temporarily unavailable.';
+        return;
+      }
 
-      const card = document.createElement('article');
-      card.className = 'pd-rev-card rv-reveal in';
-      card.innerHTML = `
-        <div class="pd-rev-stars-sm">${'★'.repeat(rating)}</div>
-        <div class="pd-rev-card-title">"${title}"</div>
-        <p class="pd-rev-card-text">${message}</p>
-        <div class="pd-rev-card-author">— ${name}</div>
-        <div class="pd-rev-card-date">Just now</div>
-        <div class="pd-rev-verified">
-          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <polyline points="20 6 9 17 4 12"></polyline>
-          </svg>
-          Submitted Review
-        </div>
-      `;
-      reviewGrid.prepend(card);
-      reviewForm.reset();
-      if (reviewMessage) reviewMessage.textContent = 'Review submitted';
+      const submitBtn = reviewForm.querySelector('[type="submit"]');
+      if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Submitting…'; }
+      let submitted = false;
+
+      try {
+        const res = await fetch(`${medusaBaseUrl}/store/reviews`, {
+          method: 'POST',
+          headers: medusaHeaders({ 'Content-Type': 'application/json' }),
+          body: JSON.stringify({
+            product_id: wishlistBase?.id || '',
+            product_handle: wishlistBase?.handle || '',
+            storefront_origin: window.location.origin,
+            customer_name: name,
+            customer_email: email,
+            rating,
+            title,
+            content: message,
+            metadata: {
+              page_url: window.location.href,
+              product_title: productTitle,
+            },
+          }),
+        });
+        if (!res.ok) throw new Error('submit_failed');
+        submitted = true;
+        reviewForm.reset();
+        syncReviewRatingValue();
+        if (reviewMessage) reviewMessage.textContent = 'Thank you! Your review is awaiting approval.';
+      } catch {
+        if (reviewMessage) reviewMessage.textContent = 'Could not submit — please try again.';
+      } finally {
+        if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Submit Review'; }
+      }
+
       window.setTimeout(() => {
         if (reviewMessage) reviewMessage.textContent = '';
-      }, 2000);
+        if (submitted && reviewPanel) reviewPanel.setAttribute('hidden', '');
+      }, 4000);
     });
 
     reviewMoreButton?.addEventListener('click', () => {
@@ -1031,15 +1247,6 @@ const wishlistBasePayload = product ? {
         card.removeAttribute('hidden');
       });
       reviewMoreButton.setAttribute('hidden', '');
-    });
-
-    newsletterForm?.addEventListener('submit', (event) => {
-      event.preventDefault();
-      const formData = new FormData(newsletterForm);
-      const email = String(formData.get('email') || '').trim();
-      if (!email) return;
-      newsletterForm.reset();
-      if (newsletterMessage) newsletterMessage.textContent = `Thanks, ${email} is subscribed.`;
     });
 
     if ('IntersectionObserver' in window && reviewBars.length > 0) {
@@ -1055,6 +1262,10 @@ const wishlistBasePayload = product ? {
       reviewBars.forEach((bar) => reviewBarObserver.observe(bar));
     }
 
+    window.addEventListener('scroll', queueStickyBarCheck, { passive: true });
+    window.addEventListener('resize', queueStickyBarCheck);
+    infoPanel?.addEventListener('scroll', queueStickyBarCheck, { passive: true });
+
     document.addEventListener('keydown', (event) => {
       if (!lightbox?.classList.contains('open')) return;
       if (event.key === 'Escape') closeLightbox();
@@ -1062,8 +1273,134 @@ const wishlistBasePayload = product ? {
       if (event.key === 'ArrowLeft') openLightbox(lightboxIndex - 1);
     });
 
+    const esc = (s) => String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+    Promise.resolve(customerApi?.getCustomerProfile?.())
+      .then((customerProfile) => {
+        if (!customerProfile) return;
+        const customerName = getCustomerDisplayName(customerProfile);
+        if (reviewNameInput && !reviewNameInput.value && customerName) {
+          reviewNameInput.value = customerName;
+        }
+        if (reviewEmailInput && !reviewEmailInput.value && customerProfile.email) {
+          reviewEmailInput.value = customerProfile.email;
+        }
+      })
+      .catch(() => {});
+
+    const loadMedusaReviews = async () => {
+      if (!medusaBaseUrl || !medusaPublishableKeyValue || !wishlistBase?.id) return;
+      try {
+        const params = new URLSearchParams({
+          product_id: wishlistBase.id,
+          limit: '100',
+        });
+        const res = await fetch(`${medusaBaseUrl}/store/reviews?${params.toString()}`, {
+          headers: medusaHeaders(),
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+        const reviews = data.reviews || [];
+        const summary = data.summary || {};
+        const count = Number(summary.total_reviews ?? data.count ?? 0);
+        const avg = Number(summary.average_rating ?? 0);
+        const ratingCounts = summary.rating_counts || {};
+
+        const revNumEl = root.querySelector('.pd-rev-num');
+        const revStarsEl = root.querySelector('.pd-rev-stars');
+        const revSubEl = root.querySelector('.pd-rev-sub');
+        if (revNumEl) revNumEl.textContent = avg.toFixed(1);
+        if (revStarsEl) revStarsEl.textContent = count > 0 ? '★★★★★' : '☆☆☆☆☆';
+        if (revSubEl) revSubEl.textContent = count > 0 ? `${count} review${count !== 1 ? 's' : ''}` : 'No reviews yet';
+
+        const dist = [5, 4, 3, 2, 1].map((n) => Number(ratingCounts[String(n)] ?? 0));
+        reviewBars.forEach((bar, idx) => {
+          const pct = count > 0 ? Math.round((dist[idx] / count) * 100) : 0;
+          const cntEl = bar.closest('.pd-rev-bar')?.querySelector('.pd-rev-bar-cnt');
+          bar.setAttribute('data-width', `${pct}%`);
+          bar.style.width = `${pct}%`;
+          if (cntEl) cntEl.textContent = String(dist[idx]);
+        });
+
+        if (reviewGrid) {
+          reviewGrid.innerHTML = '';
+          if (reviews.length === 0) {
+            reviewGrid.classList.remove('is-single');
+            const emptyCard = document.createElement('article');
+            emptyCard.className = 'pd-rev-card pd-rev-card-empty rv-reveal in';
+            emptyCard.innerHTML = `
+              <div class="pd-rev-card-top">
+                <div class="pd-rev-stars-sm">☆☆☆☆☆</div>
+              </div>
+              <span class="pd-rev-card-kicker">Review title</span>
+              <div class="pd-rev-card-title">Be the first to review</div>
+              <p class="pd-rev-card-text">Verified customer reviews will appear here once they have been approved by our team.</p>
+              <div class="pd-rev-card-foot">
+                <div class="pd-rev-card-author-block">
+                  <span class="pd-rev-card-author">Share Your Experience</span>
+                  <span class="pd-rev-card-date">Awaiting first review</span>
+                </div>
+              </div>
+            `;
+            reviewGrid.appendChild(emptyCard);
+            reviewMoreButton?.setAttribute('hidden', '');
+            return;
+          }
+
+          reviewGrid.classList.toggle('is-single', reviews.length === 1);
+
+          reviews.forEach((r, index) => {
+            const card = document.createElement('article');
+            card.className = 'pd-rev-card rv-reveal in';
+            card.setAttribute('data-extra-review', index > 2 ? 'true' : 'false');
+            if (index > 2) card.hidden = true;
+            const filled = '★'.repeat(r.rating);
+            const empty = '☆'.repeat(5 - r.rating);
+            const createdAt = r.created_at ? new Date(r.created_at) : null;
+            const dateStr = createdAt && !Number.isNaN(createdAt.getTime())
+              ? createdAt.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' })
+              : 'Recently added';
+            const verificationStatus = String(r.verification_status || 'unverified');
+            const verificationLabel = verificationStatus === 'verified_purchase'
+              ? 'Verified Purchase'
+              : verificationStatus === 'manually_verified'
+                ? 'Verified Review'
+                : '';
+            card.innerHTML = `
+              <div class="pd-rev-card-top">
+                <div class="pd-rev-stars-sm">${filled}${empty}</div>
+                ${verificationLabel ? `<div class="pd-rev-verified"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>${esc(verificationLabel)}</div>` : ''}
+              </div>
+              <span class="pd-rev-card-kicker">Review title</span>
+              <div class="pd-rev-card-title">${esc(r.title || r.content.slice(0, 50))}</div>
+              <p class="pd-rev-card-text">${esc(r.content)}</p>
+              <div class="pd-rev-card-foot">
+                <div class="pd-rev-card-author-block">
+                  <span class="pd-rev-card-author">${esc(r.customer_name)}</span>
+                  <span class="pd-rev-card-date">${dateStr}</span>
+                </div>
+              </div>
+            `;
+            reviewGrid.appendChild(card);
+          });
+        }
+
+        if (reviewMoreButton) {
+          if (reviews.length > 3) {
+            reviewMoreButton.removeAttribute('hidden');
+          } else {
+            reviewMoreButton.setAttribute('hidden', '');
+          }
+        }
+      } catch {
+        // Keep the neutral empty state when Medusa is unavailable.
+      }
+    };
+
     refreshWishlist();
     updateVariantUi();
+    loadMedusaReviews();
+    evaluateStickyBar();
   }
   })();
 </script>

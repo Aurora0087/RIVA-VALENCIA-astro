@@ -1,8 +1,7 @@
 ---
 import Layout from '@/layouts/Layout.astro';
-import { getCollectionByHandle, getAllCollections, formatPrice, isOnSale } from '@/lib/shopify';
+import { getCollectionByHandle, getAllCollections } from '@/lib/shopify';
 import { ProductGrid } from '@/components/ProductGrid';
-import { AllProductsPage } from '@/components/AllProductsPage';
 
 const COLLECTION_HANDLE = 'mens-collection';
 const { collection, status } = await getCollectionByHandle(COLLECTION_HANDLE);
@@ -22,15 +21,6 @@ const REVIEWS = [
   { text: 'My backpack arrived beautifully packed and ready for daily use. It feels luxurious without trying too hard.', author: 'Javier Moreno — Valencia, Spain', stars: 5 },
   { text: 'The finish, the hardware and the proportions are all spot on. It is one of the most polished men’s bags I have bought.', author: 'Luca Ferraro — Florence, Italy', stars: 5 },
 ];
-
-const MEN_CATEGORY_TABS = [
-  { key: 'all', label: 'All' },
-  { key: 'briefcases', label: 'Briefcases' },
-  { key: 'backpacks', label: 'Backpacks' },
-  { key: 'sling-bags', label: 'Slings Bags' },
-  { key: 'wallets', label: 'Wallets' },
-  { key: 'belts', label: 'Belt' },
-] as const;
 
 const AS_SEEN_ON = [
   {
@@ -70,25 +60,9 @@ const AS_SEEN_ON = [
       <span class="rv-hero-eyebrow">Spring / Summer 2026</span>
       <span class="rv-hero-h1">Men's<br>Leather</span>
       <span class="rv-hero-sub">Crafted for the modern man in Spain</span>
-      <span class="rv-hero-btn">Discover the Collection →</span>
+      <span class="rv-hero-btn">Discover the Products →</span>
     </div>
   </a>
-
-  <div class="rv-sh rv-reveal">
-    <h2>Shop the Full Collection</h2>
-    <p>Filter, sort and explore every piece in the men&apos;s collection</p>
-  </div>
-  <AllProductsPage
-    products={products}
-    status={status}
-    title={collection?.title ?? "Men's Collection"}
-    breadcrumbLabel={collection?.title ?? "Men's Collection"}
-    kicker="Men's Collection"
-    metaItems={['Crafted in Spain', 'Full-Grain Leather']}
-    categoryTabs={[...MEN_CATEGORY_TABS]}
-    embedded
-    client:load
-  />
 
   <!-- ── NEW ARRIVALS ── -->
   <div class="rv-sh rv-reveal">
@@ -96,7 +70,7 @@ const AS_SEEN_ON = [
     <p>The finest Spanish leather, crafted for the modern man</p>
   </div>
   <div class="rv-g2">
-    <a class="rv-ec rv-reveal rv-reveal-l" href="/collections/mens?cat=briefcases">
+    <a class="rv-ec rv-reveal rv-reveal-l" href="/collections/man-backpacks">
       <div class="rv-ph-block">
         <img
           src="https://cdn.shopify.com/s/files/1/0812/7738/7010/files/LARGE_BOWLING_duffle_bag_in_leather_in_Black___Saint_Laurent___YSL_EN-US.jpg?v=1776007265"
@@ -112,7 +86,7 @@ const AS_SEEN_ON = [
         <span class="rv-ec-cta">Shop Now →</span>
       </div>
     </a>
-    <a class="rv-ec rv-reveal rv-reveal-r" href="/collections/mens?cat=shoulder-bags">
+    <a class="rv-ec rv-reveal rv-reveal-r" href="/collections/man-shoulder-bags">
       <div class="rv-ph-block">
         <img
           src="https://cdn.shopify.com/s/files/1/0812/7738/7010/files/download_10.jpg?v=1776007318"
@@ -130,8 +104,6 @@ const AS_SEEN_ON = [
     </a>
   </div>
 
-  <!-- ── ORNAMENT ── -->
-  <div class="rv-orn rv-reveal"><span>✦</span></div>
 
   <!-- ── BEST SELLERS ── -->
   <div class="rv-sh rv-reveal">
@@ -154,10 +126,12 @@ const AS_SEEN_ON = [
     </div>
   )}
 
-  {bestSellers.length > 0
-    ? <ProductGrid products={bestSellers} client:load />
-    : <ProductGrid products={products} client:load />
-  }
+  <div class="rv-best-sellers-slider">
+    {bestSellers.length > 0
+      ? <ProductGrid products={bestSellers} mode="carousel" client:load />
+      : <ProductGrid products={products} mode="carousel" client:load />
+    }
+  </div>
 
   <!-- ── VIDEO ── -->
   <div class="rv-vid">
@@ -180,7 +154,7 @@ const AS_SEEN_ON = [
     <p>Every category, every occasion</p>
   </div>
   <div class="rv-feat">
-    <a class="rv-ec rv-reveal rv-reveal-l" href="/collections/mens?cat=briefcases" style="height:100%">
+    <a class="rv-ec rv-reveal rv-reveal-l" href="/collections/man-backpacks" style="height:100%">
       <img
         src="https://cdn.shopify.com/s/files/1/0812/7738/7010/files/Gemini_Generated_Image_eqx6jjeqx6jjeqx6.png?v=1776010385"
         alt="Briefcases"
@@ -195,7 +169,7 @@ const AS_SEEN_ON = [
       </div>
     </a>
     <div class="rv-feat-r">
-      <a class="rv-ec rv-reveal rv-reveal-r" href="/collections/mens?cat=backpacks">
+      <a class="rv-ec rv-reveal rv-reveal-r" href="/collections/man-backpacks">
         <img
           src="https://cdn.shopify.com/s/files/1/0812/7738/7010/files/Italian_Leather_Backpack.jpg?v=1776008325"
           alt="Backpacks"
@@ -209,17 +183,17 @@ const AS_SEEN_ON = [
           <span class="rv-ec-cta">Explore →</span>
         </div>
       </a>
-      <a class="rv-ec rv-reveal rv-reveal-r rv-reveal-delay2" href="/collections/mens?cat=men-wallets">
+      <a class="rv-ec rv-reveal rv-reveal-r rv-reveal-delay2" href="/collections/man-wallets">
         <img
           src="https://cdn.shopify.com/s/files/1/0812/7738/7010/files/Cruise_22.jpg?v=1776008606"
-          alt="Wallets & Belts"
+          alt="Wallets"
           style="aspect-ratio:unset;height:100%;min-height:280px;width:100%;object-fit:cover;"
           loading="lazy"
         />
         <div class="rv-ec-grad"></div>
         <div class="rv-ec-body">
           <span class="rv-ec-tag">Small Leather Goods</span>
-          <span class="rv-ec-title">Wallets & Belts</span>
+          <span class="rv-ec-title">Wallets</span>
           <span class="rv-ec-cta">Explore →</span>
         </div>
       </a>
@@ -256,6 +230,12 @@ const AS_SEEN_ON = [
       <span class="rv-fbanner-cta">Explore Now</span>
     </div>
   </a>
+
+  <div class="rv-sh rv-reveal">
+    <h2>Shop the Full Products</h2>
+    <p>Swipe through every piece in the men&apos;s collection</p>
+  </div>
+  <ProductGrid products={products} mode="carousel" client:load />
 
   <!-- ── TRUST BAR ── -->
   <div class="rv-trust">
@@ -304,7 +284,7 @@ const AS_SEEN_ON = [
 
   <!-- ── PAYMENT LOGOS ── -->
   <div class="rv-payment rv-reveal">
-    {['VISA','MASTERCARD','AMEX','APPLE PAY','GOOGLE PAY','PAYPAL','KLARNA','UPI','RAZORPAY'].map((p, i, arr) => (
+    {['VISA','MASTERCARD','AMEX','RAZORPAY'].map((p, i, arr) => (
       <>
         <span class="rv-payment-logo">{p}</span>
         {i < arr.length - 1 && i % 2 === 1 && <span class="rv-payment-sep"></span>}
@@ -341,11 +321,11 @@ const AS_SEEN_ON = [
     <span class="rv-nl-tag rv-reveal">Exclusive Access</span>
     <h2 class="rv-reveal">Stay in the Know</h2>
     <span class="rv-nl-sub rv-reveal">New arrivals, private sales and stories from our artisans</span>
-    <form class="rv-nl-form" onsubmit="return false">
-      <input type="email" class="rv-nl-input" placeholder="Your email address" />
+    <form class="rv-nl-form" data-newsletter-form data-newsletter-source="mens-collection">
+      <input type="email" class="rv-nl-input" name="email" placeholder="Your email address" required />
       <button type="submit" class="rv-nl-btn">Subscribe</button>
     </form>
-    <p class="rv-nl-note">No spam. Unsubscribe anytime. Read our <a href="/pages/privacy" class="rv-inline-link">Privacy Policy</a>.</p>
+    <p class="rv-nl-note" data-newsletter-message aria-live="polite">No spam. Unsubscribe anytime. Read our <a href="/pages/privacy" class="rv-inline-link">Privacy Policy</a>.</p>
   </div>
 
 </Layout>

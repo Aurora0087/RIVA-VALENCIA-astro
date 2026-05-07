@@ -14,7 +14,7 @@ export default defineConfig({
   integrations: [react()],
   server: {
     allowedHosts: [
-      '465f-103-42-173-157.ngrok-free.app' // Add your specific ngrok host here
+      'c6fb-45-249-164-116.ngrok-free.app' // Add your specific ngrok host here
     ]
   }
 });

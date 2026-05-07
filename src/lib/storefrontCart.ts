@@ -2,10 +2,24 @@ const SHOPIFY_DOMAIN = import.meta.env.PUBLIC_SHOPIFY_STORE_DOMAIN as string | u
 const SHOPIFY_TOKEN = import.meta.env.PUBLIC_SHOPIFY_STOREFRONT_TOKEN as string | undefined;
 const SHOPIFY_API_VERSION = '2026-04';
 const CART_STORAGE_KEY = 'rv-storefront-cart-id';
+export const CART_EVENT = 'rv_cart_changed';
 
 export interface StorefrontMoney {
   amount: string;
   currencyCode: string;
+}
+
+export interface StorefrontCartDeliveryOption {
+  handle: string;
+  title?: string | null;
+  code?: string | null;
+  estimatedCost: StorefrontMoney;
+}
+
+export interface StorefrontCartDeliveryGroup {
+  id: string;
+  selectedDeliveryOption?: StorefrontCartDeliveryOption | null;
+  deliveryOptions: StorefrontCartDeliveryOption[];
 }
 
 export interface StorefrontCartLine {
@@ -50,10 +64,16 @@ export interface StorefrontCart {
   checkoutUrl: string;
   totalQuantity: number;
   note?: string | null;
+  buyerIdentity?: {
+    countryCode?: string | null;
+  } | null;
   cost: {
     subtotalAmount: StorefrontMoney;
     totalAmount: StorefrontMoney;
     totalTaxAmount?: StorefrontMoney | null;
+  };
+  deliveryGroups: {
+    edges: Array<{ node: StorefrontCartDeliveryGroup }>;
   };
   lines: {
     edges: Array<{ node: StorefrontCartLine }>;
@@ -75,10 +95,32 @@ const CART_FIELDS = `
   checkoutUrl
   totalQuantity
   note
+  buyerIdentity {
+    countryCode
+  }
   cost {
     subtotalAmount { ${MONEY_FIELDS} }
     totalAmount { ${MONEY_FIELDS} }
     totalTaxAmount { ${MONEY_FIELDS} }
+  }
+  deliveryGroups(first: 10) {
+    edges {
+      node {
+        id
+        selectedDeliveryOption {
+          handle
+          title
+          code
+          estimatedCost { ${MONEY_FIELDS} }
+        }
+        deliveryOptions {
+          handle
+          title
+          code
+          estimatedCost { ${MONEY_FIELDS} }
+        }
+      }
+    }
   }
   lines(first: 100) {
     edges {
@@ -205,6 +247,34 @@ const CART_NOTE_UPDATE_MUTATION = `#graphql
   }
 `;
 
+const CART_BUYER_IDENTITY_UPDATE_MUTATION = `#graphql
+  mutation UpdateCartBuyerIdentity($cartId: ID!, $buyerIdentity: CartBuyerIdentityInput!) {
+    cartBuyerIdentityUpdate(cartId: $cartId, buyerIdentity: $buyerIdentity) {
+      cart {
+        ${CART_FIELDS}
+      }
+      userErrors {
+        field
+        message
+      }
+    }
+  }
+`;
+
+const CART_SELECTED_DELIVERY_OPTIONS_UPDATE_MUTATION = `#graphql
+  mutation UpdateCartSelectedDeliveryOptions($cartId: ID!, $selectedDeliveryOptions: [CartSelectedDeliveryOptionInput!]!) {
+    cartSelectedDeliveryOptionsUpdate(cartId: $cartId, selectedDeliveryOptions: $selectedDeliveryOptions) {
+      cart {
+        ${CART_FIELDS}
+      }
+      userErrors {
+        field
+        message
+      }
+    }
+  }
+`;
+
 function ensureConfig() {
   if (!SHOPIFY_DOMAIN || !SHOPIFY_TOKEN) {
     throw new Error('Shopify Storefront API is not configured.');
@@ -256,6 +326,11 @@ function setStoredCartId(cartId: string | null) {
   }
 }
 
+function emitCartChange(cart: StorefrontCart | null) {
+  if (typeof window === 'undefined') return;
+  window.dispatchEvent(new CustomEvent(CART_EVENT, { detail: { cart } }));
+}
+
 function readMutationResult<T extends { cart: StorefrontCart | null; userErrors: Array<{ message: string }> }>(
   result: T,
 ) {
@@ -274,7 +349,9 @@ export async function createCart(input?: { lines?: Array<{ merchandiseId: string
     cartCreate: { cart: StorefrontCart | null; userErrors: Array<{ message: string }> };
   }>(CART_CREATE_MUTATION, { input: input ?? {} });
 
-  return readMutationResult(data.cartCreate);
+  const cart = readMutationResult(data.cartCreate);
+  emitCartChange(cart);
+  return cart;
 }
 
 export async function getCart(createIfMissing: boolean = true): Promise<StorefrontCart | null> {
@@ -287,12 +364,15 @@ export async function getCart(createIfMissing: boolean = true): Promise<Storefro
     const data = await storefrontRequest<{ cart: StorefrontCart | null }>(CART_QUERY, { cartId });
     if (!data.cart) {
       setStoredCartId(null);
+      emitCartChange(null);
       return createIfMissing ? createCart() : null;
     }
+    emitCartChange(data.cart);
     return data.cart;
   } catch {
-    setStoredCartId(null);
     if (!createIfMissing) return null;
+    setStoredCartId(null);
+    emitCartChange(null);
     return createCart();
   }
 }
@@ -310,7 +390,9 @@ export async function addToCart(merchandiseId: string, quantity: number = 1) {
     lines: [{ merchandiseId, quantity }],
   });
 
-  return readMutationResult(data.cartLinesAdd);
+  const cart = readMutationResult(data.cartLinesAdd);
+  emitCartChange(cart);
+  return cart;
 }
 
 export async function updateCartLine(lineId: string, quantity: number) {
@@ -326,7 +408,9 @@ export async function updateCartLine(lineId: string, quantity: number) {
     lines: [{ id: lineId, quantity }],
   });
 
-  return readMutationResult(data.cartLinesUpdate);
+  const cart = readMutationResult(data.cartLinesUpdate);
+  emitCartChange(cart);
+  return cart;
 }
 
 export async function removeCartLine(lineId: string) {
@@ -342,7 +426,9 @@ export async function removeCartLine(lineId: string) {
     lineIds: [lineId],
   });
 
-  return readMutationResult(data.cartLinesRemove);
+  const cart = readMutationResult(data.cartLinesRemove);
+  emitCartChange(cart);
+  return cart;
 }
 
 export async function updateCartNote(note: string) {
@@ -358,9 +444,50 @@ export async function updateCartNote(note: string) {
     note,
   });
 
-  return readMutationResult(data.cartNoteUpdate);
+  const cart = readMutationResult(data.cartNoteUpdate);
+  emitCartChange(cart);
+  return cart;
+}
+
+export async function updateCartBuyerIdentity(buyerIdentity: Record<string, unknown>) {
+  const existingCart = await getCart(true);
+  if (!existingCart) {
+    throw new Error('Unable to load cart.');
+  }
+
+  const data = await storefrontRequest<{
+    cartBuyerIdentityUpdate: { cart: StorefrontCart | null; userErrors: Array<{ message: string }> };
+  }>(CART_BUYER_IDENTITY_UPDATE_MUTATION, {
+    cartId: existingCart.id,
+    buyerIdentity,
+  });
+
+  const cart = readMutationResult(data.cartBuyerIdentityUpdate);
+  emitCartChange(cart);
+  return cart;
+}
+
+export async function updateCartSelectedDeliveryOptions(
+  selectedDeliveryOptions: Array<{ deliveryGroupId: string; deliveryOptionHandle: string }>
+) {
+  const existingCart = await getCart(true);
+  if (!existingCart) {
+    throw new Error('Unable to load cart.');
+  }
+
+  const data = await storefrontRequest<{
+    cartSelectedDeliveryOptionsUpdate: { cart: StorefrontCart | null; userErrors: Array<{ message: string }> };
+  }>(CART_SELECTED_DELIVERY_OPTIONS_UPDATE_MUTATION, {
+    cartId: existingCart.id,
+    selectedDeliveryOptions,
+  });
+
+  const cart = readMutationResult(data.cartSelectedDeliveryOptionsUpdate);
+  emitCartChange(cart);
+  return cart;
 }
 
 export async function clearStoredCart() {
   setStoredCartId(null);
+  emitCartChange(null);
 }

@@ -10,6 +10,7 @@ import {
 export async function getStaticPaths() {
   const reservedHandles = new Set([
     'all',
+    'sale',
     'ss26',
     'mens',
     'womens',
@@ -99,6 +100,12 @@ const categoryTabs =
           { key: 'woman', label: 'Woman' },
           { key: 'man', label: 'Man' },
         ]
+    : collectionId === 'gifts'
+      ? [
+          { key: 'all', label: 'All' },
+          { key: 'woman', label: 'Woman' },
+          { key: 'man', label: 'Man' },
+        ]
     : collectionId === 'accessories'
       ? [
           { key: 'all', label: 'All' },
@@ -133,7 +140,7 @@ const pageStatus: ShopifyConnectionStatus = collection
     title={title}
     breadcrumbLabel={title}
     kicker="Riva Valencia Collection"
-    metaItems={['Crafted in Spain', 'Full-Grain Leather']}
+    metaItems={['Designed In Spain', 'Full-Grain Leather']}
     categoryTabs={categoryTabs}
     client:load
   />

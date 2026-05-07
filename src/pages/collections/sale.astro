@@ -1,0 +1,389 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import { AllProductsPage } from '@/components/AllProductsPage';
+import { ProductGrid } from '@/components/ProductGrid';
+import {
+  getAllProducts,
+  getCollectionByHandle,
+  isOnSale,
+  type ShopifyConnectionStatus,
+  type ShopifyProduct,
+} from '@/lib/shopify';
+
+const SALE_COLLECTION_HANDLE = 'sale';
+const FALLBACK_HERO =
+  'https://cdn.shopify.com/s/files/1/0812/7738/7010/files/Gemini_Generated_Image_n17qn0n17qn0n17q.png?v=1776004987';
+
+const { collection: saleCollection, status: saleCollectionStatus } =
+  await getCollectionByHandle(SALE_COLLECTION_HANDLE);
+const { products: allProducts, status: allProductsStatus } = await getAllProducts(100);
+
+const collectionProducts = saleCollection?.products.edges.map((edge) => edge.node) ?? [];
+const discountedProducts = allProducts.filter(isOnSale);
+
+function mergeProducts(productLists: ShopifyProduct[][]) {
+  const seen = new Set<string>();
+  const merged: ShopifyProduct[] = [];
+
+  for (const list of productLists) {
+    for (const product of list) {
+      if (seen.has(product.id)) continue;
+      seen.add(product.id);
+      merged.push(product);
+    }
+  }
+
+  return merged;
+}
+
+function firstImage(product?: ShopifyProduct | null) {
+  return product?.images.edges[0]?.node ?? null;
+}
+
+function salePrice(product: ShopifyProduct) {
+  return parseFloat(product.priceRange.minVariantPrice.amount);
+}
+
+function compareAtPrice(product: ShopifyProduct) {
+  return parseFloat(product.compareAtPriceRange.minVariantPrice.amount);
+}
+
+function savingsPercent(product: ShopifyProduct) {
+  const compareAt = compareAtPrice(product);
+  const price = salePrice(product);
+  if (compareAt <= 0 || compareAt <= price) return 0;
+  return Math.round(((compareAt - price) / compareAt) * 100);
+}
+
+function normalizeProductText(product: ShopifyProduct) {
+  return [
+    product.title,
+    product.handle,
+    product.description,
+    product.vendor,
+    product.productType,
+    ...product.tags,
+  ]
+    .join(' ')
+    .toLowerCase();
+}
+
+function matchesAny(text: string, keywords: string[]) {
+  return keywords.some((keyword) => text.includes(keyword));
+}
+
+function countMatchingProducts(products: ShopifyProduct[], keywords: string[]) {
+  return products.filter((product) => matchesAny(normalizeProductText(product), keywords)).length;
+}
+
+const saleProducts = mergeProducts([collectionProducts, discountedProducts]);
+const featuredOffers = [...saleProducts]
+  .sort((a, b) => savingsPercent(b) - savingsPercent(a))
+  .slice(0, 4);
+const heroProduct = featuredOffers[0] ?? saleProducts[0] ?? null;
+
+const pageStatus: ShopifyConnectionStatus = allProductsStatus.ok
+  ? allProductsStatus
+  : saleCollectionStatus.ok
+    ? saleCollectionStatus
+    : allProductsStatus;
+
+const heroImage = saleCollection?.image?.url ?? firstImage(heroProduct)?.url ?? FALLBACK_HERO;
+const heroAlt =
+  saleCollection?.image?.altText ?? firstImage(heroProduct)?.altText ?? 'Riva Valencia sale collection';
+const saleDescription =
+  saleCollection?.description?.trim() ||
+  'Archive pricing on selected leather bags, small goods, and travel essentials crafted with the same Riva Valencia finish and detail.';
+
+const maxSavings = saleProducts.reduce((max, product) => Math.max(max, savingsPercent(product)), 0);
+const womenOfferCount = countMatchingProducts(saleProducts, [' woman ', ' women ', 'womens', "women's", 'handbag', 'shoulder']);
+const menOfferCount = countMatchingProducts(saleProducts, [' man ', ' men ', 'mens', "men's", 'briefcase', 'attache']);
+const accessoriesOfferCount = countMatchingProducts(saleProducts, [
+  'wallet',
+  'belt',
+  'keychain',
+  'watch strap',
+  'watchband',
+  'mobile case',
+  'cardholder',
+]);
+
+const showFallbackNote =
+  allProductsStatus.ok && saleProducts.length > 0 && (!saleCollection || collectionProducts.length === 0);
+
+const REVIEWS = [
+  { text: 'The sale still felt very premium. The bag arrived beautifully packed and looked immaculate.', author: 'Nora Alvarez — Barcelona, Spain', stars: 5 },
+  { text: 'I found a briefcase I had been watching for months. Same quality, easier decision.', author: 'Daniel Costa — Lisbon, Portugal', stars: 5 },
+  { text: 'The leather and hardware are every bit as refined as my previous full-price order.', author: 'Chiara Bellini — Rome, Italy', stars: 5 },
+  { text: 'A rare chance to buy Riva Valencia pieces with real value and no compromise on finish.', author: 'Matteo Ruiz — Madrid, Spain', stars: 5 },
+];
+---
+
+<Layout
+  title="Sale — RIVA VALENCIA"
+  description="Shop the Riva Valencia sale collection with discounted leather bags, accessories, and gifting pieces handDesigned In Spain."
+>
+  <a class="rv-hero" href="#sale-grid">
+    <img
+      src={heroImage}
+      alt={heroAlt}
+      style="width:100%;height:100%;object-fit:cover;"
+    />
+    <div class="rv-hero-grad"></div>
+    <div class="rv-hero-content">
+      <span class="rv-hero-eyebrow">Private Sale 2026</span>
+      <span class="rv-hero-h1">Leather<br />Sale</span>
+      <span class="rv-hero-sub">{saleDescription}</span>
+      <span class="rv-hero-btn">Shop the Offers →</span>
+    </div>
+  </a>
+
+  <div class="rv-sh rv-reveal">
+    <h2>Shop the Sale</h2>
+    <p>{maxSavings > 0 ? `Up to ${maxSavings}% Off · Live Pricing` : 'Curated Offers · Designed In Spain'}</p>
+  </div>
+
+  {showFallbackNote && (
+    <div class="rv-diag">
+      <h3>Showing live discounted products</h3>
+      <p style="font-size:12px;color:#92400e;padding:4px 0">
+        The dedicated Shopify <code>sale</code> collection is still being prepared, so this page is currently pulling products from active compare-at pricing.
+      </p>
+    </div>
+  )}
+
+  {!pageStatus.ok && (
+    <div class="rv-diag">
+      <h3>{pageStatus.reason === 'not_configured' ? 'Shopify not connected' : 'Sale data unavailable'}</h3>
+      <p style="font-size:12px;color:#92400e;padding:4px 0">
+        {pageStatus.message}
+      </p>
+    </div>
+  )}
+
+  {saleProducts.length > 0 ? (
+    <section id="sale-grid">
+      <AllProductsPage
+        products={saleProducts}
+        status={pageStatus}
+        title="Sale"
+        breadcrumbLabel="Sale"
+        kicker="Riva Valencia Sale"
+        metaItems={['Designed In Spain', 'Limited-time pricing']}
+        embedded
+        client:load
+      />
+    </section>
+  ) : (
+    <div class="rv-diag">
+      <h3>No sale products are live right now</h3>
+      <p style="font-size:12px;color:#92400e;padding:4px 0">
+        {pageStatus.ok
+          ? 'Discounted styles will appear here as soon as markdown pricing is active in Shopify.'
+          : pageStatus.message}
+      </p>
+    </div>
+  )}
+
+  <div class="rv-sh rv-reveal">
+    <h2>Shop By Edit</h2>
+    <p>{saleProducts.length} Live Offers · Women, Men, and Accessories</p>
+  </div>
+  <div class="rv-g2">
+    <a class="rv-ec rv-reveal rv-reveal-l" href="/collections/woman-sale">
+      <div class="rv-ph-block">
+        <img
+          src="https://cdn.shopify.com/s/files/1/0812/7738/7010/files/Gemini_Generated_Image_qyjmyeqyjmyeqyjm.png?v=1775935488"
+          alt="Women's Sale"
+          style="width:100%;height:100%;object-fit:cover;"
+          loading="lazy"
+        />
+      </div>
+      <div class="rv-ec-grad"></div>
+      <div class="rv-ec-body">
+        <span class="rv-ec-tag">{womenOfferCount} Styles · Women's Edit</span>
+        <span class="rv-ec-title">Women&apos;s Sale</span>
+        <span class="rv-ec-cta">Shop Now →</span>
+      </div>
+    </a>
+    <a class="rv-ec rv-reveal rv-reveal-r" href="/collections/man-sale">
+      <div class="rv-ph-block">
+        <img
+          src="https://cdn.shopify.com/s/files/1/0812/7738/7010/files/men1.png?v=1775979639"
+          alt="Men's Sale"
+          style="width:100%;height:100%;object-fit:cover;"
+          loading="lazy"
+        />
+      </div>
+      <div class="rv-ec-grad"></div>
+      <div class="rv-ec-body">
+        <span class="rv-ec-tag">{menOfferCount} Styles · Men's Edit</span>
+        <span class="rv-ec-title">Men&apos;s Sale</span>
+        <span class="rv-ec-cta">Shop Now →</span>
+      </div>
+    </a>
+  </div>
+
+
+  {featuredOffers.length > 0 && (
+    <>
+      <div class="rv-sh rv-reveal">
+        <h2>Featured Offers</h2>
+        <p>A sharper edit of the strongest markdowns currently live on site</p>
+      </div>
+      <ProductGrid products={featuredOffers} client:load />
+    </>
+  )}
+
+  <div class="rv-sh rv-reveal">
+    <h2>The Sale Collections</h2>
+    <p>Discover discounted handbags, work essentials, and everyday accessories</p>
+  </div>
+  <div class="rv-feat">
+    <a class="rv-ec rv-reveal rv-reveal-l" href="/collections/sale" style="height:100%">
+      <img
+        src="https://cdn.shopify.com/s/files/1/0812/7738/7010/files/Gemini_Generated_Image_ohy6lqohy6lqohy6.png?v=1776001569"
+        alt="Handbags on Sale"
+        style="aspect-ratio:unset;height:100%;min-height:600px;width:100%;object-fit:cover;"
+        loading="lazy"
+      />
+      <div class="rv-ec-grad"></div>
+      <div class="rv-ec-body">
+        <span class="rv-ec-tag">Sale Edit</span>
+        <span class="rv-ec-title">Handbags</span>
+        <span class="rv-ec-cta">Explore →</span>
+      </div>
+    </a>
+    <div class="rv-feat-r">
+      <a class="rv-ec rv-reveal rv-reveal-r" href="/collections/man-sale">
+        <img
+          src="https://cdn.shopify.com/s/files/1/0812/7738/7010/files/LARGE_BOWLING_duffle_bag_in_leather_in_Black___Saint_Laurent___YSL_EN-US.jpg?v=1776007265"
+          alt="Work Essentials on Sale"
+          style="aspect-ratio:unset;height:100%;min-height:280px;width:100%;object-fit:cover;"
+          loading="lazy"
+        />
+        <div class="rv-ec-grad"></div>
+        <div class="rv-ec-body">
+          <span class="rv-ec-tag">Reduced Pricing</span>
+          <span class="rv-ec-title">Work Essentials</span>
+          <span class="rv-ec-cta">Explore →</span>
+        </div>
+      </a>
+      <a class="rv-ec rv-reveal rv-reveal-r rv-reveal-delay2" href="/collections/accessories">
+        <img
+          src="https://cdn.shopify.com/s/files/1/0812/7738/7010/files/Gemini_Generated_Image_2qiani2qiani2qia.png?v=1775996042"
+          alt="Accessories on Sale"
+          style="aspect-ratio:unset;height:100%;min-height:280px;width:100%;object-fit:cover;"
+          loading="lazy"
+        />
+        <div class="rv-ec-grad"></div>
+        <div class="rv-ec-body">
+          <span class="rv-ec-tag">{accessoriesOfferCount} Styles Live</span>
+          <span class="rv-ec-title">Accessories</span>
+          <span class="rv-ec-cta">Explore →</span>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <a class="rv-fbanner rv-reveal" href="/collections/all">
+    <img
+      src="https://cdn.shopify.com/s/files/1/0812/7738/7010/files/Gemini_Generated_Image_o7rv3fo7rv3fo7rv.png?v=1776093365"
+      alt="Shop the full Products"
+      loading="lazy"
+    />
+    <div class="rv-fbanner-ov"></div>
+    <div class="rv-fbanner-c">
+      <span class="rv-fbanner-tag">Beyond The Sale</span>
+      <span class="rv-fbanner-h2">Explore The Full<br />Collection</span>
+      <span class="rv-fbanner-cta">Discover Now</span>
+    </div>
+  </a>
+
+  <div class="rv-trust">
+    <div class="rv-trust-item rv-reveal">
+      <span class="rv-trust-icon">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+          <rect x="1" y="3" width="15" height="13" rx="1"/>
+          <path d="M16 8h3l4 4v4h-7V8z"/>
+          <circle cx="5.5" cy="18.5" r="2.5"/>
+          <circle cx="18.5" cy="18.5" r="2.5"/>
+        </svg>
+      </span>
+      <p class="rv-trust-h">Delivery</p>
+      <p class="rv-trust-p">Worldwide shipping available with great shipping rates.</p>
+    </div>
+    <div class="rv-trust-item rv-reveal rv-reveal-delay1">
+      <span class="rv-trust-icon">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+          <rect x="1" y="4" width="22" height="16" rx="2"/>
+          <line x1="1" y1="10" x2="23" y2="10"/>
+        </svg>
+      </span>
+      <p class="rv-trust-h">Secure Payment</p>
+      <p class="rv-trust-p">Pay in installments. Several payment methods available.</p>
+    </div>
+    <div class="rv-trust-item rv-reveal rv-reveal-delay2">
+      <span class="rv-trust-icon">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+          <polyline points="23 4 23 10 17 10"/>
+          <path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/>
+        </svg>
+      </span>
+      <p class="rv-trust-h">Returns</p>
+      <p class="rv-trust-p">Easy returns within 30 days.</p>
+    </div>
+    <div class="rv-trust-item rv-reveal rv-reveal-delay3">
+      <span class="rv-trust-icon">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+          <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+        </svg>
+      </span>
+      <p class="rv-trust-h">Customer Service</p>
+      <p class="rv-trust-p">Our team is here to help. Contact us by email.</p>
+    </div>
+  </div>
+
+  <div class="rv-payment rv-reveal">
+    {['VISA','MASTERCARD','AMEX','RAZORPAY'].map((p, i, arr) => (
+      <>
+        <span class="rv-payment-logo">{p}</span>
+        {i < arr.length - 1 && i % 2 === 1 && <span class="rv-payment-sep"></span>}
+      </>
+    ))}
+  </div>
+
+  <div class="rv-rev">
+    <div class="rv-rev-head rv-reveal">
+      <div class="rv-rev-stars-big">★★★★★</div>
+      <h2>What Our Clients Say</h2>
+      <p>4.9 / 5 · Based on 1,240 verified reviews</p>
+    </div>
+    <div class="swiper rv-rev-swiper">
+      <div class="swiper-wrapper">
+        {REVIEWS.map(({ text, author, stars }) => (
+          <div class="swiper-slide">
+            <div class="rv-rev-card rv-reveal">
+              <div class="rv-rev-stars">
+                {Array.from({ length: stars }).map(() => <span>★</span>)}
+              </div>
+              <p class="rv-rev-text">"{text}"</p>
+              <p class="rv-rev-author">— {author}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+
+  <div class="rv-nl">
+    <span class="rv-nl-tag rv-reveal">Exclusive Access</span>
+    <h2 class="rv-reveal">Stay in the Know</h2>
+    <span class="rv-nl-sub rv-reveal">Private sales, new arrivals and stories from our artisans</span>
+    <form class="rv-nl-form" data-newsletter-form data-newsletter-source="sale-collection">
+      <input type="email" class="rv-nl-input" name="email" placeholder="Your email address" required />
+      <button type="submit" class="rv-nl-btn">Subscribe</button>
+    </form>
+    <p class="rv-nl-note" data-newsletter-message aria-live="polite">No spam. Unsubscribe anytime. Read our <a href="/pages/privacy" class="rv-inline-link">Privacy Policy</a>.</p>
+  </div>
+</Layout>
